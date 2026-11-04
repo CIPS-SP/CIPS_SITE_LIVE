@@ -12,7 +12,7 @@ Public website of Channel Island Port Services (cips.agency). Read `README.md` f
 ## The rules of this repo
 - `site/` is everything public and **must be self-contained: no request to any outside server** (no CDNs, fonts, tiles, images, APIs, analytics). The one allowed exception is the CIPS review drop box address in `site/review/config.js`. Links people click are fine.
 - No `../` paths out of `site/`; no files the pages do not use (no notes, tools, backups, old versions); every file under 24 MiB.
-- The globe's ships and flights are **simulated and labelled** (`window.CIPS_LIVE_DATA = false` in `site/index.html`). Never describe them as live.
+- The globe shows **no ships and no flights, and no AIS / flights pills** (4 Nov 2026, Simon: switched off, we may bring them back). The switch is `TRAFFIC: false` in the `options.ais` of `site/index.html` (read in `_beats/globe-live/live.js`); set it to `true` to bring back the simulated fleet, the simulated flights and both pills. They are simulated either way (`window.CIPS_LIVE_DATA = false`): never describe them as live.
 - After changes: `cd tools && npm run tailwind` if classes changed, then `node check.mjs` (about 15 minutes for everything; flags `--desktop --phone --pages --doors`). It must report no missing files, no errors, nothing outside.
 - Verify in a browser before saying something works (headless Chrome via the check, or the browser pane).
 
@@ -23,6 +23,8 @@ Public website of Channel Island Port Services (cips.agency). Read `README.md` f
 
 ## The visitor's vessel (done 4 Nov 2026)
 `site/js/vessel.js` holds where the visitor is sailing from (Mediterranean = Monaco, Northern Europe = Rotterdam, Caribbean = St Maarten; Mediterranean default) and an optional vessel name (Kinship default), kept for the session, announced on `window` as a `cips:vessel` event. The globe's chooser panel (`site/js/globe-enhancements.js`, `arrangeDeparture`) sets it; the globe (`_beats/globe-live/beat.js`, `syncVesselFields`) replans the demo vessel's route and card title from it; the chart scene's tag, the enquiry form's vessel field and the arrival mini-game (`_beats/seaway-wake/game.js`, `YACHT`: the pilot, Coastguard and VTS use the name, and the vessel is "under way from" the chosen port) read it. The berthing and hold-the-line games never named the vessel, so nothing was needed there. "Observe the Channel Islands" and the ship list are gone (hidden, not deleted: the picker code still exists behind them).
+
+The picker carries a **preview of the journey card** (title, "N nm from <place>", destination, what for, speed, ETA) under the choices; it opens on the Mediterranean and follows each choice and the name. Its numbers come from the route the globe plans: `beat.js` (`publishKinRoute`) puts them on `CIPS_VESSEL.route` and fires `cips:route`; the real voyage card in the panel uses the same route (ETA counts down along it). Choosing a departure, or opening the picker, turns the globe to it (`focusOn`); once the journey is under way `tick()` keeps the globe turned to the vessel all the way (as it already did for a routed ship). "Start the journey" folds the picker away (`.voyage-mode`) and leaves the card with "Scroll to continue".
 
 ## Open items (4 Nov 2026)
 - GitHub repo `CIPS-SP/CIPS_SITE_LIVE` exists (private, empty, created by Simon 4 Nov 2026); `origin` is set locally. Push `dev` and `main` only when Simon says push. Still needed: the Cloudflare account/project.

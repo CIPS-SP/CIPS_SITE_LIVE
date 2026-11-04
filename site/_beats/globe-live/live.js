@@ -159,8 +159,15 @@ export async function initLive(g) {
     modePill.querySelector('b').textContent = enabled ? modePill.querySelector('b').dataset.word || 'AIS Loading' : 'AIS Off';
     try { window.dispatchEvent(new CustomEvent('ais:toggle', { detail: { on: enabled } })); } catch (_) {}
   }
+  // 4 Nov 2026, Simon: no ships, no flights and no AIS / flights pills on the globe for now (we may switch them back on later).
+  // The picker, the globe turning to a chosen place and everything else here keep working. options.ais.TRAFFIC:true (index.html) brings it all back.
+  const TRAFFIC = cfg.TRAFFIC !== false;
+  if (!TRAFFIC) {
+    control.style.setProperty('display', 'none', 'important');
+    const off = document.createElement('style'); off.textContent = '[data-live="key"],.lhover{display:none!important}'; document.head.appendChild(off);
+  }
   let flights = null;
-  try { flights = initFlights({ globe, CFG, lonLatToVec3, camera, stage, host, bufferUrl: cfg.SIMULATED_ONLY ? null : cfg.BUFFER_URL, simulated: !!cfg.SIMULATED_ONLY, control, showIn: [0.72, 0.80] }); } catch (e) { console.warn('[flights] not started', e.message); }
+  if (TRAFFIC) try { flights = initFlights({ globe, CFG, lonLatToVec3, camera, stage, host, bufferUrl: cfg.SIMULATED_ONLY ? null : cfg.BUFFER_URL, simulated: !!cfg.SIMULATED_ONLY, control, showIn: [0.72, 0.80] }); } catch (e) { console.warn('[flights] not started', e.message); }
   control.querySelector('button').onclick = () => { enabled = !enabled; try { sessionStorage.setItem('hlc_ais_on', enabled ? '1' : '0'); } catch (_) {} applyEnabled(); };
   // 18 Sep 2026, Simon: the AIS Live / CI Flights words (both wear .lmode — the AIS one above, flights.js's own
   // appended into this same control) are clickable shortcuts into observe mode (beat.js's onObserveJump) — one
@@ -320,6 +327,7 @@ export async function initLive(g) {
   /* --- feed: aisstream.io or simulation --- */
   let sim = null, ws = null, retry = 0;
   function connect() {
+    if (!TRAFFIC) { mode = 'off'; setStatus('traffic switched off', 'sim'); return; }
     if (cfg.SIMULATED_ONLY) { startSim('example ships, not live data'); return; }
     if (!cfg.AIS_KEY || !('WebSocket' in window)) { startSim('no key — simulated fleet'); return; }
     setStatus('connecting to AIS…', 'wait');

@@ -150,8 +150,32 @@ function arrangeDeparture(stage, S) {
   const input = nameBox.querySelector('input');
   if (V.custom) input.value = V.name;
   input.addEventListener('input', () => V.set({ name: input.value }));
+  // 4 Nov 2026, Simon: a preview of the journey card sits under the choices, so the picker opens on the Mediterranean passage and follows each choice (and the
+  // vessel name). Everything it says comes from the route the globe plans (beat.js publishes it as CIPS_VESSEL.route); once "Start the journey" is pressed the picker
+  // folds away (voyage-mode, below) and the real card takes its place.
+  const preview = document.createElement('div');
+  preview.className = 'depart-preview';
+  preview.innerHTML = '<div class="dp-title"></div><div class="dp-dist"></div><div class="dp-rows"></div>';
+  const dpTitle = preview.querySelector('.dp-title'), dpDist = preview.querySelector('.dp-dist'), dpRows = preview.querySelector('.dp-rows');
+  const renderPreview = () => {
+    const r = V.route && V.route.departure === V.departure ? V.route : null;
+    dpTitle.textContent = V.title;
+    dpDist.textContent = r ? r.nmText + ' from ' + V.dep.place : 'From ' + V.dep.place;
+    dpRows.replaceChildren(...(r ? r.rows : []).map(([k, v]) => {
+      const row = document.createElement('div'); row.className = 'dp-row';
+      const a = document.createElement('span'); a.className = 'k'; a.textContent = k;
+      const b = document.createElement('span'); b.className = 'v'; b.textContent = v;
+      row.append(a, b); return row;
+    }));
+  };
+  window.addEventListener('cips:vessel', renderPreview);
+  window.addEventListener('cips:route', renderPreview);
+  renderPreview();
+  // opening the picker turns the globe to the departure already chosen (the Mediterranean unless they were here before)
+  stage.querySelector('[data-g="voyageCtaBtn"]')?.addEventListener('click', () => V.set({}, { focus: true }));
   start.before(group);
   start.before(nameBox);
+  start.before(preview);
   const style = document.createElement('style');
   style.textContent = `
     ${S} [data-live="panel"] [data-live="search"],${S} [data-live="panel"] [data-live="results"],${S} [data-live="panel"] [data-live="expand"],${S} [data-live="panel"] [data-live="status"],
@@ -165,8 +189,16 @@ function arrangeDeparture(stage, S) {
     ${S} .depart-name input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid rgba(255,255,255,.28);border-radius:0;background:rgba(6,10,18,.6);color:#fff;font:500 14px 'Jost',system-ui,sans-serif;letter-spacing:.04em}
     ${S} .depart-name input:focus{outline:0;border-color:#FF8A1E}
     ${S} .depart-name input::placeholder{color:rgba(255,255,255,.45)}
-    ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name{display:none!important}
+    ${S} .depart-preview{margin:16px 0 6px;padding-top:12px;border-top:1px solid rgba(255,138,30,.35)}
+    ${S} .dp-title{font:700 18px/1.2 'Jost',system-ui,sans-serif;color:#FF8A1E;letter-spacing:-.01em;margin:0 0 2px;overflow-wrap:anywhere}
+    ${S} .dp-dist{font:300 12px 'Jost',system-ui,sans-serif;color:#a9cfca;margin:0 0 8px}
+    ${S} .dp-row{display:flex;font:400 12px/1.5 'Jost',system-ui,sans-serif;padding:2px 0;color:rgba(230,238,246,.9)}
+    ${S} .dp-row .k{flex:0 0 92px;color:#9fb1c4;text-transform:uppercase;letter-spacing:.05em;font-size:10px;padding-top:2px}
+    ${S} .dp-row .k::after{content:':'}
+    ${S} .dp-row .v{flex:1 1 auto;min-width:0;color:#fff}
+    ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name,${S}.voyage-mode .depart-preview{display:none!important}
     @media(max-width:820px){
+      ${S} .depart{margin-top:10px}${S} .depart-name{margin:10px 0}${S} .depart-preview{margin-top:10px}${S} .dp-rows .dp-row:nth-child(2){display:none}
       ${S}:not(.globe-intro):not(.following) [data-live="panel"]{top:calc(env(safe-area-inset-top) + 160px)!important;max-height:calc(100vh - 190px);max-height:calc(100dvh - 190px)}
     }
   `;

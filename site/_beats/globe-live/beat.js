@@ -14,7 +14,7 @@ import * as THREE from 'three152';
 import { OrbitControls } from 'three152/addons/controls/OrbitControls.js';
 import * as topojson from 'topojson-client';
 import { CSS2DRenderer, CSS2DObject } from 'three152/addons/renderers/CSS2DRenderer.js';
-import { initLive } from './live.js?v=43';   // the live AIS layer, the status pill, click-a-ship and the captain's picker — on only when options.ais is set
+import { initLive } from './live.js?v=44';   // the live AIS layer, the status pill, click-a-ship and the captain's picker — on only when options.ais is set
 
 export const meta = { order: 1, title: "Globe — live sphere zoom (AIS optional)", site: "CIPS", summary: "The dot-matrix globe flying in, then one continuous zoom — drawn coastline, real night-aerial lights, the HD Jersey plate — replacing globe-dotmatrix + channel-night. Brought in from Howard's HLC Globe Lab, 15 Sep 2026, with the live AIS feed/picker left out." };
 export const defaults = {
@@ -558,6 +558,7 @@ export async function mount(stage, o, ctx){
   // kin.pts / KIN_TRACK / the endScreen/endBearing/endBlend numbers above are all untouched: planVoyageRoute()
   // always merges its tail onto kin.pts.slice(VOYAGE_ROUTE_MERGE_INDEX), so her ending is identical to today.
   const KIN_ORIGIN = { lat: 43.7384, lng: 7.4246 };   // Monaco
+  let kinFaceLL = null, kinFocusMix = 0;   // 4 Nov 2026: where the demo vessel is right now (set every frame in placeKinship) and how firmly the globe is following her (tick)
   let kinRoute = null;   // { pts, cum, total, tailStart } from planVoyageRoute() — set once buildKinship()'s curve (kin.pts) exists, since planVoyageRoute() depends on it for its tail
   // 23 Sep 2026, Simon: widening KIN.show (above) to make her visible early accidentally also dragged the chevron-
   // >sprite crossfade and her pixel-size growth earlier too, for BOTH scripted ships — placeVoyageRoute's own uK
@@ -612,6 +613,7 @@ export async function mount(stage, o, ctx){
   const kinFxSvg = stage.querySelector('[data-g="kinfx"]');
   const kinCalloutCard = stage.querySelector('[data-g="kinCallout"]'), kinCalloutTitle = stage.querySelector('[data-g="kinCalloutTitle"]');
   const kinCalloutRows = [0, 1, 2, 3].map(i => stage.querySelector('[data-g="kinCalloutRow' + i + '"]'));
+  const kinCalloutDist = stage.querySelector('[data-g="kinCalloutDist"]');
   if (VOYAGE_CARD_IN_FINDER && voyageSlot && kinCalloutCard) voyageSlot.appendChild(kinCalloutCard);
   const KIN_AIS_D = 'M7,0 L-5,-4 L-2,0 L-5,4 Z';   // a chevron, tip = bow — same shape channel-night uses, 0deg points +x (east/right)
   let kinAisCore = null, kinAisFlash = null, kinAisGlow = null, kinCalloutLine = null, kinCardSize = null;
@@ -639,7 +641,7 @@ export async function mount(stage, o, ctx){
       // planVoyageRoute() (defined further down, needs kin.pts for its tail) is a plain function declaration,
       // hoisted within this same scope — safe to call here even though its definition appears later in the file.
       syncVesselFields();   // the visitor's departure and vessel name (js/vessel.js), if they have already chosen
-      try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); } catch (e) { console.warn('[globe-live] route from the departure unavailable, falling back to her own track', e); }
+      try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); publishKinRoute(); } catch (e) { console.warn('[globe-live] route from the departure unavailable, falling back to her own track', e); }
     } catch (e) { console.warn('[globe-live] Kinship sprite unavailable', e); }
   }
   // 4 Nov 2026, Simon: the visitor chooses where they are sailing from (js/vessel.js: Mediterranean = Monaco, Northern Europe = Rotterdam, Caribbean = St Maarten)
@@ -651,9 +653,23 @@ export async function mount(stage, o, ctx){
     KIN_ORIGIN.lat = v.dep.lat; KIN_ORIGIN.lng = v.dep.lng; KIN_ORIGIN.name = v.dep.place; KIN_CALLOUT.content.title = v.title;
     const changed = vesselDep !== v.departure; vesselDep = v.departure; return changed;
   }
+  // 4 Nov 2026, Simon: the picker shows a preview of the journey card before "Start the journey" (globe-enhancements.js, arrangeDeparture). The numbers
+  // come from the route planned here, so the preview, the voyage card and the vessel's actual passage always agree: published on window.CIPS_VESSEL.route
+  // and announced as 'cips:route'.
+  const kinFmtNm = nm => (Math.round(nm / 10) * 10).toLocaleString('en-GB') + ' nm';
+  function kinFmtEta(h) {
+    if (h >= 48) { let d = Math.floor(h / 24), r = Math.round(h - d * 24); if (r === 24) { d++; r = 0; } return d + ' days' + (r ? ' ' + r + ' hrs' : ''); }
+    return h >= 1.5 ? Math.round(h) + ' hrs' : Math.max(1, Math.round(h * 60)) + ' mins';
+  }
+  function publishKinRoute() {
+    const v = window.CIPS_VESSEL; if (!v || !kinRoute) return;
+    const kts = KIN_CALLOUT.content.speedKts, eta = kinFmtEta(kinRoute.total / kts);
+    v.route = { departure: v.departure, from: KIN_ORIGIN.name, nm: kinRoute.total, nmText: kinFmtNm(kinRoute.total), etaText: eta, rows: KIN_CALLOUT.content.rows.map(r => r[0] === 'ETA' ? ['ETA', eta] : r) };
+    try { window.dispatchEvent(new CustomEvent('cips:route', { detail: v.route })); } catch (_) {}
+  }
   window.addEventListener('cips:vessel', e => {
     const changed = syncVesselFields();
-    if (changed && kin) { try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); console.log('[globe-live] departure', KIN_ORIGIN.name, Math.round(kinRoute.total), 'nm'); } catch (err) { console.warn('[globe-live] route from', KIN_ORIGIN.name, 'unavailable', err); } }
+    if (changed && kin) { try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); publishKinRoute(); console.log('[globe-live] departure', KIN_ORIGIN.name, Math.round(kinRoute.total), 'nm'); } catch (err) { console.warn('[globe-live] route from', KIN_ORIGIN.name, 'unavailable', err); } }
     if (e.detail && e.detail.focus) live?.focusOn?.(KIN_ORIGIN.lng, KIN_ORIGIN.lat);   // choosing a departure turns the globe to it
   });
   // 25 Sep 2026, Simon: "try something else" — a nautical convention instead of an abstract heading offset. The
@@ -731,7 +747,7 @@ export async function mount(stage, o, ctx){
     // "just appeared" burst this pulse curve already has at u≈0 (wave/burst below), instead of waiting on scroll.
     const u = (voyageMonitorMode || voyageRouteMode || kinDismissed) ? 0 : Math.max(smooth(KIN.show[0], KIN.show[1], p), voyageExampleArmed ? 0.0001 : 0);   // 17 Sep 2026: Phase 4's own scripted ship uses this same hide branch while she's up — the two scripted ships are never shown at once
     if (u <= 0) {
-      kin.mat.opacity = 0;
+      kin.mat.opacity = 0; kinFaceLL = null;
       if (kinAisCore) { kinAisCore.style.opacity = '0'; kinAisFlash.style.opacity = '0'; kinAisGlow.style.opacity = '0'; }
       if (kinCalloutCard) { kinCalloutCard.style.opacity = '0'; kinCalloutLine.style.opacity = '0'; }
       return;
@@ -749,6 +765,7 @@ export async function mount(stage, o, ctx){
       const a = kin.pts[i], b = kin.pts[i + 1]; n = a.clone().lerp(b, t).normalize();
       fwd = b.clone().sub(a).normalize();
     }
+    { const ll0 = vec3ToLonLat(n); kinFaceLL = { lon: ll0.lon, lat: ll0.lat }; }   // 4 Nov 2026: tick() keeps the globe turned to her (any departure), as it already did for a routed ship
     // the match cut: blend her onto the screen point seaway-wake opens on, heading east, over endBlend
     const w = smooth(KIN.endBlend[0], KIN.endBlend[1], p);
     if (w > 0) {
@@ -849,9 +866,10 @@ export async function mount(stage, o, ctx){
         // ETA — live, from her real distance-to-go (great-circle) at 14kts, not a fixed placeholder; counts down as
         // she closes in. Was kinAlongTrackLL(u) (walked the old fixed KIN_TRACK by index) — now her actual sampled
         // position (n), same technique placeVoyageRoute uses for its own Position row (vec3ToLonLat returns {lat,lon}).
-        const llNow = vec3ToLonLat(n);
-        const distNm = kinHaversineNm({ lat: llNow.lat, lng: llNow.lon }, co.content.destination), etaHrs = distNm / co.content.speedKts;
-        const etaVal = etaHrs >= 1.5 ? Math.round(etaHrs) + ' hrs' : Math.max(1, Math.round(etaHrs * 60)) + ' mins';
+        let etaVal;
+        if (kinRoute) etaVal = kinFmtEta(kinRoute.total * (1 - kinRouteProgress(kinRoute, p)) / co.content.speedKts);   // 4 Nov 2026: from the route still to run (it was the straight line to St Helier), so it agrees with the preview in the picker and counts down as she sails
+        else { const llNow = vec3ToLonLat(n), etaHrs = kinHaversineNm({ lat: llNow.lat, lng: llNow.lon }, co.content.destination) / co.content.speedKts; etaVal = kinFmtEta(etaHrs); }
+        if (kinCalloutDist) { const vr = window.CIPS_VESSEL && window.CIPS_VESSEL.route, dt = vr && vr.departure === window.CIPS_VESSEL.departure ? vr.nmText + ' from ' + vr.from : ''; if (kinCalloutDist.textContent !== dt) kinCalloutDist.textContent = dt; }
         co.content.rows.forEach((r, idx) => kinTypeRow(kinCalloutRows[idx], r[0], r[0] === 'ETA' ? etaVal : r[1], (typeU - co.in[0] - step * (idx + 1)) / step));
       } else { kinCalloutLine.style.opacity = '0'; }
     }
@@ -2188,6 +2206,13 @@ export async function mount(stage, o, ctx){
       const shipFocusFade = 1 - smooth(VOYAGE_ROUTE.endBlend[0], VOYAGE_ROUTE.endBlend[1], p);
       if (shipFocusFade > 0) globe.quaternion.slerp(faceQuat(voyageRouteFaceLL.lon, voyageRouteFaceLL.lat), routeFocusMix * shipFocusFade);
     } else if (routeFocusMix > 0) { routeFocusMix = 0; }
+    // 4 Nov 2026, Simon: the same for the demo vessel from whichever departure was chosen (Monaco, Rotterdam, St Maarten): the globe stays turned to her
+    // through the passage, easing back out over her own match-cut window, before the Jersey pull below takes over.
+    if (kinFaceLL && !voyageRouteMode && p > 0.002) {
+      kinFocusMix = Math.min(1, kinFocusMix + 0.03 * f);
+      const kinFade = 1 - smooth(KIN.endBlend[0], KIN.endBlend[1], p);
+      if (kinFade > 0) globe.quaternion.slerp(faceQuat(kinFaceLL.lon, kinFaceLL.lat), kinFocusMix * kinFade);
+    } else if (kinFocusMix > 0) { kinFocusMix = 0; }
     // HLC lab — the deep zoom: from 70% the camera keeps coming, exponentially (constant perceived rate), down to CLOSE_DEPTH above
     // Jersey, while the globe eases from the archipelago-centred frame to Jersey-centred, north up
     const z2 = smooth(0.70, 1.0, p);
