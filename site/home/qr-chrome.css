@@ -1,0 +1,8 @@
+/* The site header and footer on the home page: graphite, to match the dark panels (--panel #0d1319) and the globe. */
+#header{background:rgba(13,19,25,.94);border-bottom-color:rgba(255,255,255,.07)}
+footer.qrfoot{background:#0d1319;border-top:1px solid rgba(255,255,255,.07)}
+.qrfoot h4.eyebrow{color:#4fb0e4}
+.qrfoot a.text-goldl{color:#fff}
+.qrfoot a.text-goldl:hover{color:#4fb0e4}
+/* 24 Oct 2026, phone check: footer links were 20px tall, too small a target for a thumb */
+@media(max-width:760px){footer.qrfoot ul a,footer.qrfoot li>a{display:inline-block;padding:7px 0}}

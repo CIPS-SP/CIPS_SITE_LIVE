@@ -1,7 +1,5 @@
 # CIPS Site LIVE
 
-> **Status: not released yet.** `main` holds no site until the first release. The site is being prepared on `dev`.
-
 The public CIPS website (cips.agency): **only what the live site needs, self-contained, nothing borrowed from outside.**
 
 ## The two branches

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="js/dev-device.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Log in to CIPS Desk LIVE | Channel Island Port Services</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="256x256" href="images/brand/favicon-256.png">
+<link rel="apple-touch-icon" href="images/brand/favicon-180.png">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root{--bg:#fafaf8;--ink:#0c1116;--ink2:#5b646d;--line:#e3e4e0;--accent:#2a5fb0;--panel:#0d1319}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:400 17px/1.5 'Inter Tight',system-ui,sans-serif;
+    background-image:linear-gradient(rgba(224,30,160,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(224,30,160,.12) 1px,transparent 1px);background-size:100% 120px,120px 100%}
+  header{background:rgba(13,19,25,.94);border-bottom:1px solid rgba(255,255,255,.07)}
+  header .in{max-width:1280px;margin:0 auto;height:74px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+  header img{height:40px;display:block}
+  header a.back{color:#d9dfe5;text-decoration:none;font-size:15px}
+  header a.back:hover{color:#fff}
+  main{flex:1;display:flex;flex-direction:column;align-items:center;gap:44px;padding:56px 16px 64px}
+  .card{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);padding:36px 34px 32px;box-shadow:0 30px 60px -28px rgba(12,17,22,.25)}
+  .eyebrow{font:500 12px 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font:300 40px/1.1 'Inter Tight',sans-serif;letter-spacing:-.02em;margin:0 0 8px}
+  h1 span{background:linear-gradient(90deg,#9a4dff,#4fb0e4,#45d3bb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p.lead{margin:0 0 24px;color:var(--ink2);font-size:16.5px}
+  label{display:block;margin:16px 0 6px;font:500 11.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  input{width:100%;height:48px;padding:0 14px;font:400 16px 'Inter Tight',sans-serif;color:var(--ink);background:#fff;border:1px solid #cfd3d0;border-radius:0}
+  input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  button{margin-top:22px;width:100%;height:50px;border:0;background:var(--ink);color:#fff;font:500 16px 'Inter Tight',sans-serif;cursor:pointer}
+  button:hover{background:#1c2733}
+  .note{display:none;margin:18px 0 0;padding:12px 14px;background:#f4f0ff;border:1px solid #ddd0ff;color:#3e2a80;font-size:15px}
+  .note.on{display:block}
+  .new{width:100%;max-width:900px;background:#fff;border:1px solid var(--line);padding:34px 34px 32px}
+  .new h2{font:300 32px/1.15 'Inter Tight',sans-serif;letter-spacing:-.02em;margin:0 0 8px}
+  .new h2 span{background:linear-gradient(90deg,#9a4dff,#4fb0e4,#45d3bb);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .new p.lead{margin:0 0 22px;max-width:40em}
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 24px}
+  .strip a{display:block;color:inherit;text-decoration:none}
+  .strip img{display:block;width:100%;height:auto;border:1px solid var(--line);background:#f3f2ef;transition:box-shadow .25s,transform .25s}
+  .strip a:hover img,.strip a:focus-visible img{box-shadow:0 18px 36px -18px rgba(12,17,22,.35);transform:translateY(-2px)}
+  .strip span{display:block;margin-top:8px;font:500 11.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .btns{display:flex;flex-wrap:wrap;gap:12px}
+  .btns a{display:inline-flex;align-items:center;height:48px;padding:0 22px;font:500 16px 'Inter Tight',sans-serif;text-decoration:none;border:1px solid var(--ink);color:var(--ink)}
+  .btns a.pri{background:var(--ink);color:#fff}.btns a.pri:hover{background:#1c2733}.btns a:not(.pri):hover{background:#f3f4f0}
+  .cn{margin:16px 0 0;font:400 11.5px 'JetBrains Mono',monospace;letter-spacing:.04em;color:#8a929a}
+  @media(max-width:720px){.strip{grid-template-columns:1fr 1fr}.new{padding:26px 20px}}
+  .tag{margin:14px 0 0;font:400 11.5px 'JetBrains Mono',monospace;letter-spacing:.06em;color:#8a929a}
+  footer{padding:20px 32px;text-align:center;font-size:13.5px;color:var(--ink2)}
+</style>
+</head>
+<body>
+<header><div class="in"><a href="index.html" aria-label="Channel Island Port Services: home"><img src="images/brand/logo-long-white.png" alt="Channel Island Port Services"></a><a class="back" href="index.html#deskl">← Back to the site</a></div></header>
+<main>
+  <div class="card">
+    <p class="eyebrow">CIPS Desk LIVE</p>
+    <h1>Log <span>in.</span></h1>
+    <p class="lead">For clients with a CIPS Desk LIVE view of their vessels.</p>
+    <form id="login" novalidate>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="username" placeholder="you@company.com">
+      <label for="pw">Password</label>
+      <input id="pw" name="pw" type="password" autocomplete="current-password">
+      <button type="submit">Log in</button>
+      <p class="note" id="note" role="status">Log in isn't switched on yet. This page is a preview of how it will look.</p>
+    </form>
+    <p class="tag">PREVIEW · NOTHING YOU TYPE HERE IS SENT OR SAVED</p>
+  </div>
+  <section class="new" aria-labelledby="newh">
+    <p class="eyebrow">Not a client yet?</p>
+    <h2 id="newh">New to CIPS Desk <span>LIVE?</span></h2>
+    <p class="lead">A private, live view of your vessels' calls with us: arrival times and status, our updates, crew travel, documents and accounts. Set up by arrangement, for the clients who want it.</p>
+    <div class="strip">
+      <a href="desk-live.html"><img src="images/desk/desk-live-shipping.webp" alt="Concept screen for a ship operator" width="2000" height="944"><span>Ship operators</span></a>
+      <a href="desk-live.html"><img src="images/desk/desk-live-yachting.webp" alt="Concept screen for a yacht captain" width="2000" height="944" loading="lazy"><span>Yachts</span></a>
+      <a href="desk-live.html"><img src="images/desk/desk-live-cruise.webp" alt="Concept screen for a cruise line" width="2000" height="944" loading="lazy"><span>Cruise lines</span></a>
+      <a href="desk-live.html"><img src="images/desk/desk-live-offshore.webp" alt="Concept screen for an offshore operator" width="2000" height="944" loading="lazy"><span>Offshore</span></a>
+    </div>
+    <div class="btns"><a class="pri" href="desk-live.html">See what it does →</a><a href="index.html#contact">Talk to us</a></div>
+    <p class="cn">Concept screens: every name, vessel and figure is made up.</p>
+  </section>
+</main>
+<footer>© 2026 Channel Island Port Services · 24/7 duty agent +44 7797 720 723</footer>
+<script>
+  // Placeholder only: no sign-in yet. The form never submits anywhere.
+  document.getElementById("login").addEventListener("submit", function(e){
+    e.preventDefault();
+    document.getElementById("note").classList.add("on");
+  });
+</script>
+</body>
+</html>

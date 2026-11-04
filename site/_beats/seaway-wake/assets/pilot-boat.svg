@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" width="200" height="64">
+  <!-- Jersey pilot launch, plan view, bow to the RIGHT. Grey deck, grey fendered strake, yellow wheelhouse, HI-VIS ORANGE cab top. ~12 m. -->
+  <defs>
+    <linearGradient id="deck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfd6d8"/><stop offset=".5" stop-color="#eaeef0"/><stop offset="1" stop-color="#c3cacd"/></linearGradient>
+    <filter id="sh" x="-10%" y="-30%" width="120%" height="160%"><feDropShadow dx="1.2" dy="1.6" stdDeviation="1.4" flood-color="#021c1e" flood-opacity=".45"/></filter>
+  </defs>
+  <g filter="url(#sh)">
+    <!-- hull: fine entry at the bow, fuller aft -->
+    <path d="M8 10 L60 7 L120 6 C150 7 178 16 199 32 C178 48 150 57 120 58 L60 57 L8 54 Z" fill="#5a6468"/>
+    <path d="M12 14 L60 11 L120 10 C147 11 170 19 189 32 C170 45 147 53 120 54 L60 53 L12 50 Z" fill="url(#deck)"/>
+    <!-- wheelhouse (yellow) with hi-vis orange roof + white trim -->
+    <rect x="52" y="14" width="62" height="36" rx="6" fill="#f2c21b"/>
+    <rect x="58" y="18" width="50" height="28" rx="5" fill="#ff6a00"/>
+    <rect x="62" y="21" width="42" height="22" rx="4" fill="none" stroke="#fff6ea" stroke-width="1.4"/>
+    <!-- mast + radar -->
+    <circle cx="80" cy="32" r="3.2" fill="#e9eef0" stroke="#7b8589" stroke-width=".8"/>
+    <line x1="80" y1="15" x2="80" y2="49" stroke="#9aa4a8" stroke-width="1.2"/>
+    <!-- lifebuoys, foredeck hatch -->
+    <circle cx="46" cy="19" r="3.2" fill="none" stroke="#ff6a1a" stroke-width="2.2"/>
+    <circle cx="46" cy="45" r="3.2" fill="none" stroke="#ff6a1a" stroke-width="2.2"/>
+    <rect x="136" y="26" width="14" height="12" rx="2" fill="#b9c1c5"/>
+    <text x="83" y="35.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="7.5" fill="#fff6ea">PILOT</text>
+  </g>
+</svg>

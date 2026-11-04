@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 54 60 46" width="60" height="46">
+  <!-- Noirmont Point light tower (Simon's own photo, 1 Oct 2026): a short black-white-black banded cylinder
+       standing directly on bare rock — no masonry plinth or building, unlike Corbière. 1 Oct, Simon's second
+       pass: "a bit shorter and wider, remove the black frame from the top" — tower widened/shortened, the open
+       lattice day-mark platform that used to sit above the gallery ring is gone, just the ring itself remains.
+       2 Oct 2026, Simon: "move the noirmont point light to be just on top of the tower, it's too far away" — the
+       artwork was drawn on a 60x100 canvas with the tower only starting ~57 units down, so ~55% of the image was
+       empty sky above it and the light dot (stacked above the icon) floated far off. viewBox cropped to start
+       just above the gallery ring; the drawing itself is unchanged. -->
+  <!-- rock -->
+  <path d="M2 92 Q10 82 20 86 Q28 80 36 85 Q46 78 58 88 L60 100 L0 100 Z" fill="#8a5a42"/>
+  <path d="M6 94 Q16 88 26 92 Q38 86 50 93 L52 100 L4 100 Z" fill="#9c6a4e"/>
+  <!-- lean-to shed at the base -->
+  <rect x="6" y="78" width="12" height="10" fill="#e9e6df" stroke="#aaa" stroke-width=".6"/>
+  <path d="M6 78 L12 72 L18 78 Z" fill="#c7c2b8"/>
+  <!-- tower: black / white / black bands, shorter and wider -->
+  <path d="M18 80 L18 62 Q18 58 23 58 L37 58 Q42 58 42 62 L42 80 Z" fill="#17181a"/>
+  <rect x="17.3" y="65" width="25.4" height="10" fill="#f3f2ee"/>
+  <!-- gallery ring on top — no frame/platform above it -->
+  <rect x="15" y="57" width="30" height="2.4" rx="1" fill="#e9e6df"/>
+</svg>

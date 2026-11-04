@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<script src="js/dev-device.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Channel Island Port Services (CIPS) — The Channel Islands' Leading Port Agency</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="images/brand/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="256x256" href="images/brand/favicon-256.png" />
+  <link rel="apple-touch-icon" href="images/brand/favicon-180.png" />
+  <meta name="description" content="CIPS is the Channel Islands' leading port agency. Your partner at the Atlantic Gateway — bunkering, ground handling, crew & guest services, customs clearance and more. 24/7 service across Jersey, Guernsey, Alderney, the UK, France and beyond." />
+  <meta name="theme-color" content="#1A1D22" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Channel Island Port Services (CIPS)" />
+  <meta property="og:description" content="The Channel Islands' leading port agency. Excellence from Ship to Shore." />
+  <meta property="og:type" content="website" />
+
+<link rel="stylesheet" href="fonts/fonts.css">
+
+  <link rel="stylesheet" href="./_beats/runtime/beats.css">
+  <link rel="stylesheet" href="home/qr-home.css">
+  <link rel="stylesheet" href="home/qr-chrome.css">
+  <script>window.CIPS_LIVE_DATA = false; /* go-live build: simulated ships and flights only */</script>
+  <script type="importmap">{ "imports": {
+  "three": "./_beats/_vendor/three-0.165.0/three.module.js",
+  "three/addons/": "./_beats/_vendor/three-0.165.0/addons/",
+  "three152": "./_beats/_vendor/three-0.152.2/three.module.js",
+  "three152/addons/": "./_beats/_vendor/three-0.152.2/addons/",
+  "topojson-client": "./_beats/_vendor/topojson-client-3.1.0/index.js"
+}}</script>
+
+  <style>
+    html, body { -webkit-font-smoothing: antialiased; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #FBFAF7; color: #1e293b; }
+
+    .font-display { font-family: 'Montserrat', system-ui, sans-serif; font-weight:600; letter-spacing:-.015em; }
+
+    /* Hero atmospheric background */
+    .hero-bg {
+      background:
+        radial-gradient(1200px 600px at 78% -10%, rgba(74,144,194,0.35), transparent 60%),
+        radial-gradient(900px 500px at 8% 110%, rgba(0,128,192,0.18), transparent 55%),
+        linear-gradient(160deg, #1A1D22 0%, #23262C 45%, #30343C 100%);
+    }
+
+    /* Hero with photograph */
+    .hero-photo {
+      background:
+        radial-gradient(1100px 600px at 80% -10%, rgba(74,144,194,0.30), transparent 60%),
+        linear-gradient(120deg, rgba(10,26,47,0.94) 0%, rgba(10,26,47,0.78) 42%, rgba(18,49,90,0.55) 100%),
+        url('images/hero.jpg') center/cover no-repeat;
+    }
+
+    /* Image tiles */
+    .tile { position: relative; overflow: hidden; border-radius: 1.25rem; }
+    .tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition: transform .8s ease; }
+    .tile:hover img { transform: scale(1.06); }
+    .tile-shade { position:absolute; inset:0; background: linear-gradient(180deg, rgba(8,17,31,0) 30%, rgba(8,17,31,0.35) 55%, rgba(8,17,31,0.92) 100%); }
+    .tile-num { font-family:'Montserrat',serif; }
+
+    /* ===================== ARRIVAL ANIMATION ===================== */
+    #arrival .scene { width:100%; height:auto; display:block; }
+    #arrival svg text { font-family:'Inter',sans-serif; }
+    #arrival .fr { font-family:'Montserrat',serif; }
+
+    /* ambient (always running) */
+    #arrival .wave  { animation: cipsWave 7s linear infinite; }
+    #arrival .wave2 { animation: cipsWave 11s linear infinite; }
+    #arrival .shimmer   { animation: cipsShim 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin:center; }
+    #arrival .plane     { animation: cipsFly 10s linear infinite; transform-box: fill-box; }
+    #arrival .berthPulse{ animation: cipsPulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin:center; }
+    #arrival .shipBob   { animation: cipsBob 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin:center; }
+    #arrival .gull      { animation: cipsFly 16s linear infinite; transform-box: fill-box; }
+
+    /* build (needs .play). Base state = final/visible for graceful no-JS fallback */
+    #arrival.play .ship { animation: cipsSail 2.1s cubic-bezier(.22,.61,.36,1) both; transform-box: fill-box; }
+    #arrival.play .wake { animation: cipsWake 2.1s ease-out both; transform-box: fill-box; transform-origin:center; }
+    #arrival.play .card { animation: cipsPop .8s cubic-bezier(.34,1.56,.64,1) both; transform-box: fill-box; transform-origin:50% 100%; }
+    #arrival.play .conn { animation: cipsDraw .7s ease-out both; }
+
+    #arrival.play .c1{animation-delay:1.55s}  #arrival.play .n1{animation-delay:1.70s}
+    #arrival.play .c2{animation-delay:1.80s}  #arrival.play .n2{animation-delay:1.95s}
+    #arrival.play .c3{animation-delay:2.05s}  #arrival.play .n3{animation-delay:2.20s}
+    #arrival.play .c4{animation-delay:2.30s}  #arrival.play .n4{animation-delay:2.45s}
+    #arrival.play .c5{animation-delay:2.55s}  #arrival.play .n5{animation-delay:2.70s}
+    #arrival.play .c6{animation-delay:2.80s}  #arrival.play .n6{animation-delay:2.95s}
+
+    @keyframes cipsSail { 0%{transform:translateX(760px)} 72%{transform:translateX(-12px)} 100%{transform:translateX(0)} }
+    @keyframes cipsBob  { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-4px) rotate(-.5deg)} }
+    @keyframes cipsWake { 0%{opacity:0} 55%{opacity:0} 80%{opacity:.5} 100%{opacity:.28} }
+    @keyframes cipsPop  { 0%{opacity:0; transform:translateY(26px) scale(.55)} 60%{opacity:1; transform:translateY(-5px) scale(1.05)} 100%{opacity:1; transform:translateY(0) scale(1)} }
+    @keyframes cipsDraw { from{stroke-dashoffset:100} to{stroke-dashoffset:0} }
+    @keyframes cipsFly  { 0%{transform:translateX(-240px)} 100%{transform:translateX(1460px)} }
+    @keyframes cipsWave { 0%{transform:translateX(0)} 100%{transform:translateX(-140px)} }
+    @keyframes cipsPulse{ 0%,100%{opacity:.25; transform:scale(1)} 50%{opacity:.75; transform:scale(1.4)} }
+    @keyframes cipsShim { 0%,100%{opacity:.28} 50%{opacity:.6} }
+
+    #replayBtn:hover { background:#30343C; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #arrival .wave, #arrival .wave2, #arrival .shimmer, #arrival .plane, #arrival .berthPulse,
+      #arrival .shipBob, #arrival .gull, #arrival.play .ship, #arrival.play .wake,
+      #arrival.play .card, #arrival.play .conn { animation: none !important; }
+    }
+
+    /* Faint latitude/sonar lines */
+    .lat-lines {
+      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 64px);
+    }
+
+    .eyebrow { letter-spacing: 0.28em; text-transform: uppercase; font-weight: 600; }
+
+    /* Nav link underline */
+    .nav-link { position: relative; }
+    .nav-link::after {
+      content: ''; position: absolute; left: 0; bottom: -6px; height: 2px; width: 0;
+      background: #0080C0; transition: width .3s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Reveal on scroll */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+
+    .card-hover { transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 24px 50px -24px rgba(10,26,47,0.35); }
+
+    .btn-gold { background: linear-gradient(180deg,#4FB0E4,#0080C0); color: #fff; }
+    .btn-gold:hover { filter: brightness(1.05); box-shadow: 0 14px 30px -12px rgba(0,128,192,0.6); }
+
+    ::selection { background: #0080C0; color: #fff; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 11px; }
+    ::-webkit-scrollbar-track { background: #1A1D22; }
+    ::-webkit-scrollbar-thumb { background: #30343C; border-radius: 20px; border: 2px solid #1A1D22; }
+    ::-webkit-scrollbar-thumb:hover { background: #1C5D82; }
+
+    .divider-anchor { color: #0080C0; }
+
+    /* ===================== CINEMATIC ARRIVAL ===================== */
+    #arrival.cinema { position: relative; background:#06121f; }
+    .cinema-track { position: relative; height: 560vh; }
+    .cinema-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background:#06121f; }
+    .cscene {
+      position:absolute; inset:0; background-size:cover; background-position:center;
+      opacity:0; transform:scale(1.06); will-change:opacity, transform;
+    }
+    .cscene.first { opacity:1; }
+    .cinema-veil {
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(6,12,20,.62) 0%, rgba(6,12,20,.12) 26%, rgba(6,12,20,.30) 58%, rgba(6,12,20,.94) 100%),
+        radial-gradient(120% 80% at 50% 120%, rgba(0,128,192,.14), transparent 60%);
+    }
+    .cinema-caption {
+      position:absolute; left:0; right:0; bottom:28%; text-align:center; padding:0 6vw; color:#fff;
+      will-change:opacity, transform;
+    }
+    .cinema-eyebrow { text-transform:uppercase; letter-spacing:.30em; font-size:12px; font-weight:600; color:#4FB0E4; margin-bottom:18px; }
+    .cinema-caption .ctitle { font-family:'Montserrat', Georgia, serif; font-weight:500; font-size:clamp(30px, 5.4vw, 66px); line-height:1.04; text-shadow:0 4px 30px rgba(0,0,0,.5); }
+    .cinema-caption .csub { margin:16px auto 0; max-width:34em; color:rgba(247,244,238,.82); font-size:clamp(15px, 1.6vw, 20px); line-height:1.55; text-shadow:0 2px 20px rgba(0,0,0,.5); }
+    .cinema-chips { position:absolute; left:0; right:0; bottom:8%; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; padding:0 5vw; }
+    .cchip {
+      display:inline-flex; align-items:center; gap:9px; padding:9px 17px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.16); background:rgba(10,26,47,.34); backdrop-filter:blur(8px);
+      color:rgba(247,244,238,.58); font-size:13px; font-weight:500; transition:color .5s ease, background .5s ease, border-color .5s ease, box-shadow .5s ease, transform .5s ease;
+    }
+    .cchip .dot { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.7; }
+    .cchip.on { color:#fff; background:linear-gradient(180deg,#4FB0E4,#0080C0); border-color:transparent; box-shadow:0 10px 26px -10px rgba(0,128,192,.6); transform:translateY(-2px); }
+    .cinema-hint { position:absolute; right:26px; bottom:26px; color:rgba(247,244,238,.55); font-size:11px; letter-spacing:.24em; }
+    .cinema-hint span { display:inline-block; margin-left:4px; animation: cinemaBounce 1.8s ease-in-out infinite; }
+    @keyframes cinemaBounce { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(4px) } }
+    .cinema-progress { position:absolute; left:0; bottom:0; height:3px; width:100%; background:rgba(255,255,255,.10); }
+    .cinema-progress > span { display:block; height:100%; width:0; background:linear-gradient(90deg,#0080C0,#4FB0E4); }
+    @media (max-width:640px){ .cinema-chips{ display:none; } .cinema-caption{ bottom:24%; } .cinema-track{ height:520vh; } }
+    @media (prefers-reduced-motion: reduce){
+      .cinema-track{ height:auto; } .cinema-stage{ position:relative; height:70vh; }
+      .cscene{ opacity:1; transform:none; } .cscene:not(.first){ display:none; }
+    }
+
+    /* ===================== FILM: SHIP COMES TO LIFE ===================== */
+    #arrival.film-sec { position:relative; background:#06121f; }
+    .film-stage { position:relative; height:92vh; min-height:560px; overflow:hidden; background:#06121f; }
+    .film { position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+      filter: grayscale(1) sepia(.35) saturate(.25) contrast(.9) brightness(.72); will-change:filter; }
+    .film-grade-veil { position:absolute; inset:0; pointer-events:none;
+      background: linear-gradient(180deg, rgba(6,12,20,.55) 0%, rgba(6,12,20,.06) 24%, rgba(6,12,20,.20) 55%, rgba(6,12,20,.93) 100%); }
+    #arrival.film-sec .cinema-caption { bottom:30%; }
+    @media (max-width:640px){ #arrival.film-sec .cinema-caption { bottom:26%; } .film-stage{ height:82vh; } }
+
+    /* ===================== GLOBE OPENING ACT ===================== */
+    #openingAct { position:relative; z-index:1; background:#04070e; }
+    /* 31 Oct 2026, Simon: the journey ends by shrinking its whole frame into the hero picture (st-helier-approach/finale.js sets has-finale on <html>). For that the home page starts one window height early, so the hero rises up
+       beneath the shrinking frame during the last window of the scroll; the dark moves from the opening act's own background onto the pinned stage (so what the shrinking frame leaves behind is the page); and the wave goes. */
+    html.has-finale .qr { margin-top:-100vh; margin-top:-100svh; }
+    html.has-finale #homeWave { display:none; }
+    html.has-finale #openingAct { background:transparent; }
+    /* 1 Nov 2026, Simon: once the visitor is settled on the main site the journey above it can no longer be reached (the hold stops it), so it is collapsed: the document then really starts at the main site and a scrollbar drag or a touch fling cannot carry the page above it (they are scrolled by the browser's own thread, which no script can stop in time). The beats are clipped away (not removed), so they stop being seen by the runtime. */
+    html.main-collapsed { overflow-anchor:none; }
+    html.main-collapsed #openingAct { height:0 !important; min-height:0 !important; overflow:hidden !important; }
+    html.main-collapsed .qr { margin-top:var(--hdr, 74px) !important; }   /* the space between the banner and the hero (1 Nov 2026, Simon) */
+    /* 31 Oct 2026, Simon: the Replay the journey button (and every other button in the hero) did nothing: with the finale the home page starts a window early, under the end of the opening act, and that section catches the clicks. Once the page is on the main site, nothing in the opening act takes clicks. */
+    html.on-cips-main #openingAct, html.on-cips-main #openingAct * { pointer-events:none !important; }
+    /* 31 Oct 2026, Simon: no chapter text for now: the captions over the beats (the globe's second caption 'Some ships pass by. Some call in.', the Cloud pass title and copy, and the Seaway, Noirmont and St Helier captions). The globe's opening card (heading, 'Play the journey' and Skip buttons) is not a chapter caption and stays. Delete this rule to bring them back. */
+    .beat-globe-live .globeCopy2, .beat-cloud-pass .title, .beat-cloud-pass .copy, .beat-seaway-wake .scopy, .beat-noirmont-transit .scopy, .beat-st-helier-approach .scopy { display:none !important; }
+    html.has-finale .beat-group > .beat-stage { background:#04070e; }
+    /* live.js's #aisControl strip is built for a bare page with nothing above it; CIPS/site has a slim top bar
+       (~39.5px, scrolls away) plus its own 75px-tall sticky #header (z-50) above it — ~114.5px worst case, at
+       scrollY 0 where this strip first appears. Push the strip (and the beat's own colour key/picker, which
+       live.js positions relative to the same 9vh) down to clear that — 16 Sep 2026, bringing globe-live-site
+       into master. #aisControl is deliberately position:fixed (stays up throughout the whole page), so it can't
+       track the header's own shrink-on-scroll — sized for the tallest (initial, un-scrolled) case instead. */
+    #aisControl { top: 124px !important; }
+    .beat-globe-live .lkey, .beat-globe-live .lpanel, .beat-globe-live .lreopen { top: 160px !important; }   /* below #aisControl's own ~30px height + a clear gap, not just its top — .lreopen added 17 Sep 2026: same top:9vh base as .lpanel in beat.css, same header-clearance problem, was sitting under the site header (found testing "Change ship" — the pill visually showed but click-through to the header intercepted it) */
+    .beat-globe-live .lreopen.lenter { top: calc(160px + 44px) !important; }   /* 17 Sep 2026: "Enter the approaches" stacks under "Change ship" — same header-clearance fix as above, offset down by one pill's height+gap rather than landing on the same 160px and overlapping it */
+    @media (max-width:820px) {   /* below this width live.js's own CSS already moves .lpanel to bottom-anchored (top:auto) and hides .lkey — leave those, just clear the header for the strip */
+      #aisControl { top: 120px !important; }
+      /* 18 Sep 2026: .lreopen's two rules above are unconditional (!important, no media guard) — below 820px they
+         fought beat.css's OWN mobile rule for this pill (top:auto;bottom:4vh, beat.css), which needs top:auto to
+         anchor from the bottom; with both top:160px and bottom:4vh active at once the element stretched to fill
+         the gap between them (found testing "Change ship" on a phone width: the pill rendered as a ~620px-tall
+         capsule covering most of the screen, not a normal pill — Simon: "couldn't see the change ship option").
+         Hand top back to beat.css's own mobile rule here, same pattern as #aisControl just above. */
+      .beat-globe-live .lreopen, .beat-globe-live .lreopen.lenter { top: auto !important; }
+    }
+    /* 14 Oct 2026, Simon: from the main site the only way back up is this pill ("go back to the globe and play the CIPS journey"), at the top of the page under the header: scrolling up is held at the top of
+       the main site once the visitor has skipped or finished the journey, and the pill is shown when they try (and for a few seconds after "Skip to CIPS") */
+    #backToGlobe { position:fixed; left:50%; top:78px; transform:translate(-50%,-14px); z-index:9997; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; visibility:hidden;
+      background:rgba(6,10,18,.88); border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:11px 20px 11px 16px; color:#fff; cursor:pointer;
+      font:600 12px/1 'Montserrat',system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; backdrop-filter:blur(8px); box-shadow:0 10px 30px rgba(0,0,0,.35);
+      transition:opacity .35s ease, transform .35s ease, visibility 0s linear .35s; max-width:calc(100vw - 32px); }
+    #backToGlobe.on { opacity:1; transform:translate(-50%,0); pointer-events:auto; visibility:visible; transition-delay:0s; }
+    #backToGlobe:hover, #backToGlobe:focus-visible { border-color:#FF8A1E; outline:none; }
+    #backToGlobe .arr { color:#FF8A1E; font-size:15px; line-height:1; }
+    #backToGlobe b { color:#FF8A1E; font-weight:600; }
+    /* the same skip, kept on screen at every stage of the journey (beats and mini-games): "Skip to CIPS" */
+    /* 14 Oct 2026, Simon: once on the CIPS page the AIS Live / CI Flights toggle strip goes (it belongs to the globe journey) */
+    html.on-cips-main #aisControl { display:none !important; }
+    /* 28 Oct 2026, Simon: matches the home page's Skip to CIPS pill (square, tracked capitals, a thin blue-violet-green outline, a line that draws along the bottom on hover); a little smaller, on a soft dark backing so it reads over every scene */
+    #skipToCips { position:fixed; right:16px; top:78px; z-index:100000; display:none; align-items:center; gap:8px; cursor:pointer;
+      background:rgba(6,10,18,.55); border:0; border-radius:0; padding:12px 20px; color:#fff;
+      font:600 12px/1.2 'Jost',system-ui,sans-serif; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; backdrop-filter:blur(8px); transition:background .2s; }
+    #skipToCips.on { display:flex; }
+    #skipToCips.ingame { top:14px; }
+    #skipToCips::before { content:''; position:absolute; inset:0; padding:1px; background:linear-gradient(100deg,#9a4dff,#4fb0e4 55%,#5fe0b5); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+    #skipToCips::after { content:''; position:absolute; left:0; bottom:-1px; height:3px; width:0; background:linear-gradient(100deg,#9a4dff,#4fb0e4 55%,#5fe0b5); transition:width .25s ease; }
+    #skipToCips .arr { color:#fff; font-size:13px; line-height:1; }
+    #skipToCips:hover, #skipToCips:focus-visible { background:rgba(255,255,255,.1); color:#fff; outline:none; }
+    #skipToCips:hover::after, #skipToCips:focus-visible::after { width:100%; }
+    @media (max-width:520px) { #skipToCips { right:10px; padding:10px 14px; font-size:11px; } }
+    @media (max-width:520px) { #backToGlobe { font-size:11px; padding:10px 16px 10px 12px; letter-spacing:.05em; } }
+    @media (prefers-reduced-motion:reduce) { #backToGlobe { transition:none; } }
+    #globeTrack { position:relative; height:190vh; }
+    #cipsGlobe { position:sticky; top:0; height:100vh; overflow:hidden; background:
+       radial-gradient(1200px 900px at 78% 42%, #0e1013 0%, #08090c 45%, #050506 100%); }
+    /* colour shimmer / nebula glow around the globe (UC-style) */
+    .gshimmer { position:absolute; inset:-10%; pointer-events:none; mix-blend-mode:screen; opacity:.6; background:
+       radial-gradient(620px 520px at 70% 30%, rgba(92,162,216,.22), transparent 62%),
+       radial-gradient(560px 520px at 84% 60%, rgba(79,176,228,.16), transparent 62%),
+       radial-gradient(760px 640px at 60% 82%, rgba(24,120,138,.18), transparent 66%),
+       radial-gradient(520px 460px at 44% 20%, rgba(120,110,200,.12), transparent 60%);
+       animation:gshim 16s ease-in-out infinite alternate; }
+    @keyframes gshim {
+       0%   { transform:translate3d(0,0,0) scale(1);      opacity:.62; }
+       50%  { transform:translate3d(-2.5%,1.5%,0) scale(1.07); opacity:.92; }
+       100% { transform:translate3d(1.5%,-1%,0) scale(1.03);  opacity:.74; } }
+    @media (prefers-reduced-motion: reduce){ .gshimmer{ animation:none; } }
+    #cipsGlobe .stars { position:absolute; inset:0; opacity:.7; background-image:
+       radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.7), transparent),
+       radial-gradient(1px 1px at 65% 18%, rgba(255,255,255,.5), transparent),
+       radial-gradient(1px 1px at 42% 72%, rgba(255,255,255,.45), transparent),
+       radial-gradient(1px 1px at 82% 60%, rgba(255,255,255,.5), transparent),
+       radial-gradient(1.3px 1.3px at 12% 82%, rgba(255,255,255,.4), transparent),
+       radial-gradient(1.3px 1.3px at 90% 88%, rgba(255,255,255,.4), transparent); }
+    #globeViz { position:absolute; top:50%; left:50%; width:112vh; height:112vh; transform:translate(-32%,-50%); }
+    @media (max-width:820px){ #globeViz { transform:translate(-50%,-30%); opacity:.6; } }
+    #cipsGlobe .gscrim { position:absolute; inset:0; pointer-events:none;
+       background:linear-gradient(90deg, rgba(4,7,14,.92) 0%, rgba(4,7,14,.65) 34%, rgba(4,7,14,0) 62%); }
+    #globeCopy { position:absolute; left:5vw; bottom:11%; max-width:min(560px,56vw); z-index:3; color:#fff; will-change:opacity,transform; }
+    #globeCopy h1 { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(34px,4.8vw,64px);
+       line-height:1; letter-spacing:-.02em; margin:14px 0 0; color:#fff; }
+    #globeCopy h1 .l2 { color:#aeb9c9; }
+    #globeCopy .gsub { margin-top:20px; font-size:clamp(15px,1.3vw,18px); line-height:1.6; color:#b9c5d4; max-width:46ch; }
+    #globeCopy .gcta { display:flex; gap:14px; margin-top:28px; flex-wrap:wrap; }
+    .gscrollcue { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); z-index:3;
+       color:#8ea3b8; font-size:11px; letter-spacing:.24em; text-transform:uppercase; }
+    .gstats { display:flex; flex-wrap:wrap; gap:0; margin-top:30px; padding-top:22px; border-top:1px solid rgba(255,255,255,.12); }
+    .gstats .s { display:flex; align-items:baseline; gap:9px; padding-right:26px; margin-right:26px;
+       border-right:1px solid rgba(255,255,255,.14); }
+    .gstats .s:last-child { border-right:none; margin-right:0; padding-right:0; }
+    .gstats b { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(20px,2vw,26px);
+       color:var(--goldl); letter-spacing:-.01em; line-height:1; }
+    .gstats span { font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:#9fb0c4; max-width:13ch; line-height:1.3; }
+
+    /* aerial scroll scenes */
+    .aerial { position:relative; z-index:1; height:100vh; overflow:hidden; display:flex; align-items:flex-end; }
+    .aerial .abg { position:absolute; inset:-8% 0; background-size:cover; background-position:center; will-change:transform; }
+    .aerial .agrade { position:absolute; inset:0;
+       background:linear-gradient(180deg, rgba(4,7,14,.55) 0%, rgba(4,7,14,.05) 30%, rgba(4,7,14,.35) 62%, rgba(4,7,14,.92) 100%); }
+    .aerial .acopy { position:relative; z-index:2; padding:0 0 12% 5vw; max-width:min(620px,66vw); color:#fff; }
+    .aerial .acopy h2 { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(28px,4vw,54px);
+       line-height:1.02; letter-spacing:-.02em; margin:12px 0 0; }
+    .aerial .acopy .gsub { margin-top:16px; font-size:clamp(15px,1.3vw,18px); line-height:1.6; color:#c4d0de; max-width:44ch; }
+    @media (prefers-reduced-motion: reduce){ .aerial .abg { transform:none !important; } }
+
+    /* ===================== ON-PASSAGE CHART JOURNEY ===================== */
+    .journey { position:relative; z-index:1; height:200vh; background:#04070e; }
+    .jstage { position:sticky; top:0; height:100vh; overflow:hidden; background:
+       radial-gradient(1400px 900px at 62% 44%, #0c1c34 0%, #071021 48%, #050506 100%); }
+    .jchart { position:absolute; inset:0; width:100%; height:100%; }
+    .jgrid line { stroke:rgba(255,255,255,.05); stroke-width:1; }
+    .jrhumb { stroke:rgba(122,166,214,.10); stroke-width:1; }
+    .jcontour { fill:none; stroke:rgba(90,160,216,.16); stroke-width:1.2; }
+    .jland { fill:#14243f; stroke:rgba(122,166,214,.35); stroke-width:1.4; }
+    .jcourse { fill:none; stroke:rgba(79,176,228,.30); stroke-width:2; stroke-dasharray:3 7; stroke-linecap:round; }
+    .jwtrail { fill:none; stroke:rgba(214,234,255,.15); stroke-width:6; stroke-linecap:round; filter:blur(1.4px); }
+    .jwfoam { fill:none; stroke:rgba(255,255,255,.62); stroke-width:13; stroke-linecap:round; filter:url(#jFoamFx); }
+    .jport { fill:#4FB0E4; }
+    .jlbl { font-family:'Montserrat',sans-serif; font-weight:700; letter-spacing:.18em; text-transform:uppercase; fill:#9fb6d0; font-size:13px; }
+    .jlbl.gold { fill:#4FB0E4; }
+    .jwp { font-family:'Montserrat',sans-serif; font-weight:700; letter-spacing:.16em; text-transform:uppercase; fill:#cdddf0; font-size:12px; opacity:0; transition:opacity .5s; }
+    .jwp.on { opacity:.9; }
+    #jship { filter:drop-shadow(0 6px 10px rgba(0,0,0,.45)); }
+    .jscrim { position:absolute; inset:0; pointer-events:none; background:
+       linear-gradient(180deg, rgba(4,7,14,.4) 0%, rgba(4,7,14,0) 26%, rgba(4,7,14,.12) 62%, rgba(4,7,14,.9) 100%); }
+    .jcompass { position:absolute; right:34px; top:96px; width:56px; height:56px; opacity:.45; z-index:4; }
+    .jcompass circle, .jcompass line { stroke:rgba(255,255,255,.28); fill:none; stroke-width:1; }
+    .jcompass .jn { font-family:'Montserrat'; font-weight:800; font-size:12px; fill:#4FB0E4; }
+    .jcopy { position:absolute; left:5vw; bottom:11%; z-index:4; max-width:min(560px,62vw); color:#fff; }
+    .jcopy h2 { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(28px,4vw,52px); line-height:1.03; letter-spacing:-.02em; margin:12px 0 0; }
+    .jcopy .gsub { margin-top:16px; font-size:clamp(15px,1.3vw,18px); line-height:1.6; color:#c4d0de; max-width:42ch; }
+    @media (prefers-reduced-motion: reduce){ .journey { height:100vh; } .jstage { position:relative; } }
+
+    /* ===================== SEA-TO-SKY SATELLITE APPROACH ===================== */
+    .approach { position:relative; z-index:1; height:100vh; overflow:hidden; background:#04070e; }
+    .amap { position:absolute; inset:0; background:#04070e; }
+    .approach .leaflet-tile { filter:brightness(.5) contrast(1.06) saturate(.82) hue-rotate(-6deg); }
+    .approach .leaflet-container { background:#04070e; }
+    .atint { position:absolute; inset:0; pointer-events:none; z-index:390; mix-blend-mode:overlay;
+       background:linear-gradient(160deg, rgba(20,60,110,.20), rgba(6,12,26,.20)); }
+    .afx { position:absolute; inset:0; width:100%; height:100%; z-index:410; pointer-events:none; overflow:visible; }
+    .ayacht { position:absolute; z-index:420; width:88px; transform-origin:center; pointer-events:none; filter:drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+    .agrade { position:absolute; inset:0; pointer-events:none; z-index:400; background:
+       radial-gradient(120% 90% at 60% 40%, rgba(4,7,14,0) 40%, rgba(4,7,14,.45) 78%, rgba(4,7,14,.85) 100%),
+       linear-gradient(180deg, rgba(4,7,14,.45) 0%, rgba(4,7,14,0) 22%, rgba(4,7,14,.10) 60%, rgba(4,7,14,.86) 100%),
+       linear-gradient(90deg, rgba(4,7,14,.55) 0%, rgba(4,7,14,0) 42%); }
+    .acopy2 { position:absolute; left:5vw; bottom:11%; z-index:440; max-width:min(560px,64vw); color:#fff; }
+    .acopy2 h2 { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(28px,4vw,52px); line-height:1.03; letter-spacing:-.02em; margin:12px 0 0; }
+    .acopy2 .gsub { margin-top:16px; font-size:clamp(15px,1.3vw,18px); line-height:1.6; color:#c8d4e2; max-width:40ch; }
+    .astat { display:flex; align-items:baseline; gap:11px; margin-top:22px; }
+    .astat b { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(24px,2.4vw,30px); color:var(--goldl); }
+    .astat span { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#9fb0c4; }
+    .albl { position:absolute; z-index:430; transform:translate(-50%,-50%); font-family:'Montserrat',sans-serif; font-weight:700;
+       letter-spacing:.16em; text-transform:uppercase; font-size:12px; color:#eaf1fb; text-shadow:0 1px 6px rgba(0,0,0,.7); pointer-events:none; white-space:nowrap; }
+    .albl.small { font-size:10.5px; color:#cdd9ea; }
+    .albl .adot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--goldl); margin-right:7px; vertical-align:middle; box-shadow:0 0 8px rgba(79,176,228,.9); }
+    .approach .leaflet-control-attribution { background:rgba(4,7,14,.6)!important; color:#6b7a8d!important; font-size:10px; }
+    .approach .leaflet-control-attribution a { color:#8ea3b8!important; }
+
+  </style>
+<link rel="stylesheet" href="css/tailwind.css">
+</head>
+<body class="antialiased">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="cipsMark" viewBox="0 0 186 188"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALoAAAC8CAYAAADPV7TsAAAGC0lEQVR4nO2dS47bShAEJcKnaOBt3v3P5I2BvoYNwpA9I4/EX38yqyKWXlhVWcGeFkmR9/Lf/z9v4tQf3++3pDCfNiw3cRxC7En2/lOIzpB/Qw6BRWe4nyGPgKIzVAgvOpK/hmyCiM4gtyEjc9EZ4H7IylR0BnccMjMTnYGdh+yMRFe98qda1zPIbiK6olSPetTq+gqHGhWQEF1pYM91qNT1Fcq1qSEjurI467+rSaVWjzpSos8c3p7PVpBL8aBzQEr0lRlDPPKZM0VD8ECijx7o2c8aKTyr+HW+3RLTQp7H/9H6NB9it+WuHGjPc8Q9+z5bt/Is3M/lS4veK8RZPT96Uc88oujpti7qZ3Yg0ZfRXnIgWl7kRW8FkudmySApkoOF6FdAcrAS/YywSA52op+5VN+3GnDCSvS9IDmEFx3JIYTo70RGcmgmuvLlXuXawEj0h0izhXq3cs+uLQL1x/d7tByXs40rB6FcmzL1ac6RctwUXbXZrf24at2q1Bd5RcnxrehbTaqHoF6fCtV8zpdE39ucegjq9bnsxat5jotzU3tPJ7r0M5J6IhPnHJcsATjUOIIa8IzKYdGjB5B1yA9a9O6a39KqAacAnGpVPMCrYX6La+FXL/tnWN179ljNsgvxLJIWoUe6T8ZNQrubupwDdq4901+ps6R73EXE564g9zaIviGOsvQIvp8uQY2WY8TAVYRH7sSizxBgZI/IfR22Lo3kayU+UvcB0RuBoNrY/WYU4AyIbg5vw9gHohvzUXBkfw+im/KV2Mj+GkQ3ZOvZNgj/L4huxl6Jkf0ziG7EUXmR/S+IHhxk7yQ6wfbhSq6FmcRY0aNflWz54t+shBA9MryVT1D0zEG6UJLOiBU9oZQloeyILkpvGUsy2ZuJni24CJREM7Nf0SOecRkpYEkiexPRs4QVlZJgfpdFzxDSSGblWYLP0XrrEnHbMpMSWPZLokcOZgYKeRaBGqREjxpIdmrQv5K2W5doA1FYOGqwTC+LrjAUgK6iI3lMauDV3HbrEm0osxePGizPJqJnCAXicWpFnyk7B1pbapI8T29dsgQUedtSE81wcQoq02BA7Mso8nlSk81tcQkt22BA9PRiTxGRvC01YZ68fjHx+fNMNL9g1Fp2Dh6QvTLaSk4kb09Nmumi+hbjrAMB03tdEBbS3NR1VHYODrC9e3GvvEgO9rfpbkmM5BDmfvRXMiM5hPvhxbPUSA5hf2H0kBvJIfxP6ZAcRvHtluh+EQ6svNiI3vM9PhwA8ZEVfeajkxE/HlKiq9y2+rEOpI/B9CGqyL1FD+Fn9V4THrzTGnYRvLcoM3KoCUUffnpxHayz5Cvu9WdkGTW0CIJH7ifFit5zYNGFcOyvNKrXqfc/W5fWBTuF0IJMvTr2u/Q60m8JOXNwz/piWC7MyHG+S+sAHENoTeQMimlvS6tmXAPohUMe5WCNDj0dPr24tylW8evZOJzXLuYzXq405978KJRzKjtqU66/2QWjV01GaH4kynmVN7Up1938yujHZtmqnOddborblxJozrtvAUDwNqhmWJ7qUq0zxG262VlX9ZmClWBy279+EeAoiD4Yxb14BhBdTHIOhD4g+iAQeC6IPgCeJjwfRO8M0mqA6B3hjR86IHonWoiK7O1A9A4gqB6I3hheP6mJ/S0Ae0WIfHkbtpl6b8WsFa5Xzz1XX+U5VYO/OhaiOwg0Ytiqs6oGoktvXUYE+PiMKxI5DDo7kl9Gr751euRnjqyTAyqQ6LOHeeTzZ9Q6Ox9Xlsyr+JVaZtaqkpMTEqKrDo53osZhuujq0qi+E1WlDhekz7qooCrV7N+YOjF9RWdQkEL0FWQ/B7mZib7C0I5BXqairzC8fZCTuegrDPE95BNE9BWG+TXkEkz0FYb6GfIIKvoKw/0NOQQXfSX7kLP3n0b0zMPO2nda0TOC5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIMudNytABni1C6QA0SEFiA4pQHRIAaJDChAdUoDokAJEhxQgOqQA0SEFiA63DPwCIvdS9a6BCXMAAAAASUVORK5CYII=" width="186" height="188"/></symbol><symbol id="cipsMarkW" viewBox="0 0 186 188"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALoAAAC8CAYAAADPV7TsAAAF+klEQVR4nO2d2ZLbMAwERVX+/5eZUm2c7Dq2dfGYAbof8xADgxaXlmSp1FrrIk4ppSxJYT5tWBdxHELsSfb+U4jOkL8gh8CiM9yfkEdA0RkqhBcdyd9DNkFEZ5D7kJG56AzwOGRlKjqDOw+ZmYnOwK5Ddkaiq175U63rGWQ3EV1Rqkc9anW9wqFGBSREVxrYcx0qdb1CuTY1ZERXFmf7dzWp1OpRR0r0mcM78tkKcikedA5Iib4xY4hnPnOmaAgeSPTRA736WSOFZxW/z68lMS3kefwfrU/zIXZbinKgPc8R9+z7at3Ks3A/ly8teq8QZ/X86EU984iip9u6qJ/ZgURfRnvJgWh5kRe9FUiemzWDpEgOFqLfAcnBSvQrwiI52Il+5VJ932rACSvRj4LkEF50JIcQon8SGcmhmejKl3uVawMj0R8izRbq08o9u7YIlD8s2UR/1bhyEMq1KVOe5hwpx13RVZvd24+r1q1KeZNXlBw/ir7XpHoI6vWpUMznfEv0o82ph6Ben8tevJjnuDo3dfR0oks/IykXMnHOcc0SgEONIygBz6icFj16AFmH/KBF7675ra0acArAqVbFA7wY5re6Fn73sn+G1b1nj8UsuxDPImkReqT7ZNwktLupyzlg59oz/ZW6SrrHXUR87gpy74PoO+IoS4/gx+kS1Gg5RgxcRXjkTiz6DAFG9ojc92Hr0ki+VuIjdR8QvREIqo3db0YBroDo5vA2jGMgujHfBUf2zyC6Ka/ERvb3ILohe8+2Qfj/QXQzjkqM7D9BdCPOyovs/0D04CB7J9EJtg93cq3MJMaKHv2qZMsX/2YlhOiR4a18gqJnDtKFmnRGrOgJpawJZUd0UXrLWJPJ3kz0bMFFoCaamf2KHvGMy0gBaxLZm4ieJayo1ATzuy16hpBGMivPGnyO1luXiNuWmdTAst8SPXIwM1DIswrUICV61ECyU4L+lbTdukQbiMLCUYJlelt0haEAdBUdyWNSAq/mtluXaEOZvXiUYHk2ET1DKBCPSyv6TNk50NpSkuR5eeuSJaDI25aSaIarU1CZBgNiX0aRz5OSbG6rS2jZBgOipxd7iojkbSkJ8+T1i4nPn2ei+QWj1rJz8IDsldFWciJ5e0rSTFfVtxhnHQiY3uuCsJDmpq6zsnNwgO3di0flRXKwv013T2IkhzD3o7+TGckh3A8vnqVGcgj7C6OH3EgO4X9Kh+Qwil9LovtFOLDyYiN6z/f4cADER1b0mY9ORvx4SImuctvq9zqQPgbTh6gi9x49hJ/Ve0l48E5r2EXw3qLMyKEkFH346cVtsM6Sb7jXn5F11NAiCB65nxQres+BRRfCsb/aqF6n3v9uXVoX7BRCCzL16tjv2utIXxJy5eCe9cWw3piR43zX1gE4htCayBlU097WVs24BtALhzzqyRodejp9evFoU6zi97NxOK9dzWe83mnOvflRKOdUD9SmXH+zC0bvmozQ/EiU86ofalOuu/mV0e/NslW5zqfcFLcvNdCcD98CgOBtUM2wPtWlWmeI23Szs63qMwWrweS2f/0iwFkQfTCKe/EMILqY5BwIfUD0QSDwXBB9ADxNeD6I3hmk1QDRO8IbP3RA9E60EBXZ24HoHUBQPRC9Mbx+UhP7WwCOihD58jbsM/XeilkrXK+ee66+ynMqBn91LER3EGjEsFVnVQxEl966jAjw8Rl3JHIYdHYkv4zefev0yM8cWScHVCDRZw/zzOfPqHV2Pq6smVfxO7XMrFUlJyckRFcdHO9EjcN00dWlUX0nqkodLkifdVFBVarZvzF1YvqKzqAghegbyH4NcjMTfYOhnYO8TEXfYHjHICdz0TcY4mfIJ4joGwzzNeQSTPQNhvoT8ggq+gbD/YIcgou+kX3I2ftPI3rmYWftO63oGUFyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQpfBmBcgAr3aBFCA6pADRIQWIDilAdEgBokMKEB1SgOiQAkSHFCA6pADRYcnAb/UHfTU/J31/AAAAAElFTkSuQmCC" width="186" height="188"/></symbol><symbol id="cipsWordmark" viewBox="0 0 440.65 83.83"><g id="Layer_3" data-name="Layer 3">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <g>
+        <g>
+          <path fill="currentColor" d="M123.88,34.09c-2.44,0-4.71-.4-6.8-1.2-2.1-.8-3.91-1.94-5.45-3.41-1.54-1.48-2.74-3.21-3.59-5.2-.86-1.99-1.29-4.17-1.29-6.56s.43-4.57,1.29-6.56c.86-1.99,2.06-3.72,3.62-5.2,1.55-1.48,3.37-2.61,5.45-3.41s4.36-1.2,6.83-1.2c2.74,0,5.22.47,7.44,1.42,2.21.95,4.08,2.34,5.58,4.18l-4.7,4.34c-1.09-1.24-2.29-2.16-3.62-2.78-1.33-.62-2.77-.93-4.34-.93-1.48,0-2.83.24-4.07.72-1.24.48-2.31,1.18-3.21,2.08s-1.61,1.97-2.1,3.21c-.5,1.24-.75,2.61-.75,4.12s.25,2.88.75,4.11c.5,1.24,1.2,2.31,2.1,3.21s1.97,1.6,3.21,2.08c1.24.48,2.59.72,4.07.72,1.57,0,3.01-.31,4.34-.93,1.33-.62,2.53-1.56,3.62-2.83l4.7,4.34c-1.51,1.84-3.37,3.24-5.58,4.21-2.22.96-4.71,1.45-7.48,1.45Z"/>
+          <path fill="currentColor" d="M154.61,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V0h7.05v15.96l-1.58-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M177.26,33.91c-1.9,0-3.53-.32-4.88-.97s-2.4-1.53-3.12-2.65c-.72-1.11-1.08-2.37-1.08-3.75s.35-2.71,1.06-3.8,1.83-1.94,3.37-2.55c1.54-.62,3.54-.93,6.01-.93h6.47v4.11h-5.7c-1.66,0-2.8.27-3.41.81-.62.54-.93,1.22-.93,2.03,0,.9.35,1.62,1.06,2.15.71.53,1.68.79,2.92.79s2.23-.28,3.17-.84c.93-.56,1.61-1.38,2.04-2.46l1.08,3.25c-.51,1.57-1.45,2.76-2.8,3.57-1.36.81-3.11,1.22-5.25,1.22ZM184.68,33.55v-4.75l-.45-1.04v-8.5c0-1.51-.46-2.68-1.38-3.53-.92-.84-2.33-1.27-4.23-1.27-1.3,0-2.57.2-3.82.61s-2.31.96-3.19,1.65l-2.53-4.93c1.33-.93,2.92-1.66,4.79-2.17s3.77-.77,5.7-.77c3.71,0,6.59.87,8.64,2.62,2.05,1.75,3.07,4.48,3.07,8.18v13.88h-6.6Z"/>
+          <path fill="currentColor" d="M211.15,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M241.11,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M268.45,33.91c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M283.79,33.55V0h7.05v33.55h-7.05Z"/>
+          <path fill="currentColor" d="M309.79,33.55V1.9h7.33v31.65h-7.33Z"/>
+          <path fill="currentColor" d="M331.75,33.91c-2.08,0-4.08-.25-5.99-.75-1.91-.5-3.43-1.12-4.54-1.88l2.35-5.06c1.11.69,2.43,1.26,3.96,1.7,1.52.44,3.02.66,4.5.66,1.63,0,2.78-.2,3.46-.59.68-.39,1.02-.93,1.02-1.63,0-.57-.26-1-.79-1.29-.53-.29-1.23-.5-2.1-.66-.88-.15-1.83-.3-2.87-.45-1.04-.15-2.09-.35-3.14-.61-1.05-.26-2.02-.64-2.89-1.15-.87-.51-1.58-1.21-2.1-2.08s-.79-2-.79-3.39c0-1.54.44-2.89,1.33-4.07.89-1.18,2.18-2.1,3.87-2.78,1.69-.68,3.71-1.02,6.06-1.02,1.66,0,3.35.18,5.06.54,1.72.36,3.15.89,4.29,1.58l-2.35,5.02c-1.18-.69-2.36-1.17-3.55-1.42-1.19-.26-2.34-.38-3.46-.38-1.57,0-2.71.21-3.44.63-.72.42-1.08.97-1.08,1.63,0,.6.26,1.06.79,1.36.53.3,1.23.54,2.1.72.87.18,1.83.34,2.87.47s2.09.34,3.14.61c1.05.27,2.01.66,2.87,1.15.86.5,1.56,1.18,2.1,2.03.54.86.81,1.98.81,3.37,0,1.51-.45,2.84-1.36,4s-2.21,2.07-3.91,2.74c-1.7.66-3.78.99-6.22.99Z"/>
+          <path fill="currentColor" d="M346.73,33.55V0h7.05v33.55h-7.05Z"/>
+          <path fill="currentColor" d="M366.67,33.91c-1.9,0-3.53-.32-4.88-.97s-2.4-1.53-3.12-2.65c-.72-1.11-1.08-2.37-1.08-3.75s.35-2.71,1.06-3.8,1.83-1.94,3.37-2.55c1.54-.62,3.54-.93,6.01-.93h6.47v4.11h-5.7c-1.66,0-2.8.27-3.41.81-.62.54-.93,1.22-.93,2.03,0,.9.35,1.62,1.06,2.15.71.53,1.68.79,2.92.79s2.23-.28,3.17-.84c.93-.56,1.61-1.38,2.04-2.46l1.08,3.25c-.51,1.57-1.45,2.76-2.8,3.57-1.36.81-3.11,1.22-5.25,1.22ZM374.09,33.55v-4.75l-.45-1.04v-8.5c0-1.51-.46-2.68-1.38-3.53-.92-.84-2.33-1.27-4.23-1.27-1.3,0-2.57.2-3.82.61s-2.31.96-3.19,1.65l-2.53-4.93c1.33-.93,2.92-1.66,4.79-2.17s3.77-.77,5.7-.77c3.71,0,6.59.87,8.64,2.62,2.05,1.75,3.07,4.48,3.07,8.18v13.88h-6.6Z"/>
+          <path fill="currentColor" d="M400.57,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M426.32,33.91c-2.29,0-4.36-.52-6.19-1.56-1.84-1.04-3.29-2.49-4.36-4.36-1.07-1.87-1.61-4.07-1.61-6.6s.54-4.78,1.61-6.65c1.07-1.87,2.52-3.32,4.36-4.34,1.84-1.02,3.9-1.54,6.19-1.54,2.05,0,3.84.45,5.38,1.36s2.73,2.28,3.57,4.11c.84,1.84,1.27,4.19,1.27,7.05s-.41,5.18-1.22,7.03c-.81,1.85-1.98,3.23-3.5,4.14-1.52.9-3.35,1.36-5.49,1.36ZM427.54,28.12c1.15,0,2.19-.27,3.12-.81.93-.54,1.68-1.32,2.24-2.33s.84-2.21.84-3.59-.28-2.62-.84-3.62-1.3-1.76-2.24-2.31c-.93-.54-1.97-.81-3.12-.81s-2.23.27-3.17.81c-.93.54-1.68,1.31-2.24,2.31s-.84,2.2-.84,3.62.28,2.58.84,3.59,1.3,1.79,2.24,2.33c.93.54,1.99.81,3.17.81ZM433.91,33.55v-4.97l.14-7.23-.45-7.19V0h7.05v33.55h-6.74Z"/>
+          <path fill="currentColor" d="M108.73,83.29v-31.65h13.7c2.83,0,5.28.46,7.33,1.38,2.05.92,3.63,2.24,4.75,3.96,1.11,1.72,1.67,3.77,1.67,6.15s-.56,4.39-1.67,6.1c-1.12,1.72-2.7,3.04-4.75,3.96s-4.49,1.38-7.33,1.38h-9.63l3.26-3.3v12.03h-7.33ZM116.05,72.07l-3.26-3.48h9.22c2.26,0,3.95-.48,5.06-1.45,1.12-.96,1.67-2.31,1.67-4.02s-.56-3.1-1.67-4.07-2.8-1.45-5.06-1.45h-9.22l3.26-3.48v17.95Z"/>
+          <path fill="currentColor" d="M151.45,83.65c-2.59,0-4.89-.54-6.9-1.63-2-1.09-3.59-2.57-4.75-4.45s-1.74-4.03-1.74-6.44.58-4.6,1.74-6.49,2.74-3.36,4.75-4.43c2-1.07,4.3-1.6,6.9-1.6s4.85.54,6.87,1.6c2.02,1.07,3.6,2.54,4.75,4.41s1.72,4.04,1.72,6.51-.57,4.56-1.72,6.44-2.73,3.37-4.75,4.45c-2.02,1.08-4.31,1.63-6.87,1.63ZM151.45,77.86c1.18,0,2.23-.27,3.17-.81.93-.54,1.67-1.32,2.22-2.33.54-1.01.81-2.21.81-3.59s-.27-2.62-.81-3.62c-.54-1-1.28-1.76-2.22-2.31-.93-.54-1.99-.81-3.17-.81s-2.23.27-3.17.81c-.93.54-1.68,1.31-2.24,2.31-.56,1-.84,2.2-.84,3.62s.28,2.58.84,3.59c.56,1.01,1.3,1.79,2.24,2.33.93.54,1.99.81,3.17.81Z"/>
+          <path fill="currentColor" d="M168.38,83.29v-24.33h6.74v6.87l-.95-1.99c.72-1.72,1.88-3.02,3.48-3.91,1.6-.89,3.54-1.33,5.83-1.33v6.51c-.3-.03-.57-.05-.81-.07-.24-.01-.5-.02-.77-.02-1.93,0-3.49.55-4.68,1.65-1.19,1.1-1.79,2.81-1.79,5.13v11.48h-7.05Z"/>
+          <path fill="currentColor" d="M184.86,64.93v-5.43h16.87v5.43h-16.87ZM197.7,83.65c-2.86,0-5.09-.73-6.69-2.19s-2.4-3.64-2.4-6.53v-21.34h7.05v21.25c0,1.02.27,1.82.81,2.37.54.56,1.28.84,2.22.84,1.11,0,2.06-.3,2.85-.9l1.9,4.97c-.72.51-1.59.9-2.6,1.15-1.01.26-2.06.38-3.14.38Z"/>
+          <path fill="currentColor" d="M230.21,83.83c-2.53,0-4.96-.34-7.28-1.02-2.32-.68-4.19-1.56-5.61-2.65l2.49-5.52c1.36.97,2.96,1.76,4.82,2.37,1.85.62,3.73.93,5.63.93,1.45,0,2.61-.14,3.5-.43.89-.29,1.54-.69,1.97-1.2.42-.51.63-1.1.63-1.76,0-.84-.33-1.51-.99-2.01-.66-.5-1.54-.9-2.62-1.22s-2.28-.62-3.59-.9c-1.31-.29-2.62-.64-3.93-1.06-1.31-.42-2.51-.96-3.59-1.63-1.08-.66-1.97-1.54-2.65-2.62-.68-1.08-1.02-2.47-1.02-4.16,0-1.81.49-3.46,1.47-4.95s2.46-2.68,4.43-3.57c1.97-.89,4.45-1.33,7.44-1.33,1.99,0,3.95.23,5.88.7,1.93.47,3.63,1.17,5.11,2.1l-2.26,5.56c-1.48-.84-2.96-1.47-4.43-1.88-1.48-.41-2.92-.61-4.34-.61s-2.58.17-3.48.5c-.9.33-1.55.76-1.94,1.29s-.59,1.14-.59,1.83c0,.81.33,1.47,1,1.97.66.5,1.54.9,2.62,1.2,1.08.3,2.28.6,3.59.9,1.31.3,2.62.65,3.93,1.04,1.31.39,2.51.92,3.59,1.58,1.09.66,1.97,1.54,2.65,2.62.68,1.08,1.02,2.46,1.02,4.11,0,1.78-.5,3.41-1.49,4.88-1,1.48-2.48,2.67-4.45,3.57-1.97.9-4.47,1.36-7.48,1.36Z"/>
+          <path fill="currentColor" d="M259.57,83.65c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M274.85,83.29v-24.33h6.74v6.87l-.95-1.99c.72-1.72,1.88-3.02,3.48-3.91,1.6-.89,3.54-1.33,5.83-1.33v6.51c-.3-.03-.57-.05-.81-.07-.24-.01-.5-.02-.77-.02-1.93,0-3.49.55-4.68,1.65-1.19,1.1-1.79,2.81-1.79,5.13v11.48h-7.05Z"/>
+          <path fill="currentColor" d="M301.21,83.29l-10.22-24.33h7.28l8.5,20.93h-3.62l8.82-20.93h6.78l-10.26,24.33h-7.28Z"/>
+          <path fill="currentColor" d="M324.29,55.57c-1.3,0-2.35-.38-3.17-1.13-.81-.75-1.22-1.69-1.22-2.8s.41-2.05,1.22-2.8c.81-.75,1.87-1.13,3.17-1.13s2.35.35,3.17,1.06c.81.71,1.22,1.62,1.22,2.74,0,1.18-.4,2.15-1.2,2.92s-1.86,1.15-3.19,1.15ZM320.77,83.29v-24.33h7.05v24.33h-7.05Z"/>
+          <path fill="currentColor" d="M344.87,83.65c-2.62,0-4.96-.53-7.01-1.6s-3.66-2.55-4.82-4.45-1.74-4.05-1.74-6.47.58-4.6,1.74-6.49,2.77-3.36,4.82-4.43c2.05-1.07,4.39-1.6,7.01-1.6s4.79.54,6.69,1.6c1.9,1.07,3.3,2.6,4.21,4.59l-5.47,2.94c-.63-1.14-1.42-1.99-2.37-2.53-.95-.54-1.98-.81-3.1-.81-1.21,0-2.29.27-3.26.81-.96.54-1.73,1.31-2.28,2.31-.56,1-.84,2.2-.84,3.62s.28,2.62.84,3.62c.56,1,1.32,1.76,2.28,2.31.96.54,2.05.81,3.26.81,1.11,0,2.15-.26,3.1-.79.95-.53,1.74-1.38,2.37-2.55l5.47,2.98c-.9,1.96-2.31,3.47-4.21,4.54-1.9,1.07-4.13,1.6-6.69,1.6Z"/>
+          <path fill="currentColor" d="M370.77,83.65c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M394.6,83.65c-2.08,0-4.08-.25-5.99-.75-1.91-.5-3.43-1.12-4.54-1.88l2.35-5.06c1.11.69,2.43,1.26,3.96,1.7,1.52.44,3.02.66,4.5.66,1.63,0,2.78-.2,3.46-.59.68-.39,1.02-.93,1.02-1.63,0-.57-.26-1-.79-1.29-.53-.29-1.23-.5-2.1-.66-.88-.15-1.83-.3-2.87-.45-1.04-.15-2.09-.35-3.14-.61-1.05-.26-2.02-.64-2.89-1.15-.87-.51-1.58-1.21-2.1-2.08s-.79-2-.79-3.39c0-1.54.44-2.89,1.33-4.07.89-1.18,2.18-2.1,3.87-2.78,1.69-.68,3.71-1.02,6.06-1.02,1.66,0,3.35.18,5.06.54,1.72.36,3.15.89,4.29,1.58l-2.35,5.02c-1.18-.69-2.36-1.17-3.55-1.42-1.19-.26-2.34-.38-3.46-.38-1.57,0-2.71.21-3.44.63-.72.42-1.08.97-1.08,1.63,0,.6.26,1.06.79,1.36.53.3,1.23.54,2.1.72.87.18,1.83.34,2.87.47s2.09.34,3.14.61c1.05.27,2.01.66,2.87,1.15.86.5,1.56,1.18,2.1,2.03.54.86.81,1.98.81,3.37,0,1.51-.45,2.84-1.36,4s-2.21,2.07-3.91,2.74c-1.7.66-3.78.99-6.22.99Z"/>
+        </g>
+        <g>
+          <path fill="currentColor" fill-rule="evenodd" d="M6.26,47.18c10.86-12.13.07-22.73.07-22.73L.04,30.26l-.04-21.59,21.81.04-5.61,5.55c20.83,25.01-.02,42.42-.02,42.42l-9.93-9.5Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M36.19,14.93c12.13,10.86,22.73.07,22.73.07l-5.81-6.29,21.59-.04-.04,21.81-5.55-5.61c-25.01,20.83-42.42-.02-42.42-.02l9.5-9.93Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M68.44,44.86c-10.86,12.13-.07,22.73-.07,22.73l6.29-5.81.04,21.59-21.81-.04,5.61-5.55c-20.83-25.01.02-42.42.02-42.42l9.93,9.5Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M38.51,77.11c-12.13-10.86-22.73-.07-22.73-.07l5.81,6.29-21.59.04.04-21.81,5.55,5.61c25.01-20.83,42.42.02,42.42.02l-9.5,9.93Z"/>
+        </g>
+      </g>
+    </g>
+  </g></symbol></svg>
+
+  <!-- CIPS brand mark — interpretation of the official four-arrow logo; swap in the official SVG/PNG when available -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="cipsMark" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="butt">
+        <path d="M50 84 A34 34 0 0 1 84 50"/>
+        <path d="M50 84 A34 34 0 0 1 84 50" transform="rotate(90 50 50)"/>
+        <path d="M50 84 A34 34 0 0 1 84 50" transform="rotate(180 50 50)"/>
+        <path d="M50 84 A34 34 0 0 1 84 50" transform="rotate(270 50 50)"/>
+      </g>
+      <g fill="currentColor" stroke="none">
+        <path d="M84 50 l-4 -15 l18 7 z"/>
+        <path d="M84 50 l-4 -15 l18 7 z" transform="rotate(90 50 50)"/>
+        <path d="M84 50 l-4 -15 l18 7 z" transform="rotate(180 50 50)"/>
+        <path d="M84 50 l-4 -15 l18 7 z" transform="rotate(270 50 50)"/>
+      </g>
+    </symbol>
+  </svg>
+
+  <!-- ========================= TOP ANNOUNCEMENT BAR ========================= -->
+  <div class="bg-ink text-cream/90 text-[13px]">
+    <div class="max-w-8xl mx-auto px-5 sm:px-8 py-2.5 flex items-center justify-between gap-4">
+      <p class="hidden sm:flex items-center gap-2 tracking-wide">
+        <span class="divider-anchor">⚓</span>
+        <span>The Atlantic Gateway&nbsp;C.I. — Jersey · Guernsey · Alderney</span>
+      </p>
+      <div class="flex items-center gap-5 ml-auto">
+        <a href="tel:+447797720723" class="flex items-center gap-2 hover:text-goldl transition-colors">
+          <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+          <span class="font-medium tracking-wide">+44 7797 720 723</span>
+        </a>
+        <span class="hidden md:inline-flex items-center gap-1.5 text-goldl/90">
+          <span class="w-1.5 h-1.5 rounded-full bg-goldl animate-pulse"></span> 24/7 Service
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================= HEADER / NAV ========================= -->
+  <header id="header" class="sticky top-0 z-50 transition-all duration-300 bg-ink/95 backdrop-blur supports-[backdrop-filter]:bg-ink/80 border-b border-white/5">
+    <div class="max-w-8xl mx-auto px-5 sm:px-8">
+      <div class="flex items-center justify-between h-[74px]">
+        <!-- Logo -->
+        <a href="#top" class="flex items-center group" aria-label="Channel Island Port Services — home">
+          <img src="images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-9 sm:h-10 w-auto" />
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="hidden lg:flex items-center gap-8 text-[15px] text-cream/85">
+          <a href="#desks" class="nav-link hover:text-white transition-colors">Sectors</a>
+          <a href="#islands" class="nav-link hover:text-white transition-colors">Islands</a>
+          <a href="#services" class="nav-link hover:text-white transition-colors">Services</a>
+          <a href="#gateway" class="nav-link hover:text-white transition-colors">Atlantic Gateway</a>
+          <a href="#deskl" class="nav-link hover:text-white transition-colors">Desk LIVE</a>
+          <a href="reviews.html" class="nav-link hover:text-white transition-colors">Reviews</a>
+          <a href="#contact" class="nav-link hover:text-white transition-colors">Contact</a>
+        </nav>
+
+        <!-- WhatsApp: a small round logo in the top bar at every width, menu open or closed (Howard, 21 Sep 2026) -->
+        <div class="flex items-center gap-3 ml-auto mr-2 lg:ml-0 lg:mr-0">
+          <!-- Log in to CIPS Desk LIVE: goes to a placeholder sign-in page for now (desk-live-login.html) -->
+          <a href="desk-live-login.html" class="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-full border border-white/25 text-[13px] font-medium text-cream hover:bg-white/10 hover:border-white/40 transition-colors" title="Log in to CIPS Desk LIVE"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.9-3.6 3.6-5.4 7.2-5.4s6.3 1.8 7.2 5.4"/></svg>Log in</a>
+          <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="inline-flex items-center justify-center w-10 h-10 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-md transition-all" aria-label="Message CIPS on WhatsApp" title="WhatsApp CIPS">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
+          </a>
+        </div>
+
+        <!-- Mobile toggle -->
+        <button id="menuBtn" aria-label="Open menu" class="lg:hidden text-cream p-2 -mr-2">
+          <svg id="menuIcon" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-white/10 bg-ink">
+      <nav class="px-5 py-4 flex flex-col gap-1 text-cream/90">
+        <a href="#desks" class="mobile-link py-3 border-b border-white/5">Sectors</a>
+        <a href="#islands" class="mobile-link py-3 border-b border-white/5">Islands</a>
+        <a href="#services" class="mobile-link py-3 border-b border-white/5">Services</a>
+        <a href="#gateway" class="mobile-link py-3 border-b border-white/5">Atlantic Gateway</a>
+        <a href="#deskl" class="mobile-link py-3 border-b border-white/5">Desk LIVE</a>
+        <a href="desk-live-login.html" class="mobile-link py-3 border-b border-white/5">Log in to CIPS Desk LIVE</a>
+        <a href="reviews.html" class="mobile-link py-3 border-b border-white/5">Reviews</a>
+        <a href="#contact" class="mobile-link py-3 border-b border-white/5">Contact</a>
+        <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="mobile-link mt-3 py-3 rounded-full text-center font-semibold bg-[#25D366] text-white inline-flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
+          WhatsApp
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= OPENING ACT — built from the shared beat library (_beats/) ================= -->
+    <div id="openingAct"><div id="beats"></div></div>
+    <!-- "Back to the globe": a pill offered from the main site (scroll up, or just after "Skip to CIPS") that returns to the START of the globe journey -->
+    <button id="skipToCips" type="button">Skip to CIPS <span class="arr" aria-hidden="true">↓</span></button>
+    <button id="backToGlobe" type="button" aria-label="Go back to the globe and play the CIPS journey"><span class="arr" aria-hidden="true">↑</span><span>Back to the globe &mdash; <b>play the CIPS journey</b></span></button>
+    <!-- Wave divider into the page -->
+      <div class="relative -mb-1" id="homeWave">
+        <svg class="w-full h-[70px] sm:h-[90px]" viewBox="0 0 1440 90" preserveAspectRatio="none" fill="#FBFAF7">
+          <path d="M0,48 C240,90 480,10 720,40 C960,70 1200,20 1440,52 L1440,90 L0,90 Z"/>
+        </svg>
+      </div>
+
+        <!-- ========================= THE HOME PAGE (Quiet Render, 21 Oct 2026) =========================
+         Everything below the journey. Styles: home/qr-home.css (all scoped under .qr). Page map and copy decisions: _beats/tools/site-directions (board, home.html, sector wireframes).
+         Facts used here are the ones Simon confirmed on 21 Oct 2026: alongside berths up to 150 m in Jersey and Guernsey (150 m is the maximum), pontoon berths up to 70 m, "VAT and duty free" (never "tax-free"), Alderney kept vague. -->
+    <div class="qr"><div class="frame">
+
+      <section id="about" class="hero grid-bg">
+        <div class="row">
+          <div>
+            <span class="pill mono"><i></i> 24/7 · JERSEY · GUERNSEY · ALDERNEY &amp; BEYOND</span>
+            <h1>The port agency for <span class="grad">every vessel.</span></h1>
+            <p class="lead">Yachts, cruise ships, offshore support vessels and commercial shipping. One agency for the whole port call, day or night.</p>
+            <div class="ctas"><a class="btn pri" href="#contact">Plan a call →</a><a class="btn" href="tel:+447797720723">Call +44 7797 720 723</a></div>
+          </div>
+          <div class="panel">
+            <div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">the approach · chart plotter · live</span></div>
+            <div class="mont" style="aspect-ratio:auto">
+              <img src="images/home/journey-corbiere.jpg" alt="The approach to La Corbière with the CIPS chart plotter" style="position:static;opacity:1;animation:none;display:block;width:100%;height:auto">
+              <button type="button" class="play" id="homeReplay" style="cursor:pointer">▶ REPLAY THE JOURNEY</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="stats">
+        <div><b>24/7</b><br><span>every day of the year</span></div>
+        <div><b>VAT &amp; duty free</b><br><span>hi-spec marine fuels, delivered alongside at the berth</span></div>
+        <div><b>Up to 150&nbsp;m</b><br><span>alongside berths · floating dock up to 70&nbsp;m</span></div>
+        <div><b>1986</b><br><span>established: forty years of port calls</span></div>
+      </div>
+
+      <div class="sec" id="desks"><div class="deskhead"><div><div class="eyebrow">Sectors</div><h2>Choose an <span class="grad">Agency Desk.</span></h2><p class="sub">Four specialist desks, one agency.</p></div><img class="roundel" src="images/home/roundel.png" alt="CIPS, cips.agency, established 1986: Shipping, Yachting, Offshore, Cruise" width="480" height="480"></div>
+        <div class="desks tall">
+          <a href="sectors/shipping.html"><div class="im"><img src="images/home/sector-shipping.jpg" alt="Two tankers alongside, from above" style="object-position:40% 50%"></div><div class="b"><h3>SHIPPING <span>→</span></h3><p>Commercial vessel agency, bunkering and fast-track customs clearance.</p></div></a>
+          <a href="sectors/yachting.html"><div class="im"><img src="images/home/sector-yachting.jpg" alt="Savannah passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
+          <a href="sectors/offshore.html"><div class="im"><img src="images/home/sector-offshore.jpg" alt="An offshore wind turbine" style="object-position:50% 20%"></div><div class="b"><h3>OFFSHORE <span>→</span></h3><p>Reliable logistics, provisioning and clearances for offshore operations.</p></div></a>
+          <a href="sectors/cruise.html"><div class="im"><img src="images/home/sector-cruise.jpg" alt="Vista, bow-on" style="object-position:38% 50%"></div><div class="b"><h3>CRUISE <span>→</span></h3><p>Ground handling, shore experiences and port formalities for cruise calls.</p></div></a>
+        </div>
+      </div>
+
+      <div class="sec" id="islands">
+        <div class="eyebrow">The islands</div><h2>Across the Channel Islands <span class="grad">And&nbsp;Beyond.</span></h2><p class="sub">One team, one standard, wherever the call is. We help you choose the place that suits it.</p>
+        <div class="isl4">
+          <div><div class="pim"><img src="images/home/place-jersey.jpg" alt="A superyacht off St Helier at dusk" loading="lazy"></div><h4>Jersey</h4><ul><li>Alongside berths for vessels up to 150&nbsp;m</li><li>Pontoon berths up to 70&nbsp;m</li><li>VAT and duty free fuel</li></ul></div>
+          <div><div class="pim"><img src="images/home/place-guernsey.jpg" alt="A cruise ship off Castle Cornet, Guernsey" loading="lazy"></div><h4>Guernsey</h4><ul><li>Alongside berths for vessels up to 150&nbsp;m</li><li class="tbc">further details to follow</li></ul></div>
+          <div><div class="pim"><img src="images/home/place-alderney.jpg" alt="Braye harbour and breakwater, Alderney, from the air" loading="lazy"></div><h4>Alderney</h4><ul><li>A quieter island option</li><li class="tbc">details to follow</li></ul></div>
+          <div class="bey"><div class="pim"><img src="images/home/place-beyond.jpg" alt="Looking out from a yacht's side deck between two headlands" loading="lazy" style="object-position:50% 60%"></div><h4>Beyond</h4><ul><li>UK, France, Spain, Portugal and the Caribbean</li><li>With our associates and partners</li></ul></div>
+        </div>
+      </div>
+
+      <div class="sec" id="services"><div class="eyebrow">What we handle</div><h2>One Contact, <span class="grad">The whole call.</span></h2><p class="sub">Nine services behind a single point of contact.</p>
+        <div class="grid8">
+          <div><div class="svcph"><img src="images/home/svc-fuel.jpg" alt="Fuel hose being passed up to a yacht" style="object-position:50% 40%" loading="lazy"></div><span class="k">01</span><h4>Fuel &amp; bunkering</h4><p>VAT and duty free marine fuel, ULSD or Renewable (HVO), arranged and delivered alongside.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-berthing.jpg" alt="A yacht alongside" style="object-position:50% 50%" loading="lazy"></div><span class="k">02</span><h4>Berthing &amp; quayside</h4><p>Floating dock up to 70m and fendered quayside for up to 150 m, with pilotage, waste and quayside services.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-crew-guests.jpg" alt="Crew on the aft deck of a yacht" style="object-position:50% 50%" loading="lazy"></div><span class="k">03</span><h4>Crew &amp; guest services</h4><p>24/7 Concierge, Transfers, Logistics, Experiences and more</p></div>
+          <div><div class="svcph"><img src="images/home/svc-itinerary.jpg" alt="Crew boarding a transfer minibus" style="object-position:50% 50%" loading="lazy"></div><span class="k">04</span><h4>Itinerary &amp; ground handling</h4><p>Every part of the call planned, full shoreside support, confirmed and covered</p></div>
+          <div><div class="svcph"><img src="images/home/svc-produce.jpg" alt="A hamper of fresh local produce" style="object-position:50% 50%" loading="lazy"></div><span class="k">05</span><h4>Provisions &amp; produce</h4><p>Fresh local produce delivered to the dock.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-provisions.jpg" alt="Cargo being loaded by crane" style="object-position:50% 50%" loading="lazy"></div><span class="k">06</span><h4>Cargo &amp; stores</h4><p>Cargo, stores and urgent parts, sourced and moved, locally or worldwide.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-customs.jpg" alt="Crates loaded onto an offshore support vessel" style="object-position:50% 45%" loading="lazy"></div><span class="k">07</span><h4>Customs &amp; clearances</h4><p>Customs and clearance, fast, correct and handled for you.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-dispute.jpg" alt="The Resolution Centre" style="object-position:50% 50%" loading="lazy"></div><span class="k">08</span><h4>Crew development &amp; dispute resolution</h4><p>Coaching and training for crew, and maritime dispute resolution through trusted professionals.</p></div>
+          <div><div class="svcph"><img src="images/home/svc-registry.jpg" alt="The Jersey Red Ensign flying from a yacht" style="object-position:40% 50%" loading="lazy"></div><span class="k">09</span><h4>British ship registry</h4><p>Red Ensign registration, representative person and administrative support, from first enquiry to flag.</p></div>
+        </div>
+      </div>
+
+      <div class="sec gwhead" id="gateway"><div class="eyebrow">The Channel Islands</div><h2>Your <span class="grad">Atlantic Gateway.</span></h2></div>
+
+      <div class="filmband" id="gwband"><img src="images/home/atlantic-gateway.jpg" alt="Kinship with the CIPS roundel over the sea"><video playsinline preload="none" controls controlslist="nodownload" tabindex="-1" aria-label="The Atlantic Gateway film"></video><span class="gwp" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z" fill="currentColor"/></svg></span><div class="fb"><button class="pl gwwatch" type="button"><i aria-hidden="true">&#9654;</i>Watch the film <span></span></button></div><button class="gwe" type="button" aria-label="Expand the film"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 2h4v4M6 14H2v-4M14 2 9.5 6.5M2 14l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Expand</button><button class="gwx" type="button" aria-label="Close the film">&times;</button></div>
+
+      <div class="pstrip" aria-label="CIPS at work">
+        <img src="images/home/strip-1.jpg" alt="Tankers side by side, bunkering" loading="lazy">
+        <img src="images/home/strip-2.jpg" alt="A yacht alongside in the sunshine" loading="lazy">
+        <img src="images/home/strip-3.jpg" alt="The pilot launch alongside a red offshore vessel" loading="lazy" style="object-position:50% 28%">
+        <img src="images/home/strip-4.jpg" alt="Hebridean Princess alongside at sunset" loading="lazy">
+      </div>
+
+      <div class="sec" id="deskl"><div class="split dl"><div><div class="eyebrow">CIPS Desk LIVE</div><h2>Your port calls, <span class="grad">live.</span></h2><p class="sub">For clients who want it, we can open a private, live view of your vessels' calls with us, set up for you and showing what matters to you.</p>
+        <ul class="dlpoints"><li>Arrival times, berth and live status for each call</li><li>Our updates, crew travel, documents and accounts in one place</li><li>Private to you: your vessels only, on any device</li><li>Set up by arrangement, with the 24/7 duty agent behind it</li></ul>
+        <div class="ctas"><a class="btn pri" href="#contact" data-service="CIPS Desk LIVE">Talk to us about CIPS Desk LIVE →</a><a class="btn" href="desk-live.html">Find out more</a></div></div>
+        <div class="dlcar" id="dlcar"><div class="panel"><div class="bar"><b></b><b></b><b></b><span class="dlttl" style="margin-left:8px">cips desk live · ship operators</span></div>
+          <button type="button" class="dlslides" data-lb-open aria-label="Enlarge the CIPS Desk LIVE concept screen"><img class="on" src="images/desk/desk-live-shipping.webp" data-lb data-cap="Ship operators" alt="Concept screen for a ship operator: a tanker alongside and discharging, with the call timeline, crew travel and supplier invoices" width="2000" height="944"><img src="images/desk/desk-live-yachting.webp" data-lb data-cap="Yachts" alt="Concept screen for a yacht captain: a motor yacht at anchor with guests ashore, cars, lunch and bunkering" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-cruise.webp" data-lb data-cap="Cruise lines" alt="Concept screen for a cruise line: a ship tendering at anchor with guests ashore and coach tours" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-offshore.webp" data-lb data-cap="Offshore" alt="Concept screen for an offshore operator: a service operation vessel on the worksite, crew transfer by CTV, provisions and supplier invoices" width="2000" height="944" loading="lazy"></button></div>
+          <div class="dltabs" role="group" aria-label="Example views"><button type="button" aria-selected="true">Ship operators</button><button type="button" aria-selected="false">Yachts</button><button type="button" aria-selected="false">Cruise lines</button><button type="button" aria-selected="false">Offshore</button></div>
+          <p class="dlnote">Concept screens: every name, vessel and figure is made up.</p></div></div></div>
+
+      <div class="sec" id="proof"><div class="split"><div><div class="eyebrow">Port Call Index</div><h2>Don't take our word. <span class="grad">Take the master's.</span></h2><p class="sub" style="margin:0">Every score is tied to a real booking and verified by our team before it is published.</p><div class="ctas"><a class="btn" href="reviews.html">Read every review →</a></div></div>
+        <div class="panel idx" id="homeReviewCards"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cips port call index</span></div><div class="top"><div class="big">5.0</div><span>★★★★★ VERIFIED</span></div>
+          <div class="row"><p>“Made the Jersey visit exceptionally smooth.”</p><small>CAPT. MATT ALLEN · M/Y LALABE</small></div>
+          <div class="row"><p>“Welcomed with fresh local produce on arrival.”</p><small>ZOLTAN SIPOS · OCEAN DREAMWALKER III</small></div>
+          <div class="row"><p>“Very good service on a short stay.”</p><small>CAPT. BO · T/S GUNILLA</small></div>
+        </div>
+      </div></div>
+
+      <div class="sec"><div class="people"><div class="pt"><div class="phbox"><span>PHOTO PLACEHOLDER</span><small>Portrait of Simon or the team</small></div></div><div><div class="eyebrow">The personal touch</div><h2>One call. <span class="grad">A person who answers.</span></h2><p class="sub" style="margin-bottom:22px">CIPS is led by Simon Porritt and a small team on the quay. Whatever the vessel, you deal with someone who knows your plan before you ask.</p><a class="btn" href="#contact">Speak to Simon's team</a></div></div></div>
+
+      <div class="assoc" aria-label="Associates and memberships"><div class="eyebrow">Associates and memberships</div><div class="mq"><ul class="track"><li><img src="images/logos/ics.png" alt="Institute of Chartered Shipbrokers, company member"></li><li><img src="images/logos/british-superyacht.png" alt="British Superyacht, Leading the Industry"></li><li><img src="images/logos/superyacht-ready.png" alt="Superyacht Ready"></li><li><img src="images/logos/captains-recommended-2026.png" alt="Captain's Recommended Service 2026, Superyacht Services Guide"></li><li><img src="images/logos/atlantic-gateway.png" alt="The Atlantic Gateway, Channel Islands"></li><li><img src="images/logos/water-taxi-ci.png" alt="Water Taxi CI"></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li></ul></div></div>
+
+      <div class="banner" style="margin:0"><img src="images/home/corbiere.jpg" alt="La Corbière lighthouse at sunset" style="object-position:50% 24%"><span class="t">La Corbière, Jersey</span></div>
+
+      <section class="sec grid-bg" id="contact">
+        <div class="split" style="align-items:flex-start">
+          <div><div class="eyebrow">Get in touch</div><h2>Tell us <span class="grad">what you need.</span></h2><p class="sub">We reply fast. For anything urgent, call or message us on WhatsApp, any hour.</p>
+            <ul class="clist">
+              <li><span>Phone or WhatsApp · 24/7</span><a href="tel:+447797720723">+44 7797 720 723</a></li>
+              <li><span>Email</span><a href="mailto:dutyagent@cips.agency">dutyagent@cips.agency</a></li>
+            </ul>
+          </div>
+          <form id="enquiryForm" class="form" data-enquiry style="max-width:none">
+            <fieldset class="topics full"><legend>What is your enquiry about?</legend><div class="chips">
+              <label><input type="radio" name="topic" value="port" checked><span>Port Call</span></label>
+              <label><input type="radio" name="topic" value="cargo"><span>Cargo/Freight</span></label>
+              <label><input type="radio" name="topic" value="project"><span>Project</span></label>
+              <label><input type="radio" name="topic" value="registry"><span>Registry Services</span></label>
+              <label><input type="radio" name="topic" value="other"><span>Something Else</span></label>
+            </div></fieldset>
+            <div data-topic="port" data-main><label for="vessel">Vessel or company</label><input id="vessel" name="vessel" type="text" placeholder="Name or IMO number"></div>
+            <div data-topic="port"><label for="vtype">Type</label><select id="vtype" name="vtype"><option>Yacht</option><option>Cruise</option><option>Offshore</option><option>Shipping</option><option>Other</option></select></div>
+            <div data-topic="port"><label for="island">Port</label><select id="island" name="island"><option>Jersey</option><option>Guernsey</option><option>Other</option></select></div>
+            <div data-topic="port"><label for="arrival">Arrival</label><input id="arrival" name="arrival" type="text" placeholder="Date or window"></div>
+            <div data-topic="port"><label for="service">Service required</label><select id="service" name="service"><option value="General enquiry">General enquiry</option><option>Fuel / Bunkering</option><option>Itinerary &amp; Ground Handling</option><option>Crew &amp; Guest Services</option><option>Provisions &amp; Produce</option><option>Cargo &amp; Stores</option><option>Berthing &amp; Quayside</option><option>Customs &amp; Clearances</option><option>Crew Development &amp; Dispute Resolution</option><option>British Ship Registry</option></select></div>
+            <div data-topic="cargo" data-main><label for="ccompany">Company</label><input id="ccompany" name="ccompany" type="text"></div>
+            <div data-topic="cargo"><label for="cargo">Cargo</label><input id="cargo" name="cargo" type="text" placeholder="What, and how much"></div>
+            <div data-topic="cargo"><label for="corigin">From</label><input id="corigin" name="corigin" type="text" placeholder="Where it is coming from"></div>
+            <div data-topic="cargo"><label for="cdest">To</label><input id="cdest" name="cdest" type="text" placeholder="Where it needs to go"></div>
+            <div data-topic="cargo"><label for="cwhen">When</label><input id="cwhen" name="cwhen" type="text" placeholder="Date or window"></div>
+            <div data-topic="cargo"><label for="cservice">What do you need</label><select id="cservice" name="cservice"><option>Not sure yet</option><option>Import to the Channel Islands</option><option>Export from the Channel Islands</option><option>Customs clearance</option><option>Cargo handling and storage</option></select></div>
+            <div data-topic="project" data-main><label for="pcompany">Company</label><input id="pcompany" name="pcompany" type="text"></div>
+            <div data-topic="project"><label for="pproject">Project</label><input id="pproject" name="pproject" type="text" placeholder="Name, or a line on what it is"></div>
+            <div data-topic="project"><label for="plocation">Where</label><input id="plocation" name="plocation" type="text" placeholder="Location or island"></div>
+            <div data-topic="project"><label for="pdates">Dates</label><input id="pdates" name="pdates" type="text" placeholder="Start date and duration"></div>
+            <div data-topic="project" class="full"><label for="psupport">Support needed</label><select id="psupport" name="psupport"><option>Not sure yet</option><option>Crew changes</option><option>Freight and logistics</option><option>Provisions and supplies</option><option>Port services and berthing</option><option>A bit of everything</option></select></div>
+            <div data-topic="registry" data-main><label for="rcompany">Owner or company</label><input id="rcompany" name="rcompany" type="text"></div>
+            <div data-topic="registry"><label for="rvessel">Vessel</label><input id="rvessel" name="rvessel" type="text" placeholder="Name, or planned name"></div>
+            <div data-topic="registry"><label for="rtype">Type</label><select id="rtype" name="rtype"><option>Yacht</option><option>Commercial vessel</option><option>Offshore</option><option>Other</option></select></div>
+            <div data-topic="registry"><label for="rneed">What do you need</label><select id="rneed" name="rneed"><option>Not sure yet</option><option>Register a vessel</option><option>Move a vessel onto the British register</option><option>Renew or change a registration</option><option>General information</option></select></div>
+            <div data-topic="other" data-main><label for="ocompany">Company or organisation</label><input id="ocompany" name="ocompany" type="text" placeholder="Optional"></div>
+            <div><label for="name">Your name</label><input id="name" name="name" type="text" required></div>
+            <div class="full"><label for="email">Email or phone</label><input id="email" name="email" type="text" required placeholder="How we reach you"></div>
+            <div class="full"><label for="message">What do you need?</label><textarea id="message" name="message" rows="4" placeholder="Clearance, bunkers, crew change, provisions…"></textarea></div>
+            <div class="full"><button class="btn pri" type="submit">Send enquiry →</button> <span style="margin-left:14px;color:var(--ink2);font-size:15px">Opens in your email app</span></div>
+          </form>
+          <script src="home/enquiry-form.js" defer></script>
+        </div>
+      </section>
+
+    </div></div>
+
+    <script src="review/config.js"></script>
+    <script>
+    (function(){
+      // "Replay the journey" returns to the start of the globe, exactly like the pill that appears when you scroll up
+      var r = document.getElementById('homeReplay'); if (r) r.addEventListener('click', function(){ var b = document.getElementById('backToGlobe'); if (b) b.click(); else window.scrollTo({top:0,behavior:'smooth'}); });
+      // Port Call Index: the live reviews replace the three illustrative ones as soon as there are real ones
+      function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+      fetch((window.REVIEW_API || '') + '/api/reviews').then(function(x){ return x.json(); }).then(function(data){
+        var reviews = (data && data.reviews) ? data.reviews : []; if (!reviews.length) return;
+        var wrap = document.getElementById('homeReviewCards'); if (!wrap) return;
+        wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });
+        reviews.slice(0, 3).forEach(function(r){
+          var who = (r.ship ? esc(r.ship) : 'Verified master'), when = [r.port, r.when].filter(Boolean).map(esc).join(' · ');
+          var quote = (r.didWell && r.didWell.trim()) ? ('“' + esc(r.didWell) + '”') : ('Rated ' + (r.overall||'-') + '/5 on the CIPS Port Call Index.' + (r.appoint === 'Yes' ? ' Will appoint again.' : ''));
+          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = '<p>' + quote + '</p><small>' + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
+        });
+      }).catch(function(){ /* keep the illustrative examples on any error */ });
+    })();
+    </script>
+    <script>
+    (function(){
+      // CIPS Desk LIVE: three concept screens (ship operators, yachts, cruise lines). Rotates on its own, stops once someone picks a tab, paused on hover, still for reduced motion.
+      var box = document.getElementById("dlcar"); if (!box) return;
+      var imgs = [].slice.call(box.querySelectorAll(".dlslides img")), tabs = [].slice.call(box.querySelectorAll(".dltabs button")), ttl = box.querySelector(".dlttl");
+      var names = ["ship operators", "yachts", "cruise lines", "offshore"], cur = 0, timer = 0, auto = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      function show(i){ cur = i; imgs.forEach(function(im, k){ im.classList.toggle("on", k === i); }); tabs.forEach(function(t, k){ t.setAttribute("aria-selected", k === i ? "true" : "false"); }); ttl.textContent = "cips desk live · " + names[i]; }
+      function start(){ clearInterval(timer); if (auto) timer = setInterval(function(){ show((cur + 1) % imgs.length); }, 6500); }
+      tabs.forEach(function(t, k){ t.addEventListener("click", function(){ auto = false; clearInterval(timer); imgs.forEach(function(im){ im.loading = "eager"; }); show(k); }); });
+      box.addEventListener("mouseenter", function(){ clearInterval(timer); }); box.addEventListener("mouseleave", start);
+      start();
+      // "Talk to us about CIPS Desk LIVE" lands on the enquiry form with that service already chosen.
+      [].forEach.call(document.querySelectorAll("a[data-service]"), function(a){ a.addEventListener("click", function(){ var sel = document.getElementById("service"); if (sel) sel.value = a.getAttribute("data-service"); }); });
+    })();
+    </script>
+    <script src="home/desk-lightbox.js" defer></script>
+    <script src="home/gateway-film.js" defer></script>
+
+
+  </main>
+
+  <!-- ========================= FOOTER ========================= -->
+  <footer class="qrfoot bg-[#08111f] text-cream/70">
+    <div class="max-w-8xl mx-auto px-5 sm:px-8 py-16">
+      <div class="grid md:grid-cols-12 gap-10">
+        <div class="md:col-span-5">
+          <img src="images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-11 w-auto" />
+          <p class="mt-6 max-w-sm leading-relaxed text-cream/55">
+            The Channel Islands' leading port agency. Strategic port solutions with a personal touch —
+            excellence from ship to shore, widely respected for visible excellence.
+          </p>
+        </div>
+
+        <div class="md:col-span-3 md:col-start-7">
+          <h4 class="eyebrow text-[11px] text-gold/70 mb-4">Explore</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#desks" class="hover:text-white transition-colors">Sectors</a></li>
+            <li><a href="#islands" class="hover:text-white transition-colors">Islands</a></li>
+            <li><a href="#services" class="hover:text-white transition-colors">Services</a></li>
+            <li><a href="#gateway" class="hover:text-white transition-colors">Atlantic Gateway</a></li>
+            <li><a href="#deskl" class="hover:text-white transition-colors">Desk LIVE</a></li>
+            <li><a href="reviews.html" class="hover:text-white transition-colors">Reviews</a></li>
+            <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-3">
+          <h4 class="eyebrow text-[11px] text-gold/70 mb-4">Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Terms of Use</a></li>
+            <li><a href="https://www.linkedin.com/company/channelislandportservices" target="_blank" rel="noopener" class="hover:text-white transition-colors">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-white/10">
+        <p class="text-sm text-cream/60">Had a port call with CIPS? Look out for your review link by email after you sail.</p>
+      </div>
+      <div class="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-cream/45">
+        <p>&copy; <span id="year">2026</span> Channel Island Port Services. All rights reserved.</p>
+        <p>The Atlantic Gateway · The Channel Islands</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================= SCRIPTS ========================= -->
+  <script>
+    // Current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Sticky header shadow on scroll
+    const header = document.getElementById('header');
+    const onScroll = () => {
+      if (window.scrollY > 12) header.classList.add('shadow-lg','shadow-black/20');
+      else header.classList.remove('shadow-lg','shadow-black/20');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const openIcon = '<path stroke-linecap="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>';
+    const closeIcon = '<path stroke-linecap="round" d="M6 18 18 6M6 6l12 12"/>';
+    let open = false;
+    const toggleMenu = (state) => {
+      open = state ?? !open;
+      mobileMenu.classList.toggle('hidden', !open);
+      menuIcon.innerHTML = open ? closeIcon : openIcon;
+    };
+    menuBtn.addEventListener('click', () => toggleMenu());
+    document.querySelectorAll('.mobile-link').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
+
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Plan-a-call form -> mailto: now in home/enquiry-form.js (topic-led, 24 Oct 2026)
+
+    // Film: real footage graded from faded B&W to vibrant as service blocks complete
+    (function(){
+      const sec = document.getElementById('arrival');
+      if (!sec || !sec.classList.contains('film-sec')) return;
+      const vid = sec.querySelector('.film');
+      const titleEl = sec.querySelector('.ctitle');
+      const subEl = sec.querySelector('.csub');
+      const bar = sec.querySelector('.cinema-progress > span');
+      const chips = Array.prototype.slice.call(sec.querySelectorAll('.cchip'));
+      const STAGES = [
+        { at:0.00, t:"She arrives, weary from the sea", s:"Faded from a long passage — until CIPS goes to work." },
+        { at:0.14, t:"Fuel & bunkers aboard",           s:"Tanks topped — tax-efficient, transparent, clean." },
+        { at:0.30, t:"Provisions replenished",           s:"The finest Jersey produce and supplies, loaded." },
+        { at:0.46, t:"Fresh water & technical",          s:"Topped up and shipshape, alongside the quay." },
+        { at:0.62, t:"Crew refreshed & rotated",         s:"Rested crew, flights to London and concierge, handled." },
+        { at:0.78, t:"Interiors renewed",                s:"Furnishings and finishing touches, restored." },
+        { at:0.92, t:"Fully replenished. Ready to sail.",s:"Vibrant, and away — to Europe and beyond." }
+      ];
+      const chipStops = [0.14, 0.30, 0.46, 0.62, 0.78, 0.92];
+      let curStage = -1, raf = 0;
+      function grade(p){
+        const k = Math.min(1, p / 0.92);
+        const g   = (1 - k).toFixed(3);
+        const se  = (0.35 * (1 - k)).toFixed(3);
+        const sat = (0.25 + 1.20 * k).toFixed(3);
+        const con = (0.90 + 0.28 * k).toFixed(3);
+        const bri = (0.72 + 0.34 * k).toFixed(3);
+        if (vid) vid.style.filter = 'grayscale('+g+') sepia('+se+') saturate('+sat+') contrast('+con+') brightness('+bri+')';
+      }
+      function frame(){
+        raf = requestAnimationFrame(frame);
+        if (!vid) return;
+        const d = vid.duration;
+        if (!d || isNaN(d)) return;
+        const p = Math.min(1, vid.currentTime / d);
+        grade(p);
+        if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
+        for (let i = 0; i < chips.length; i++) chips[i].classList.toggle('on', p >= chipStops[i]);
+        let st = 0; for (let i = 0; i < STAGES.length; i++){ if (p >= STAGES[i].at) st = i; }
+        if (st !== curStage){ curStage = st; if (titleEl) titleEl.textContent = STAGES[st].t; if (subEl) subEl.textContent = STAGES[st].s; }
+      }
+      grade(0);
+      if ('IntersectionObserver' in window){
+        const io = new IntersectionObserver(function(es){
+          es.forEach(function(e){
+            if (e.isIntersecting){ if (vid && vid.play) vid.play().catch(function(){}); if (!raf) frame(); }
+            else { if (vid && vid.pause) vid.pause(); if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+          });
+        }, { threshold: 0.25 });
+        io.observe(sec);
+      } else { frame(); }
+      return;
+    })();
+
+    // (legacy scroll-cinema — inert unless a .cinema section exists)
+    (function(){
+      const sec = document.getElementById('arrival');
+      if (!sec || !sec.classList.contains('cinema')) return;
+      const track  = sec.querySelector('.cinema-track');
+      const scenes = Array.prototype.slice.call(sec.querySelectorAll('.cscene'));
+      const N = scenes.length;
+      const titleEl = sec.querySelector('.ctitle');
+      const subEl   = sec.querySelector('.csub');
+      const capEl   = sec.querySelector('.cinema-caption');
+      const bar     = sec.querySelector('.cinema-progress > span');
+      const chips   = Array.prototype.slice.call(sec.querySelectorAll('.cchip'));
+      const STORY = [
+        { t: "A superyacht makes for Jersey", s: "Inbound to the Atlantic Gateway — the call is in hand before she is alongside." },
+        { t: "Whatever flies your flag",      s: "From cruise ships to superyachts, cleared and berthed at St Helier." },
+        { t: "Into the Atlantic Gateway",     s: "Deepwater access and local knowledge, from the first line to the last." },
+        { t: "The finest Jersey provisions",  s: "Island produce, fine dining supplies and urgent parts — sourced and delivered." },
+        { t: "Luxury, crew & concierge",      s: "Rolex to rotations — shopping, travel and white-glove crew support." },
+        { t: "Every service. One agency.",    s: "Excellence from ship to shore, day or night." }
+      ];
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return; // CSS fallback shows the first scene statically
+      let idx = -1, ticking = false;
+      function clamp(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
+      function update(){
+        ticking = false;
+        const rect = track.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const total = track.offsetHeight - vh;
+        const p = clamp((-rect.top) / (total || 1));
+        if (bar) bar.style.width = (p * 100).toFixed(2) + '%';
+        const sf = p * N;
+        const i = Math.min(N - 1, Math.floor(sf));
+        const local = sf - i;
+        for (let k = 0; k < N; k++){
+          const el = scenes[k];
+          let op = 0, sc = 1.06;
+          if (k === i){
+            sc = 1.06 + 0.13 * local;
+            op = (i < N - 1 && local > 0.80) ? (1 - (local - 0.80) / 0.20) : 1;
+          } else if (k === i + 1){
+            sc = 1.02 + 0.13 * local;
+            op = local > 0.80 ? (local - 0.80) / 0.20 : 0;
+          }
+          el.style.opacity = op;
+          el.style.transform = 'scale(' + sc.toFixed(3) + ')';
+        }
+        if (i !== idx){ idx = i; const st = STORY[Math.min(i, STORY.length - 1)]; if (titleEl) titleEl.textContent = st.t; if (subEl) subEl.textContent = st.s; }
+        if (capEl){ const vis = 1 - Math.min(1, Math.abs(local - 0.45) * 1.7); capEl.style.opacity = Math.max(0.06, vis).toFixed(2); capEl.style.transform = 'translateY(' + ((1 - vis) * 18).toFixed(1) + 'px)'; }
+        const lit = Math.round(p * chips.length);
+        for (let c = 0; c < chips.length; c++) chips[c].classList.toggle('on', c < lit);
+      }
+      function onScroll(){ if (!ticking){ ticking = true; requestAnimationFrame(update); } }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      update();
+    })();
+  </script>
+
+  <!-- ===================== GLOBE OPENING ACT ===================== -->
+  <script>
+  (function(){
+    var act=document.getElementById('openingAct'); if(!act) return;
+    // full-bleed hero: pull the opening act up so the first 100vh stage fills the viewport beneath the dark nav
+    function fitHero(){ act.style.marginTop='0px'; var off=act.offsetTop; act.style.marginTop=(-off)+'px'; }
+    fitHero(); window.addEventListener('resize',fitHero); window.addEventListener('load',fitHero);
+  })();
+  </script>
+
+  <!-- ===================== ON-PASSAGE CHART JOURNEY ===================== -->
+  
+  <!-- ===================== SEA-TO-SKY SATELLITE APPROACH ===================== -->
+  
+  <!-- ===== OPENING ACT — beat list (order = array). Library: ../_beats (synced copy in ./_beats). See TECH-REFERENCE-hero-animation.md ===== -->
+  <script src="js/scroll-momentum.js" defer></script>
+  <script type="module">
+    import { run } from './_beats/runtime/stage.js';
+    /* 25 Sep 2026, Simon: "I see the old globe (without the Skip to CIPS button) for a second, then it switches" —
+       there's no old page hiding anywhere; the CTA/Skip link/compact layout below are added entirely by
+       globe-enhancements.js, which used to be imported only AFTER `await run([...])` resolved — and run() doesn't
+       return until ALL SEVEN scenes in this list have finished loading, not just the globe (the first one). So
+       the globe rendered in its plainer, pre-enhancement form for however long the other six scenes took to
+       load, before the enhancement script caught up. Fixed by starting the import now, in parallel with run(),
+       and installing the moment the globe's OWN stage exists — it's the very first beat in the list, so this
+       settles almost immediately, well before run() as a whole is done. */
+    const enhancePromise = (async () => {
+      try {
+        const mod = await import('./js/globe-enhancements.js');
+        // the stage <div> itself exists as soon as run() starts processing globe-live (near-instant), but its
+        // actual content — beat.html, fetched separately — lands a moment later; installGlobeEnhancements()'s own
+        // internal steps (addSkipLink etc.) each guard on their target element and just silently no-op if it's
+        // still missing, so checking only for the empty stage let this run too early with no error to show for
+        // it. [data-g="voyageCta"] only exists once beat.html's own content has actually landed.
+        const tryInstall = () => { if (document.querySelector('#beats .beat-globe-live > .beat-stage [data-g="voyageCta"]')) { mod.installGlobeEnhancements('#beats'); return true; } return false; };
+        if (!tryInstall()) {
+          await new Promise(res => { const iv = setInterval(() => { if (tryInstall()) { clearInterval(iv); res(); } }, 30); setTimeout(() => { clearInterval(iv); res(); }, 90000); });   /* 24 Oct 2026: was 5000 ms; on a slow load the globe's content can land later than that, which left the plain pre-enhancement globe on screen for good (Simon: "why are we looking at a really old version of the globe?") */
+        }
+      } catch (e) { console.warn('[globe-enhancements]', e); }
+    })();
+    await run([
+      /* one pinned stage: the globe becomes the clouds becomes the sea in the same space (group), clouds layered over both (over) */
+      { beat:'globe-live',     track:'560vh', group:'opening', options:{ fadeOut:false, northUp:true, ais: { SIMULATED_ONLY: true, AIS_BBOX:[[[43,-12],[54,6]]] } } },   /* 16 Sep 2026: live AIS layer + captain's picker brought back in from Howard's merge-ready _beats/globe-live-site (CIPS/HLC-globe-lab) — status pill, click-a-ship, "Show her"/"Take me in", reading Howard's always-on buffer in London when it's up. AIS_KEY is a TEMPORARY stopgap (Simon + Howard OK'd, 16 Sep) — his buffer is down (502), so without a key the page falls back to a simulated fleet; this key lets it fall back one step further to a direct aisstream.io connection instead, same as the lab's own lab-config.js. This ships the key to every visitor (the whole reason the buffer exists is to avoid that) — remove AIS_KEY the moment the buffer's back up, and swap the buffer route for a real one before this site goes public. AIS_BBOX narrowed to the Channel/Western Europe window (was the default whole North Atlantic + Med, [[25,-85],[66,30]]) — that default firehose was tens of thousands of ships worldwide, which stalled the deep-zoom map build for minutes as the registry grew; narrower is also just more relevant for a Jersey port agency. Kinship's marker/callout (Simon, 15 Sep) unchanged. Set ais:null to go back to the globe alone. One continuous zoom: dot-matrix globe fly-in -> drawn coastline -> real night-aerial city lights on the sphere -> deep zoom onto Jersey with channel-night's own HD plate. channel-night itself is untouched and still in _beats/, just no longer wired into this page. */
+      { beat:'cloud-pass',     track:'260vh', group:'opening', over:true, reveal:0.64, fadePrev:[0.50,0.70], options:{ chart:false, chartHold:0.06, chartIn:2.0, dawn:[0.12,0.72] } },   /* into the cloud at night, out in daylight */   /* chartIn 2.0 = the dark sky backdrop barely arrives before the whiteout; the clouds do the covering, so the night map is not dimmed early */  /* clouds only — close over the night map, break through to the sea */
+      { beat:'seaway-wake',    track:'2405vh', group:'opening', overlap:'80vh', options:{ heading:'east', arrivalSpeed:22, copyIn:[0.60,0.70], islands:false, yaw:0, hudIn:[0.031,0.045] } },   /* 3 Oct 2026, Simon: "incorporate cloud pass into the start of seaway... currently its a bit glitchy loading/switching between the two" — overlap:'80vh' starts this beat's slice 80vh before cloud-pass ends (cloud-pass's reveal point is 94vh from its end, so seaway is live well before then): the ship is already sailing (the due-east preamble) while the clouds break through, instead of sitting frozen on its first frame and then popping into motion; the plotter + play door wait (hudIn, raw progress 0.031-0.045 = the 80vh overlap plus a short fade) so they don't pop in on top of the clouds. The runtime shortens the group by the overlap. Seaway also now compiles its shaders at mount and uploads its coast textures at load, so nothing stalls the frame it is revealed. 3 Oct 2026, Simon: "speed up the scroll speed in seaway (so it matches that in noirmont) but make sure it stays smooth not jerky" — 4320vh -> 2607vh, but NOT a straight cut: the beat now remaps scroll progress through a smooth constant-ground-speed curve (CRUISE_VH_PER_NM=260 in seaway-wake/beat.js, easing back to the old pilot-transfer pace between its 50-60% points), so the pilot transfer + exit keep their old scroll length and only the open-water cruise speeds up. 2607 is that curve's computed total (ctrl.paceVh) — if CRUISE_VH_PER_NM or the route changes, recompute and update this. 2 Oct 2026 (later), Simon: "scroll rate on seaway is too slow, lets speed that up by 25%" — 5400vh -> 4320vh (5400/1.25), a straight track-length cut so every phase's relative timing stays exactly as tuned. 2 Oct 2026, Simon: "the leg as we exit the pilot zone goes way too fast... at least x3" — was 1800vh. Pushing pilot.home[0] earlier (the only lever that widens the exit phase's own p-share directly) badly compresses the alongside/boarding-transfer phase instead — even an aggressive shift only reaches ~1.6x, and alongside was deliberately widened for "slow down time" earlier. A straight 3x track-length increase instead: guarantees the exit phase gets at least 3x more vh without touching any of the other already-tuned phase boundaries or their own relative timing. 30 Sep 2026: was 900vh (600vh before that); 29 Sep 2026: yaw moved to noirmont-transit's own ending — this beat now hands off mid-crossing, not straight to berth-arrival */
+      { beat:'noirmont-transit', track:'900vh', group:'opening' },   /* 23 Oct 2026, Simon: the handover to st-helier-approach moved back to East Rock on the 022 heading (endAt 0.8 -> 0.5625, see _shared/st-helier-route.js): 1600vh * 0.5625 = 900vh keeps the scroll speed. */   /* 3 Oct 2026, Simon: "lets end noirmont beat at the point where it is currently p80%, thats where we will transition into the next beat, as the zoom in starts" — 1600vh -> 1280vh (1600*0.8): the beat now stops at its old 80% point (option endAt:0.8), same scroll speed, no yaw/zoom-in; the next beat takes the zoom-in. 1 Oct 2026, Simon: "the route goes way too fast" — was 260vh, no more than a by-feel number from before seaway-wake's own pacing got slowed down repeatedly; 1600vh paces this beat's real ~4.4 M route (GEO.pilotage.slice(3)) at roughly the same vh-per-mile seaway-wake's own cruise legs now run at (~1800vh / ~3 M, excluding its pilot-transfer hold), not reasoned from scratch — a starting point to tune further, not a final number. 29 Sep 2026: Chapter 1 scene 1 — pilot already aboard, past Noirmont Point into St Aubin's Bay, picks up the leading line; ends with the yaw/turn that used to be seaway-wake's own, matching berth-arrival's opening frame */
+      { beat:'st-helier-approach', track:'21250vh', group:'opening', keepPrev:0.0018 },   /* 31 Oct 2026 (the finale): chapter 5, the way out, added: the yacht casts off and the camera lifts, the Savannah departure full screen, the closing line, and the whole frame shrinking into the home page's hero panel (finale.js): 1500vh more, track 18850vh -> 20350vh (keepPrev 0.0019 = about 39vh); home-port and statement-breather are no longer in the run (their job is the closing line). 31 Oct 2026 (latest): every speed in the quay halved, story 1565 s -> 2842 s, quay track 9300vh -> 16850vh at the same pace (keepPrev 0.0021 = about 39vh). 31 Oct 2026 (later): quay re-timed, story 1702 s -> 1565 s, track 12100vh -> 11300vh at the same pace (quay 9300vh). 31 Oct 2026: track 9750vh -> 12100vh (the quay slowed for people and the van, see quayTail in the beat: chapters 1-3 stay 2000vh); keepPrev 0.0032 (about 39vh, was 0.004 of 9750vh). 30 Oct 2026: keepPrev (about 39vh): the runtime keeps the beat before drawn for the first 3% of a beat by default, which on this 9750vh beat was about 290vh of scrolling with noirmont-transit's sea and plates drawn underneath the harbour and never seen (the Small Roads ran at 16-27 fps there); the next scene is now warmed up before the changeover, so the short overlap is enough. */   /* 4 Oct 2026, Simon: Small Roads, entrance and berth rebuilt in the new style as ONE scene with three chapters (picks up exactly where noirmont-transit stops). Replaces berth-arrival; bunkers-road and provisions-quay are not needed any more (the quay at work is chapter 4 of this scene). 30 Oct 2026: all three are archived in CIPS/archive/beats. */
+    ], { root:'#beats', base:'./_beats/' });
+    /* 21 Sep 2026 (Howard): the globe enhancements first made on the Monaco page, applied here (js/globe-enhancements.js)
+       — the import/install itself now starts above, concurrently with run(); this just makes sure it's genuinely
+       finished (it settles almost immediately in practice) before anything below reads the enhanced DOM. */
+    await enhancePromise;
+
+    /* ---- "Back to the globe" pill and the scroll-up hold (14 Oct 2026, Simon) ----
+       Once the visitor is on the main site (skipped, or finished the journey and scrolled down) they cannot scroll back up into the globe journey: scrolling up stops at the top of the main site and the
+       pill, fixed at the top of the page, offers the way back. Clicking it returns to the START of the globe with its "choose your voyage" scroll lock back (a clean reload of the page at the top: the
+       globe's own start-up puts the lock, the CTA and everything else back exactly as a first visit; going through the page's own state to undo a whole voyage would be far more fragile). */
+    const backPill = document.getElementById('backToGlobe'), openingEl = document.getElementById('openingAct');
+    const mainTop = () => openingEl ? openingEl.getBoundingClientRect().bottom + scrollY - (document.documentElement.classList.contains('has-finale') ? innerHeight : 0) : 0;       // where the opening act ends and the main site begins (with the finale the home page starts one window height early, under the shrinking frame)
+    let pillTimer = 0, armed = false, restarting = false, lastY = scrollY, quietUntil = 0;
+    const showPill = (ms = 5000) => { backPill.classList.add('on'); clearTimeout(pillTimer); pillTimer = setTimeout(hidePill, ms); quietUntil = performance.now() + 600; };   // (the scroll that put it there must not hide it again)
+    const hidePill = () => { backPill.classList.remove('on'); clearTimeout(pillTimer); };
+    function restartAtGlobe() {
+      if (restarting) return; restarting = true; hidePill(); clearTimeout(collapseTimer);
+      try { history.scrollRestoration = 'manual'; } catch (e) { /* older browsers */ }
+      const veil = document.createElement('div'); veil.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#04070e;opacity:0;transition:opacity .25s ease'; document.body.appendChild(veil);
+      requestAnimationFrame(() => { veil.style.opacity = '1'; });
+      setTimeout(() => { document.body.style.overflow = ''; scrollTo(0, 0); const qs = new URLSearchParams(location.search); qs.delete('goto'); const q = qs.toString(); location.replace(location.pathname + (q ? '?' + q : '')); }, 280);   /* (1 Nov 2026: a ?goto= link jumped straight back to where it pointed, so Replay the journey seemed to do nothing) */
+    }
+    const syncMainClass = () => document.documentElement.classList.toggle('on-cips-main', scrollY > mainTop() - innerHeight * 0.6);
+    addEventListener('scroll', syncMainClass, { passive: true }); addEventListener('resize', syncMainClass); syncMainClass();
+    addEventListener('scroll', () => {
+      if (restarting) return;
+      const y = scrollY, floor = mainTop(), prev = lastY, d = y - prev; lastY = y;
+      if (d > 3 && performance.now() > quietUntil) hidePill();                                           // the pill goes as soon as the visitor scrolls down
+      if (y > floor + 60 || prev > floor + 60) armed = true;                                                                // properly on the main site: from here the way up is the pill
+      if (armed && y < floor - 1) {
+        if (y <= 2) { restartAtGlobe(); return; }                                                     // a jump to the very top (the logo, Home) means "back to the globe"
+        scrollTo({ top: floor, behavior: 'instant' }); showPill();                                                                // anything else is held at the top of the main site
+      }
+    }, { passive: true });
+    document.addEventListener('click', e => { if (e.target.closest && e.target.closest('.skip-globe')) setTimeout(() => { lastY = scrollY; armed = true; collapseJourney(); showPill(); }, 120); }, true);   // "Skip to CIPS ↓"
+    backPill.addEventListener('click', restartAtGlobe);
+    /* 1 Nov 2026, Simon: scrolling up at the top of the main site made the screen judder violently. The hold above snaps the page back to the top AFTER the browser has already scrolled it above (a wheel scroll is animated by the browser, off the page's own thread), so with the wheel kept turning the two
+       fought every frame. So the scroll is stopped at the source: a wheel or key that would take the page above the top of the main site is cancelled, and the page is put exactly at the top (the pill still tells the visitor how to go back). The snap-back above stays as the safety net (scrollbar drags, touch). */
+    const wheelPx = e => e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY;
+    const holdTop = d => {   // d: the scroll about to happen (negative = up). True when it would go above the top of the main site (and has been stopped)
+      if (restarting || !armed || d >= 0) return false; const floor = collapsed ? 0 : mainTop(); if (scrollY + d >= floor - 0.5) return false;
+      if (!collapsed && scrollY > floor + 0.5) scrollTo({ top: floor, behavior: 'instant' }); lastY = scrollY; if (!backPill.classList.contains('on')) showPill(); return true; };
+    addEventListener('wheel', e => { if (e.ctrlKey) return; if (holdTop(wheelPx(e))) e.preventDefault(); }, { passive: false });
+    let collapsed = false, collapseTimer = 0;
+    const collapseJourney = () => {   // at rest on the main site: take the journey out of the document and keep the page exactly where it is on screen
+      if (collapsed || restarting || !armed) return; const about = document.getElementById('about'); if (!about) return;
+      const v0 = about.getBoundingClientRect().top; about.style.transform = ''; collapsed = true;   // v0: where the hero is on screen now (the finale holds it a header's height down)
+      document.documentElement.style.setProperty('--hdr', ((document.querySelector('header') || {}).offsetHeight || 0) + 'px'); document.documentElement.classList.add('main-collapsed');
+      const v1 = about.getBoundingClientRect().top; scrollTo({ top: Math.max(0, scrollY + (v1 - v0)), behavior: 'instant' }); lastY = scrollY; };
+    // 1 Nov 2026, Simon: the collapse is INSTANT: the moment the page reaches the main site (the finale landing, a scroll, Skip to CIPS) the journey is taken out, so there is no moment in which the visitor can scroll back up into it (it used to wait 0.4 s after the scrolling stopped, and he got back into the quay).
+    let prevScrollY = scrollY;
+    addEventListener('scroll', () => { const wasY = prevScrollY; prevScrollY = scrollY; if (collapsed && !restarting && armed && scrollY <= 0.5 && wasY > 0.5 && !backPill.classList.contains('on')) showPill(); if (collapsed || restarting) return; const mt = mainTop(); if (mt > innerHeight * 3 && scrollY >= mt - 0.5) { armed = true; collapseJourney(); } }, { passive: true });   // (mt > 3 windows: not while the page is still sizing itself at load)
+    window.__cipsCollapse = () => collapsed;   // dev aid
+    window.__cipsArrive = () => { armed = true; lastY = scrollY; collapseJourney(); };   // called by the globe's own Skip link right after it jumps: the journey goes at once
+    let touchY = 0; addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
+    addEventListener('touchmove', e => { if (!armed || restarting || e.touches.length !== 1) return; if (e.touches[0].clientY > touchY && scrollY <= (collapsed ? 0 : mainTop()) + 0.5 && e.cancelable) { e.preventDefault(); if (!backPill.classList.contains('on')) showPill(); } touchY = e.touches[0].clientY; }, { passive: false });   // (a finger moving down scrolls up: stopped at the top of the main site before the collapse has happened)
+    addEventListener('keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) return;
+      const up = e.key === 'ArrowUp' ? -60 : e.key === 'PageUp' || (e.key === ' ' && e.shiftKey) ? -innerHeight * 0.9 : 0; if (up && holdTop(up)) e.preventDefault(); });
+    window.__cipsHold = () => ({ armed, restarting, lastY, floor: mainTop(), y: scrollY });   // dev aid
+
+    /* ---- "Skip to CIPS" at every stage (14 Oct 2026, Simon): the globe's own skip link only exists at the very start; this one stays on screen through the whole journey, the beats and the mini-games ---- */
+    const skipBtn = document.getElementById('skipToCips');
+    // 1 Nov 2026, Simon: Skip to CIPS took him to the end of the quay. The hero's top minus the header is just INSIDE the last sliver of the finale (99.7% through), and the finale's rule that the film cannot be skipped sent him back to where it starts. The skip lands exactly where the finale itself lands: the hero's resting place (the top of the main site) when the finale is in the page.
+    window.__cipsSkipTarget = () => { const t = document.getElementById('about'); if (!t) return null; const header = document.querySelector('header')?.offsetHeight || 0; t.style.transform = ''; return t.getBoundingClientRect().top + scrollY - header; };   // (the hero's top below the header; any hold from the finale is cleared first)
+    function skipToCips() {
+      document.querySelectorAll('.splay-close').forEach(b => b.click());                 // close any mini-game overlay properly (restores the scroll it locked)
+      document.documentElement.style.overflow = ''; document.body.style.overflow = '';
+      const target = document.getElementById('about'); if (!target) return;
+      const header = document.querySelector('header')?.offsetHeight || 0;
+      scrollTo({ top: window.__cipsSkipTarget() ?? (target.getBoundingClientRect().top + scrollY - header), behavior: 'instant' });
+      lastY = scrollY; armed = true; collapseJourney(); showPill();
+    }
+    skipBtn.addEventListener('click', skipToCips);
+    setInterval(() => {                                                                    // show it through the journey; not on top of the globe's own skip link, not on the main site
+      const inGame = !!document.querySelector('.splay-overlay'), own = document.querySelector('.skip-globe');
+      const ownShown = (el => {                                                              // 28 Oct 2026, Simon: this pill takes over the moment the globe's own Skip pill is gone: off screen, hidden, or faded out with the opening copy
+        if (!el || !el.getClientRects().length) return false;
+        const r = el.getBoundingClientRect(); if (r.bottom <= 0 || r.top >= innerHeight) return false;
+        for (let n = el; n && n !== document.body; n = n.parentElement) { const cs = getComputedStyle(n); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.25) return false; }
+        return true;
+      })(own);
+      const inJourney = scrollY < mainTop() - 80;
+      skipBtn.classList.toggle('on', (inJourney || inGame) && !ownShown && !restarting);
+      skipBtn.classList.toggle('ingame', inGame); syncMainClass();
+    }, 300);
+  </script>
+</body>
+</html>

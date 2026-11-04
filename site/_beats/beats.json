@@ -1,0 +1,179 @@
+{
+ "generated": "2026-10-31T21:00",
+ "beats": [
+  {
+   "name": "globe-simple",
+   "order": 1,
+   "title": "Globe — the world arrives at the islands",
+   "site": "CIPS",
+   "summary": "Dark globe with brand-blue routes from the Caribbean and the Med converging on the Channel Islands; holds and turns, then dives to the archipelago.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "globe-live",
+   "order": 1,
+   "title": "Globe — live sphere zoom (AIS optional)",
+   "site": "CIPS",
+   "summary": "The dot-matrix globe flying in, then one continuous zoom — drawn coastline, real night-aerial lights, the HD Jersey plate — replacing globe-dotmatrix + channel-night. Brought in from Howard's HLC Globe Lab, 15 Sep 2026, with the live AIS feed/picker left out.",
+   "needs": [],
+   "modified": "2026-09-28",
+   "ok": true
+  },
+  {
+   "name": "channel-night",
+   "order": 2,
+   "title": "Channel at night — satellite approach",
+   "site": "CIPS",
+   "summary": "Opens on the globe's last frame — the islands as one orange dot on a night satellite image of the Channel — then zooms in on the dot until it dissolves into the islands' lights and Kinship comes up the western approaches.",
+   "needs": [],
+   "modified": "2026-09-13",
+   "ok": true
+  },
+  {
+   "name": "globe-dotmatrix",
+   "order": 3,
+   "title": "Globe — dot-matrix",
+   "site": "both",
+   "summary": "The showpiece globe: dot-matrix land, orange/blue polar glow, comet arcs converging on the Channel Islands, then the fly-in that leaves the islands as one orange dot for the next beat to pick up. CIPS default since 13 Sep 2026.",
+   "needs": [],
+   "modified": "2026-09-13",
+   "ok": true
+  },
+  {
+   "name": "cloud-pass",
+   "order": 4,
+   "title": "Chart & cloud — the gateway, then down through cloud",
+   "site": "both",
+   "summary": "Opens wide on the Channel chart (south coast, London, Cotentin, Brittany, the islands) under the Atlantic Gateway title, zooms to the islands, then clouds close over and we break through to the sea.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "seaway-wake",
+   "order": 5,
+   "title": "Seaway — the yacht steams in, pilot boards",
+   "site": "both",
+   "summary": "Real-time teal sea with a physical wake. The yacht crosses from the west toward the islands; the Jersey pilot launch comes alongside and the pilot boards; she slows and turns for the harbour.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "noirmont-transit",
+   "order": 5.5,
+   "title": "Noirmont transit — round to the Small Roads",
+   "site": "both",
+   "summary": "Pilot already aboard (from the seaway-wake game), the real-time sea continues past Noirmont Point into St Aubin's Bay, Elizabeth Castle off the bow, picking up the leading line for the Small Roads.",
+   "needs": [
+    "yachtScreen"
+   ],
+   "modified": "2026-09-29",
+   "ok": true
+  },
+  {
+   "name": "st-helier-approach",
+   "order": 5.6,
+   "title": "St Helier approach — Small Roads, entrance and berth",
+   "site": "CIPS",
+   "summary": "One continuous scene from where noirmont-transit stops: up the Small Road, onto the Pier Head lead and through the harbour entrance, then up the central channel and alongside the Albert Pier. Real satellite plates, true-scale harbour, door seams for 'Play Hold the Line' and 'Play the berthing'. Replaced berth-arrival, bunkers-road and provisions-quay in the live run (4 Oct 2026; those three are now archived in CIPS/archive/beats). Chapter 4 is the quay at work; the two doors play Hold the Line and the berthing game in the scene.",
+   "needs": [],
+   "modified": "2026-10-30",
+   "ok": true
+  },
+  {
+   "name": "journey-chart",
+   "order": 8,
+   "title": "Journey — chart plan view (spare)",
+   "site": "either",
+   "summary": "Nautical-chart beat: the yacht follows a course into St Helier with an SVG wake. Not in the CIPS list at present.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "approach-satellite",
+   "order": 9,
+   "title": "Approach — satellite map to London (spare)",
+   "site": "either",
+   "summary": "Leaflet satellite map with the yacht track and flights to London. Not in the CIPS list at present.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "home-port",
+   "order": 9,
+   "title": "The close — a home port you trust",
+   "site": "both",
+   "summary": "the sequence resolves: dark card, the one line the whole film has been walking toward",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  },
+  {
+   "name": "statement-breather",
+   "order": 9,
+   "title": "Statement — we own the call",
+   "site": "both",
+   "summary": "one positioning statement over a real drone photo, then a tagline — the pivot from the cinematic arrival into the stats and reasons that follow",
+   "needs": [],
+   "modified": "2026-09-10",
+   "ok": true
+  },
+  {
+   "name": "aerial-photo",
+   "order": 10,
+   "title": "Aerial photo — full-bleed still with copy",
+   "site": "both",
+   "summary": "Reusable photographic beat: any aerial photo with gentle parallax and a copy block.",
+   "needs": [],
+   "modified": "2026-08-21",
+   "ok": true
+  }
+ ],
+ "sites": [
+  {
+   "name": "site-cips",
+   "site": "CIPS",
+   "title": "CIPS website",
+   "summary": "cips.agency replacement — full page, opening act first",
+   "url": "../CIPS-website/index.html"
+  },
+  {
+   "name": "site-ag",
+   "site": "Atlantic Gateway",
+   "title": "Atlantic Gateway website",
+   "summary": "the proposition site — current draft home page",
+   "url": "../atlantic-gateway/index.html"
+  }
+ ],
+ "sequences": [
+  {
+   "name": "cips",
+   "site": "CIPS",
+   "title": "CIPS opening sequence",
+   "url": "../CIPS-website/index.html",
+   "beats": [
+    "globe-live",
+    "cloud-pass",
+    "seaway-wake",
+    "noirmont-transit",
+    "st-helier-approach"
+   ]
+  },
+  {
+   "name": "ag",
+   "site": "Atlantic Gateway",
+   "title": "AG opening sequence (beats)",
+   "url": "../atlantic-gateway/opening-beats.html",
+   "beats": [
+    "globe-dotmatrix",
+    "seaway-wake",
+    "aerial-photo"
+   ]
+  }
+ ]
+}

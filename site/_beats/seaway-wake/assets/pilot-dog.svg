@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20">
+  <!-- a small terrier, plan view, on the pilot launch's foredeck. True to scale — barely visible until you look. -->
+  <ellipse cx="10" cy="11" rx="5.2" ry="3.6" fill="#8a5a2b"/>
+  <ellipse cx="10" cy="11" rx="5.2" ry="3.6" fill="none" stroke="#5c3a19" stroke-width=".5" opacity=".5"/>
+  <circle cx="5.2" cy="10.6" r="2.6" fill="#8a5a2b"/>
+  <path d="M4.1 8.6 L3.2 6.4 L5.3 8.2 Z" fill="#6e461f"/>
+  <path d="M6.3 8.6 L7.2 6.4 L5.1 8.2 Z" fill="#6e461f"/>
+  <circle cx="4.3" cy="10.3" r=".55" fill="#1a120a"/>
+  <path d="M14.8 11 Q17.4 10.3 18.4 11.6" fill="none" stroke="#8a5a2b" stroke-width="1.3" stroke-linecap="round"/>
+</svg>

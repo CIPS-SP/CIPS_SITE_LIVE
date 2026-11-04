@@ -1,0 +1,25 @@
+{
+ "source": "Esri World Imagery z16 via _beats/tools/stitch.html",
+ "w": 5376,
+ "h": 3072,
+ "bounds": {
+  "west": -2.28515625,
+  "east": -2.1697998046875,
+  "north": 49.19606400072378,
+  "south": 49.15296965617039
+ },
+ "mPerPx": 1.5615708025333577,
+ "no4_px": [
+  3526,
+  1580
+ ],
+ "pilot_px": [
+  2510,
+  1901
+ ],
+ "corbiere_px": [
+  1638,
+  1145
+ ],
+ "note": "sw-plate.webp: SW Jersey from Corbi\u00e8re to Portelet with the water masked out (alpha) so the game sea shows through; anchorage No 4 at no4_px"
+}

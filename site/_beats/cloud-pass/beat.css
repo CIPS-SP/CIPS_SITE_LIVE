@@ -1,0 +1,38 @@
+/* cloud-pass — descend through a cloud layer. UC: 7 huge white cut-outs scaled 2–8× → 1 as the camera passes, lilac haze, decor clouds sliding with blur. Reversed here (we go down). */
+.beat-cloud-pass .beat-stage { background:#04070e; overflow:hidden; }
+.beat.beat-cloud-pass.beat-layer { pointer-events:none; }
+.beat-cloud-pass .beat-stage.layered { background:transparent; pointer-events:none; }   /* in a pinned group the neighbours show through — and clicks pass through to them (the seaway Play door) */
+.beat-cloud-pass .sky, .beat-cloud-pass .sea, .beat-cloud-pass .haze, .beat-cloud-pass .chart { position:absolute; inset:0; pointer-events:none; }   /* none of these take clicks (the stage sits layered over seaway-wake) */
+.beat-cloud-pass .chart { opacity:0; }
+.beat-cloud-pass .chart .land { fill:#0b131c; }   /* solid dark land under the clouds (AG globe uses a translucent fill) */
+.beat-cloud-pass .sky { background:radial-gradient(1200px 900px at 60% 40%, #0f1f33 0%, #07111c 55%, #04070e 100%); }
+.beat-cloud-pass .sea { background:#02484b; opacity:0; }
+.beat-cloud-pass .haze { background:#cfe3ea; opacity:0; mix-blend-mode:normal; }
+.beat-cloud-pass .layer, .beat-cloud-pass .decor { position:absolute; inset:0; pointer-events:none; }
+.beat-cloud-pass .c, .beat-cloud-pass .d { position:absolute; opacity:0; will-change:transform,opacity; user-select:none; }
+/* positions after UC's seven (origins matter: each cloud grows away from its own anchor so the pass feels volumetric) */
+.beat-cloud-pass .c1 { width:130vw; left:95%; bottom:13%; transform-origin:0 0;     translate:-50% 50%; }
+.beat-cloud-pass .c2 { width:105vw; left:20%; bottom:0;   transform-origin:100% 0;  translate:-50% -50%; }
+.beat-cloud-pass .c3 { width:100vw; right:30%; top:0;     transform-origin:100% 0;  translate:-50% -50%; rotate:-4deg; }
+.beat-cloud-pass .c4 { width:74vw;  left:56%; top:75%;    transform-origin:10% -15%; translate:-50% -50%; rotate:3deg; }
+.beat-cloud-pass .c5 { width:100vw; left:41%; bottom:0;   transform-origin:50% 0;   translate:-50% 50%; }
+.beat-cloud-pass .c6 { width:70vw;  left:10%; bottom:4%;  transform-origin:0 0;     translate:71% 50%; rotate:-2deg; }
+.beat-cloud-pass .c7 { width:130vw; right:30%; top:50%;   transform-origin:100% 0;  translate:0 -50%; }
+.beat-cloud-pass .c8 { width:120vw; right:-18%; top:-22%;  transform-origin:100% 0;  translate:0 0; rotate:2deg; }   /* top-right cover */
+.beat-cloud-pass .d  { filter:blur(2px); }
+.beat-cloud-pass .d1 { width:55vw; left:-10%; top:12%; }
+.beat-cloud-pass .d2 { width:60vw; right:-15%; top:58%; }
+/* AIS-style target — a moving box tracking her on the chart, before the real ship appears in seaway-wake */
+.beat-cloud-pass .ais { position:absolute; z-index:2; left:0; top:0; display:flex; align-items:center; gap:8px;
+    transform:translate(-50%,-50%); opacity:0; pointer-events:none; will-change:transform,opacity; }
+.beat-cloud-pass .ais-tri { flex:none; filter:drop-shadow(0 0 4px rgba(57,255,143,.8)); transform-origin:50% 50%; }
+.beat-cloud-pass .ais-tag { font:600 10px/1.35 ui-monospace,Menlo,monospace; letter-spacing:.04em; color:#c9ffe0;
+    background:rgba(4,20,14,.7); border:1px solid rgba(57,255,143,.45); border-radius:3px; padding:3px 7px; white-space:nowrap; }
+.beat-cloud-pass .ais-tag b { color:#39ff8f; font-weight:600; }
+.beat-cloud-pass .title { position:absolute; z-index:5; left:6vw; top:14vh; color:#eafff9; opacity:0; }
+.beat-cloud-pass .title .beat-eyebrow { font-size:12px; letter-spacing:.32em; text-transform:uppercase; opacity:.75; margin:0 0 .5rem; }
+.beat-cloud-pass .title .beat-title { font-size:clamp(1.6rem,3vw,2.4rem); font-weight:600; letter-spacing:.02em; margin:0; }
+.beat-cloud-pass .copy { position:absolute; z-index:5; left:6vw; bottom:12vh; max-width:34rem; color:#0b1727; opacity:0; }
+.beat-cloud-pass .beat-eyebrow { font-size:12px; letter-spacing:.3em; text-transform:uppercase; opacity:.7; margin:0 0 .6rem; }
+.beat-cloud-pass .beat-sub { font-size:1.05rem; line-height:1.5; margin:0; }
+@media (prefers-reduced-motion: reduce){ .beat-cloud-pass .c, .beat-cloud-pass .d { transition:none; } }

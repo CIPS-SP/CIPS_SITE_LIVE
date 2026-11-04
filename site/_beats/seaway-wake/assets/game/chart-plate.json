@@ -1,0 +1,23 @@
+{
+ "file": "chart-plate.webp",
+ "source": "OpenStreetMap land/water (tile.openstreetmap.org) · EMODnet Bathymetry WMS · OpenSeaMap seamarks",
+ "attribution": "© OpenStreetMap contributors · © OpenSeaMap contributors · EMODnet Bathymetry",
+ "disclaimer": "Not for navigation",
+ "projection": "EPSG:3857 (Web Mercator)",
+ "w": 7168,
+ "h": 5888,
+ "bounds": {
+  "west": -2.28515625,
+  "east": -1.9775390625,
+  "north": 49.28214015975995,
+  "south": 49.117029040779315
+ },
+ "mPerPxAtCentre": 3.121595496003454,
+ "generated": "2026-09-25T18:32:39.011Z",
+ "tiles": {
+  "size": 1024,
+  "cols": 7,
+  "rows": 6,
+  "dir": "chart-plate-tiles/"
+ }
+}

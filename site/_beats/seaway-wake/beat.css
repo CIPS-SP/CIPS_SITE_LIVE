@@ -1,0 +1,121 @@
+/* seaway-wake — scoped to .beat-seaway-wake */
+.beat-seaway-wake { background:#02484b; }
+.beat-seaway-wake .beat-stage { background:#02484b; }
+.beat-seaway-wake .socean { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.beat-seaway-wake .sfallback { position:absolute; inset:0; background:#02484b center/cover; display:none; }
+.beat-seaway-wake .sship { position:absolute; left:50%; top:50%; z-index:2; width:48.7rem; transform:translate(-50%,-50%); transform-origin:center; will-change:transform; pointer-events:none; filter:none; }
+.beat-seaway-wake .sship img { display:block; width:100%; height:auto; transform-origin:center; }  /* rotation set by beat.js from options.heading */
+.beat-seaway-wake .sscrim { position:absolute; inset:0; z-index:3; pointer-events:none; background:linear-gradient(180deg,rgba(4,7,14,.35) 0%,transparent 28%,transparent 70%,rgba(4,7,14,.55) 100%); }
+.beat-seaway-wake .scopy { position:absolute; z-index:4; left:6vw; bottom:12vh; max-width:34rem; opacity:0; transform:translateY(18px); color:#e8f3f4; }
+.beat-seaway-wake .beat-eyebrow { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#e6fbf9; opacity:.85; margin:0 0 .6rem; }
+.beat-seaway-wake .beat-sub { font-size:1.05rem; line-height:1.5; margin:0; }
+/* gates — stat cards she sails through, positioned by JS to her own on-screen x as she crosses the water */
+.beat-seaway-wake .sgate { position:absolute; top:20%; z-index:4; width:min(300px,32vw); padding:18px 20px; border-radius:14px;
+    background:rgba(4,20,22,.55); backdrop-filter:blur(5px); border:1px solid rgba(255,255,255,.14);
+    opacity:0; pointer-events:none; transform:translate(-50%,0); }
+.beat-seaway-wake .sgate .dots { width:44px; height:26px; margin-bottom:10px; opacity:.85;
+    background-image:radial-gradient(#FF8A1E 1.4px, transparent 1.4px); background-size:8px 8px; }
+.beat-seaway-wake .sgate .big { font-family:'Jost',system-ui,sans-serif; font-weight:800; letter-spacing:-.02em;
+    font-size:clamp(26px,3vw,38px); color:#f3f6f5; margin:0; line-height:1; }
+.beat-seaway-wake .sgate .label { font-size:.85rem; color:#cfe7e5; margin:8px 0 0; line-height:1.4; }
+.beat-seaway-wake .sgate[data-gate="1"] { top:auto; bottom:20%; }
+.beat-seaway-wake.nogl .socean, .beat-seaway-wake .nogl .socean { display:none; }
+.beat-seaway-wake.nogl .sfallback, .beat-seaway-wake .nogl .sfallback { display:block; }
+@media (max-width:767px){ .beat-seaway-wake .sship { width:60vw; } }   /* narrow windows still run the real beat; calibrate() sizes her from this */
+/* Corbière lighthouse: real position, projected from the 3D scene (beat.js's placeCorbiere()); the tower plus a
+   soft halo that blinks on the light's real Iso WR 10s character (--iso set from beat.js each frame) */
+.beat-seaway-wake .slighthouse { position:absolute; z-index:2; opacity:0; pointer-events:none; transform:translate(-50%,-100%); padding-bottom:23px;
+  transition:opacity .4s; text-align:center; --r:0px; --rot:0deg; }
+/* the sector wash on the sea — ported verbatim from game.css's own `.world .lighthouse .sectors`/`.mine`
+   (conic-gradient background built in JS by placeCorbiere()'s sectorGradient(), same mask/opacity rules here).
+   --rot stays 0deg: this beat's camera is north-up exactly like the game's own default view (upBrg=0), so the
+   conic-gradient's "0deg at top = true north" needs no extra rotation, same as game.js's own `--rot:0deg`. */
+.beat-seaway-wake .slighthouse .sectors, .beat-seaway-wake .slighthouse .mine {
+  position:absolute; left:50%; top:18%; width:calc(var(--r) * 2); height:calc(var(--r) * 2);
+  margin:calc(var(--r) * -1) 0 0 calc(var(--r) * -1); border-radius:50%; transform:rotate(var(--rot));
+  -webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 0%,rgba(0,0,0,.55) 30%,rgba(0,0,0,.15) 65%,rgba(0,0,0,0) 100%);
+  mask-image:radial-gradient(circle,rgba(0,0,0,1) 0%,rgba(0,0,0,.55) 30%,rgba(0,0,0,.15) 65%,rgba(0,0,0,0) 100%);
+  pointer-events:none; }
+.beat-seaway-wake .slighthouse .sectors { opacity:calc(.6 + .4 * var(--iso,0)); }
+.beat-seaway-wake .slighthouse .mine { opacity:var(--iso,0); }
+/* the pilot station mark — ported from game.css's own `.stationring` (a dashed circle over the real boarding
+   waypoint), 30 Sep 2026: "can we include the pilot zone outline in the beat (as it is in the game also)".
+   Positioned/sized every frame in beat.js's placeStation(); .live pulses once she's genuinely within the real
+   boarding-zone radius, same trigger game.js itself uses. */
+.beat-seaway-wake .sstation { position:absolute; left:0; top:0; border:2px dashed rgba(242,182,74,.55); border-radius:50%;
+  pointer-events:none; display:flex; align-items:center; justify-content:center; opacity:0;
+  transition:opacity .4s, border-color .4s, box-shadow .4s; transform:translate(-50%,-50%); z-index:2; }
+.beat-seaway-wake .sstation span { font:600 clamp(7px, calc(var(--sr, 70) * .16px), 11px)/1 'Jost',system-ui,sans-serif; letter-spacing:.2em; white-space:nowrap; text-align:center; padding-left:.2em; text-transform:uppercase;   /* 23 Oct 2026, Simon: the wording was not central in the circle: while the ring is small (--sr, its radius in px, is set in placeStation) the label was wider than the circle, wrapped onto two lines and sat against its left edge; now one line, scaled to fit, centred (padding-left balances the letter-spacing after the last letter) */ color:#f2b64a; text-shadow:0 1px 3px rgba(0,0,0,.6); transition:opacity .4s; }
+.beat-seaway-wake .sstation.live { border-color:#f2b64a; box-shadow:0 0 0 6px rgba(242,182,74,.12),0 0 30px rgba(242,182,74,.25); animation:sstation-pulse 1.6s ease-in-out infinite; }
+@keyframes sstation-pulse { 0%,100%{box-shadow:0 0 0 6px rgba(242,182,74,.12),0 0 30px rgba(242,182,74,.25)} 50%{box-shadow:0 0 0 14px rgba(242,182,74,.05),0 0 40px rgba(242,182,74,.35)} }
+/* 30 Sep 2026, Simon: "something is still different with the size of the satelite image and lighthouse... is it
+   a scaling thing?" — right instinct: found it. The coastline plate is a real 3D mesh (correctly zoom-accurate
+   by construction) and .beam/.sectors already scale with pxPerUnit, but .tower/.halo were still fixed pixel
+   sizes regardless of camera distance — so as she closes in, the real satellite imagery grows correctly while
+   the lighthouse icon stayed the same small size, throwing off the whole picture's relative proportions even
+   though the coastline itself was fine. Ported game.css's own --k scaling verbatim (`.tower3d`:72px*k,
+   `.halo`:260px*k, k=ppu/6 — this beat's own pxPerUnit/6, set on corbiereEl in placeCorbiere()), not re-guessed. */
+.beat-seaway-wake .slighthouse .tower { display:block; width:calc(72px * var(--k,1)); height:auto; margin:0 auto; filter:drop-shadow(0 1px 3px rgba(2,28,30,.6)); }
+.beat-seaway-wake .slighthouse .halo { display:block; position:absolute; left:50%; top:18%; width:calc(260px * var(--k,1)); height:calc(260px * var(--k,1)); border-radius:50%; transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(var(--c,255,246,215),.9) 0%, rgba(var(--c,255,246,215),.4) 40%, rgba(var(--c,255,246,215),0) 72%);
+  opacity:var(--iso,0); }
+/* the sector-light beam itself, laid across the sea toward her — ported verbatim (gradient/clip-path/blend) from
+   game.css's own `.world .lighthouse .beam`; pivots (transform-origin) at the same left:50%/top:18% point the
+   halo is centred on, so it visibly springs from the tower. beat.js sets height (px, real on-screen distance to
+   the hull, capped) and rotation (pointing at the hull) every frame — not a CSS animation, same Iso WR 10s
+   envelope (--iso) already driving the halo. */
+.beat-seaway-wake .slighthouse .beam { position:absolute; left:50%; top:18%; width:12px; height:0; margin-left:-6px; transform-origin:50% 0%;   /* width/margin-left overridden every frame from beat.js, matching pxPerUnit — see placeCorbiere() */
+  background:linear-gradient(to bottom, rgba(var(--c,255,246,215),.75), rgba(var(--c,255,246,215),.3) 40%, rgba(var(--c,255,246,215),0));
+  clip-path:polygon(47% 0,53% 0,100% 100%,0 100%); mix-blend-mode:screen; opacity:calc(.8 * var(--iso,0)); pointer-events:none; }
+/* 3 Oct 2026, Simon: "make the labels that show the light sequences more visible, they are a bit hard to see/read"
+   — was 10px/9px, pale and dim straight on the satellite plate. Same treatment as noirmont-transit's nav-aid
+   labels now: a dark translucent pill, 13px/600 white name, the sequence in larger warm-coloured monospace. */
+/* the label is taken out of flow (absolute) so the element keeps exactly its old height (tower + 23px, see padding-bottom
+   on .slighthouse): that element is anchored by its bottom edge and the sector/halo/beam origin is a % of its height, so a
+   taller in-flow pill would have shifted the tower and the light's origin off their real position. */
+.beat-seaway-wake .slighthouse b { position:absolute; left:50%; top:calc(100% - 21px); transform:translateX(-50%); display:inline-block; margin-top:0; padding:0; opacity:.6;   /* 3 Oct 2026, Simon: "now that they are outlined, fade them a bit" — label only, the lighthouse's own fade is on .slighthouse */
+  font:600 13px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.1em; text-transform:uppercase; color:#fff; white-space:nowrap;
+  /* 3 Oct 2026, Simon: "what if we just outline the text" — pill dropped for a dark outline (8-way 1.5px ring) + soft halo */
+  text-shadow:-2px 0 #031a1e,2px 0 #031a1e,0 -2px #031a1e,0 2px #031a1e,-1.5px -1.5px #031a1e,1.5px -1.5px #031a1e,-1.5px 1.5px #031a1e,1.5px 1.5px #031a1e,0 0 8px rgba(0,0,0,.8); }
+.beat-seaway-wake .slighthouse .chr { display:block; margin-top:3px; font:600 12.5px/1.1 ui-monospace,Menlo,Consolas,monospace; letter-spacing:.03em; text-transform:none; color:#ffe7a3; opacity:1; }
+/* islands outline overlay (shared channel chart, outline-only styling) */
+.beat-seaway-wake .islands { position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0; /* transform-origin set in beat.js from the shared chart frame */ will-change:transform,opacity; }
+.beat-seaway-wake .islands .land { fill:none; stroke:#bfe9e4; stroke-opacity:.35; stroke-width:1; }
+.beat-seaway-wake .islands .isle { fill:rgba(191,233,228,.10); stroke:#e6fbf9; stroke-opacity:.85; stroke-width:1; }
+.beat-seaway-wake .islands .lbl { fill:#e6fbf9; font:400 9px system-ui,sans-serif; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+.beat-seaway-wake .islands .mk, .beat-seaway-wake .islands .tssg, .beat-seaway-wake .islands .rflights { display:none; }
+.beat-seaway-wake .srot { position:absolute; inset:0; transform-origin:50% 50%; will-change:transform; }
+/* pilot launch */
+.beat-seaway-wake .pilot { position:absolute; z-index:2; height:auto; pointer-events:none; will-change:transform; filter:drop-shadow(0 1px 2px rgba(2,28,30,.35)); }
+.beat-seaway-wake .pwake { position:absolute; z-index:1; pointer-events:none; border-radius:50%; background:radial-gradient(ellipse at 88% 50%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 30%, rgba(255,255,255,.18) 55%, rgba(255,255,255,0) 75%); filter:blur(1.2px); }
+.beat-seaway-wake .pilotman { position:absolute; z-index:3; height:auto; pointer-events:none; transform:translate(-50%,-50%); opacity:0; filter:drop-shadow(0 .5px 1px rgba(2,28,30,.5)); }
+.beat-seaway-wake .pilotdog { position:absolute; z-index:3; height:auto; pointer-events:none; will-change:transform; filter:drop-shadow(0 .5px .8px rgba(2,28,30,.5)); }
+
+/* the Play door (lab, 16 Sep 2026): appears as the beat opens, fades once she is under way; opens game.html in a full-screen overlay */
+.beat-seaway-wake .plotter-box { opacity:var(--hud,1); }   /* held back while cloud-pass is still clearing over the start of the beat (hudIn in beat.js) */
+/* the doors into the mini-games (28 Oct 2026, Simon: 'Take the helm' over the game's name, a play ring with 'Mini-game' under it; 'or keep scrolling' centred underneath) */
+.beat-seaway-wake .splay { position:absolute; z-index:5; left:50%; bottom:9vh; transform:translate(-50%,0); appearance:none; border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:9px; color:#fff; font-family:'Jost',system-ui,sans-serif;
+  opacity:0; transition:opacity .35s, transform .35s; pointer-events:none; }
+.beat-seaway-wake .splay.on { opacity:1; pointer-events:auto; }
+.beat-seaway-wake .splay:hover { transform:translate(-50%,-2px); }
+.beat-seaway-wake .splay .sp-door { position:relative; display:flex; align-items:stretch; background:rgba(6,10,18,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 10px 30px rgba(0,0,0,.35); }
+.beat-seaway-wake .splay .sp-door::before { content:""; position:absolute; inset:0; padding:1px; background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.1)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.beat-seaway-wake .splay .sp-door::after { content:""; position:absolute; left:0; bottom:-1px; height:3px; width:0; background:#FF8A1E; transition:width .25s ease; }
+.beat-seaway-wake .splay:hover .sp-door::after, .beat-seaway-wake .splay:focus-visible .sp-door::after { width:100%; }
+.beat-seaway-wake .splay .sp-ic { min-width:62px; padding:8px 6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border-right:1px solid rgba(255,255,255,.2); }
+.beat-seaway-wake .splay .sp-ic i { width:26px; height:26px; border:1.6px solid #fff; border-radius:50%; position:relative; flex:none; }
+.beat-seaway-wake .splay .sp-ic i::after { content:""; position:absolute; left:9px; top:6.5px; border-left:8px solid #fff; border-top:5px solid transparent; border-bottom:5px solid transparent; }
+.beat-seaway-wake .splay .sp-ic em { font:600 7.5px/1 'Jost',system-ui,sans-serif; font-style:normal; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.78); white-space:nowrap; }
+.beat-seaway-wake .splay .sp-tx { padding:11px 20px 11px 15px; display:flex; flex-direction:column; justify-content:center; gap:6px; text-align:left; }
+.beat-seaway-wake .splay .sp-tx b { font:600 10px/1 'Jost',system-ui,sans-serif; letter-spacing:.2em; text-transform:uppercase; color:#FF8A1E; white-space:nowrap; }
+.beat-seaway-wake .splay .sp-tx .sp-name { font:600 15px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+.beat-seaway-wake .splay .sp-keep { font:500 11px/1 'Jost',system-ui,sans-serif; font-style:normal; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.72); text-shadow:0 1px 6px rgba(0,0,0,.6); text-align:center; }
+.beat-seaway-wake .splay .sp-keep::before, .beat-seaway-wake .splay .sp-keep::after { content:"↓"; display:inline-block; margin:0 .7em; color:#FF8A1E; font-size:13px; letter-spacing:0; }   /* a down arrow either side of 'or keep scrolling' */
+.beat-seaway-wake .splay[hidden] { display:none; }
+.splay-overlay { position:fixed; inset:0; z-index:1000; background:#02484b; }
+.splay-overlay iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
+/* 28 Sep 2026, Simon: "the back to story button is on top of the arrival notes, can you separate them" — this
+   button lives in the parent page, over the game's own iframe, so it can't be laid out against the game's
+   in-iframe elements directly; the game's Arrival notes card sits top-right (right:14px), so moved this to the
+   opposite corner instead of trying to thread the two into the same 18px strip. */
+.splay-overlay .splay-close { position:absolute; left:18px; top:max(14px,env(safe-area-inset-top)); z-index:2; appearance:none; border:0; cursor:pointer; padding:9px 14px; border-radius:999px; background:rgba(4,22,26,.7); color:#eaf4f5; font:500 12px/1 'Jost',system-ui,sans-serif; letter-spacing:.14em; text-transform:uppercase; }

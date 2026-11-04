@@ -1,0 +1,75 @@
+/* noirmont-transit — scoped to .beat-noirmont-transit. Base ocean/hull/scrim/copy rules mirror seaway-wake's own
+   (the same real sea, same hull sprite, same look — continuing the crossing, not a new visual language). */
+.beat-noirmont-transit { background:#02484b; }
+.beat-noirmont-transit .beat-stage { background:#02484b; }
+.beat-noirmont-transit .socean { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.beat-noirmont-transit .sfallback { position:absolute; inset:0; background:#02484b center/cover; display:none; }
+.beat-noirmont-transit .sship { position:absolute; left:50%; top:50%; z-index:2; width:48.7rem; transform:translate(-50%,-50%); transform-origin:center; will-change:transform; pointer-events:none; filter:none; }
+.beat-noirmont-transit .sship img { display:block; width:100%; height:auto; transform-origin:center; }
+.beat-noirmont-transit .sscrim { position:absolute; inset:0; z-index:3; pointer-events:none; background:linear-gradient(180deg,rgba(4,7,14,.35) 0%,transparent 28%,transparent 70%,rgba(4,7,14,.55) 100%); }
+.beat-noirmont-transit .scopy { position:absolute; z-index:4; left:6vw; bottom:12vh; max-width:34rem; opacity:0; transform:translateY(18px); color:#e8f3f4; }
+.beat-noirmont-transit .beat-eyebrow { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#e6fbf9; opacity:.85; margin:0 0 .6rem; }
+.beat-noirmont-transit .beat-sub { font-size:1.05rem; line-height:1.5; margin:0; }
+.beat-noirmont-transit.nogl .socean, .beat-noirmont-transit .nogl .socean { display:none; }
+.beat-noirmont-transit.nogl .sfallback, .beat-noirmont-transit .nogl .sfallback { display:block; }
+@media (max-width:767px){ .beat-noirmont-transit .sship { width:60vw; } }
+
+/* landmarks — Noirmont Point / Elizabeth Castle, positioned by JS relative to the hull as she passes each one
+   (real bearing/distance from her current lat/lng, not a fixed screen-x reveal — see beat.js's landmarkScreen()) */
+.beat-noirmont-transit .slandmark { position:absolute; z-index:4; display:flex; align-items:center; gap:8px; opacity:0;
+  pointer-events:none; transform:translate(-4px,-50%); transition:opacity .4s; }   /* the dot (7px) sits ON the projected point, label to its right — was centred on the whole dot+label, which pushed the dot off the spot */
+/* 3 Oct 2026, Simon: "apply the same label treatment to the elizabeth castle label and dot" — the dot now has the nav-aid dots' own
+   7px core + 3px ring + 6px glow (warm amber instead of a light colour), and the label the same outlined 13px/600 name at 60%. */
+.beat-noirmont-transit .slandmark::before { content:""; width:7px; height:7px; border-radius:50%; background:#f2b64a; box-shadow:0 0 0 3px rgba(242,182,74,.25), 0 0 6px rgba(242,182,74,.7); flex:none; }
+.beat-noirmont-transit .slandmark .name { margin:0; opacity:.6; font:600 13px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#fff; white-space:nowrap;
+  text-shadow:-2px 0 #031a1e,2px 0 #031a1e,0 -2px #031a1e,0 2px #031a1e,-1.5px -1.5px #031a1e,1.5px -1.5px #031a1e,-1.5px 1.5px #031a1e,1.5px 1.5px #031a1e,0 0 8px rgba(0,0,0,.8); }
+
+/* nav-aid marks (1 Oct 2026) — real charted marks from seamarks.json (NAVAID_NAMES, beat.js), positioned by true
+   3D projection (worldOffsetTo + camera.project), not the stylised bearing-offset slandmark technique above.
+   Each mark is either a cardinal icon (cardinalIcon(), inline SVG), a tower (Noirmont Point only), or — for a
+   plain lit lateral buoy with neither — just its own blinking dot. */
+/* 2 Oct 2026, Simon: "something's up with the nav aids... they jolt as you scroll, wobble back and forwards,
+   they need to be solid like the land" — real cause: left/top had their own CSS transition here, but JS already
+   sets accurate left/top every single frame from the real 3D projection (same as Corbière/the pilot station in
+   seaway-wake, and .slandmark just above, neither of which transitions left/top) — animating toward a target
+   that's already being updated every frame fights itself, lagging behind the true position and reading as a
+   wobble, worse the faster she moves on screen. Only opacity (the fade in/out) still transitions. */
+/* 3 Oct 2026: the mark is now a zero-size anchor sitting exactly on the projected lat/lng; the icon is centred on it and
+   the label hangs beside it (.name below). Before, the whole icon+label row was centred on the point, so the wider the
+   label got the further the icon was dragged off its real position (--half = half the icon's width, set from beat.js). */
+.beat-noirmont-transit .snavaid { position:absolute; z-index:1; width:0; height:0; opacity:0; --half:10px;
+  pointer-events:none; transition:opacity .4s; }
+/* the light sits physically on top of the real structure, so .mark-visual stacks the dot above whatever icon
+   (cardinal pillar / tower) follows it, instead of the two sitting side by side. */
+.beat-noirmont-transit .snavaid .mark-visual { position:absolute; left:0; top:0; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:2px; }
+.beat-noirmont-transit .snavaid svg { flex:none; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+.beat-noirmont-transit .snavaid img.tower { width:76px; max-width:none; min-width:76px;   /* 23 Oct 2026, "the Noirmont point icon has gone tiny again": the host page's img { max-width:100% } was shrinking it to the width of its zero-width container (7px, the dot above it); never let it shrink */   /* 4 Oct 2026, Simon: "the noirmont point icon [is] way too small" — was 40px; 92px was too big, 58px too small again (15 Oct): 76px */ height:auto; flex:none; filter:drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+.beat-noirmont-transit .snavaid i.dot { width:7px; height:7px; border-radius:50%; flex:none; background:var(--lc,#fff);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--lc,#fff) 25%, transparent), 0 0 6px color-mix(in srgb, var(--lc,#fff) 70%, transparent);
+  transition:opacity .15s linear; }
+/* green lights: same 7px core and same glow footprint as the other colours (Simon: greens looked bigger than reds) — only the colour is brighter
+   and the glow a touch more intense, not wider */
+.beat-noirmont-transit .snavaid i.dot.g { box-shadow:0 0 0 3px rgba(61,255,122,.30), 0 0 6px rgba(61,255,122,.95); }
+/* a static (non-blinking) marker for a genuinely unlit mark with no cardinal/tower icon either (Oyster Beacon) */
+.beat-noirmont-transit .snavaid i.plain { width:6px; height:6px; border-radius:50%; flex:none; background:#d8f1fa; box-shadow:0 0 0 3px rgba(216,241,250,.22); }
+/* all lights (22 Oct 2026, Simon: "kept visible, outlined but dim, between flashes"): the marker is always there with a dark rim and a dim core; a flash brightens the core and lights the glow */
+.beat-noirmont-transit .snavaid i.dot.solid { background:color-mix(in srgb, var(--lc,#fff) 38%, rgba(6,20,26,.9)); box-shadow:0 0 0 1.5px rgba(6,20,26,.85), 0 0 0 3px color-mix(in srgb, var(--lc,#fff) 16%, transparent); }
+.beat-noirmont-transit .snavaid i.dot.solid.lit { background:var(--lc,#fff); box-shadow:0 0 0 1.5px rgba(6,20,26,.85), 0 0 0 4px color-mix(in srgb, var(--lc,#fff) 50%, transparent), 0 0 12px 2px color-mix(in srgb, var(--lc,#fff) 95%, transparent); }
+/* 3 Oct 2026, Simon: "make the labels that show the light sequences more visible, they are a bit hard to see/read" —
+   was 10.5px pale-blue text with only a faint shadow, sitting straight on bright satellite imagery. Now a dark
+   translucent pill (reads on any ground), 13px/600 white name, and the light sequence as its own larger
+   monospace span in a warm light colour, divided from the name by a hairline. */
+.beat-noirmont-transit .snavaid .name { position:absolute; top:0; left:calc(var(--half) + 8px); transform:translateY(-50%); margin:0; display:flex; align-items:center; gap:8px; padding:0; opacity:.6;   /* 3 Oct 2026, Simon: "now that they are outlined, fade them a bit"; 60% after a second pass — on the label only, so the mark's own show/hide fade (opacity on .snavaid) is untouched */
+ 
+  font:600 13px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#fff; white-space:nowrap;
+  /* 3 Oct 2026, Simon: "what if we just outline the text" — pill dropped for a dark outline (8-way 1.5px ring) + soft halo */
+  text-shadow:-2px 0 #031a1e,2px 0 #031a1e,0 -2px #031a1e,0 2px #031a1e,-1.5px -1.5px #031a1e,1.5px -1.5px #031a1e,-1.5px 1.5px #031a1e,1.5px 1.5px #031a1e,0 0 8px rgba(0,0,0,.8); }
+.beat-noirmont-transit .snavaid.lab-left .name { left:auto; right:calc(var(--half) + 8px); }   /* Noirmont Point: Pignonet is close on its east side, so its label goes west */
+.beat-noirmont-transit .snavaid .name .chr { font:600 12.5px/1.1 ui-monospace,Menlo,Consolas,monospace; letter-spacing:.03em; text-transform:none; color:#ffe7a3;
+  padding-left:0; border-left:0; }
+
+/* channel markers (the red and green lateral buoys): smaller and dimmer than the lights that matter (22 Oct 2026, Simon) */
+.beat-noirmont-transit .snavaid.chan i.dot.solid { width:5px; height:5px; box-shadow:0 0 0 1.2px rgba(6,20,26,.8), 0 0 0 2.5px color-mix(in srgb, var(--lc,#fff) 12%, transparent); }
+.beat-noirmont-transit .snavaid.chan i.dot.solid.lit { background:color-mix(in srgb, var(--lc,#fff) 75%, rgba(6,20,26,.9)); box-shadow:0 0 0 1.2px rgba(6,20,26,.8), 0 0 0 3px color-mix(in srgb, var(--lc,#fff) 32%, transparent), 0 0 7px 1px color-mix(in srgb, var(--lc,#fff) 60%, transparent); }
+.beat-noirmont-transit .snavaid.chan .name { opacity:.4; font-size:11px; gap:6px; }
+.beat-noirmont-transit .snavaid.chan .name .chr { font-size:10px; }

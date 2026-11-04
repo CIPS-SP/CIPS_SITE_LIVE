@@ -1,0 +1,202 @@
+<!doctype html><html lang="en"><head>
+<script src="../../js/dev-device.js"></script><meta charset="utf-8"><title>The Approaches | Approaches interface 03</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<script type="importmap">{ "imports": {
+  "three": "../_vendor/three-0.165.0/three.module.js",
+  "three/addons/": "../_vendor/three-0.165.0/addons/",
+  "three152": "../_vendor/three-0.152.2/three.module.js",
+  "three152/addons/": "../_vendor/three-0.152.2/addons/",
+  "topojson-client": "../_vendor/topojson-client-3.1.0/index.js"
+}}</script>
+<link rel="stylesheet" href="game.css">
+<link rel="stylesheet" href="arrival.css">
+</head><body>
+<div id="game" class="game arrival-interface">
+  <div class="scene"><canvas class="sea"></canvas>
+  <div class="plan"><canvas class="coast" hidden></canvas><div class="world"></div><canvas class="fx"></canvas></div></div>
+  <div class="hud">
+    <div class="hud-l"><b data-hud="clock">0:00</b><span>on passage</span></div>
+    <div class="hud-c"><div class="ribbon"><canvas data-hud="ribbon" width="640" height="88"></canvas></div><i data-hud="bar"></i>
+      <div class="inst">
+        <span><b data-hud="nm">—</b><i>nm</i><em>to pilot stn</em></span>
+        <span><b data-hud="isog">0.0</b><i>kn</i><em>sog</em></span>
+        <span class="rotseg"><b data-hud="irot">0</b><i>&deg;/m</i>
+          <svg class="rotgauge" viewBox="0 0 120 40" aria-hidden="true">
+            <defs><linearGradient id="rotGrad" x1="24" x2="96" y1="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#e0242b"/><stop offset="50%" stop-color="#c7d1d6"/><stop offset="100%" stop-color="#2fbf5a"/>
+            </linearGradient></defs>
+            <path d="M24,35 Q60,2 96,35" stroke="url(#rotGrad)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <polygon data-hud="rotmk" points="0,6 4,-3 -4,-3" fill="#f2c14e" stroke="#7a5a12" stroke-width="0.6"/>
+          </svg>
+        <em>rot</em></span>
+        <span><b data-hud="ihdg">110</b><i>&deg;</i><em>hdg</em></span>
+        <span><b data-hud="idepth">—</b><i>m</i><em>depth</em></span>
+        <span><b data-hud="iukc">—</b><i>m</i><em>keel</em></span>
+      </div></div>
+    <div class="hud-r"><b data-hud="hits">0</b><span>close calls</span></div>
+    <button type="button" class="sndbtn" data-act="sound" aria-label="Sound on or off" title="Sound">🔇</button>
+  </div>
+  <div class="toast" data-hud="toast" hidden></div>
+
+  <div class="arrival-contacts" data-arrival-ui aria-label="Approach contacts">
+    <div class="vts-contact-group">
+      <button type="button" class="arrival-contact vts-contact" data-arrival-act="vts" aria-label="VTS and Pilots, current game instruction">
+        <img class="arrival-face" src="assets/arrival/harbour-portrait.webp" alt="Illustrated Harbour Master on a mobile phone">
+        <span class="contact-title">VTS / PILOTS <span aria-hidden="true">›</span></span>
+        <span class="contact-line" data-arrival="vts" role="status" aria-live="polite" aria-atomic="true">Give 1&nbsp;hr's notice once under way.</span>
+      </button>
+      <button type="button" class="vhf-notice" data-act="notice-call" aria-label="Send the hour's notice to Jersey Coastguard on VHF channel eight two" title="Send 1 hr's notice · VHF 82">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 10v4a2 2 0 0 0 2 2h1l3 4v-4h7a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+        <span>VHF 82<small>1 hr notice</small></span>
+      </button>
+    </div>
+    <div class="simon-contact-group">
+      <button type="button" class="arrival-contact simon-contact" data-arrival-act="simon" aria-label="Simon at CIPS, arrange game provisions and bunkers">
+        <img class="arrival-face" src="assets/arrival/simon-portrait.webp" alt="Illustrated Simon on a mobile phone">
+        <span class="contact-title">SIMON · CIPS <span aria-hidden="true">›</span></span>
+        <span class="contact-line" data-arrival="simon" role="status" aria-live="polite" aria-atomic="true">Provisions and bunkers</span>
+      </button>
+      <button type="button" class="real-call" data-arrival-act="contact" aria-label="Call Simon for real, choose phone or WhatsApp" title="Call Simon for real: phone or WhatsApp">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 3h4l2 5-3 2c1.5 3 3 4.5 6 6l2-3 5 2v4c0 2-2 2-3 2C10 20 4 14 3 6c0-1 0-3 2-3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span>Call Simon<small>for real</small></span>
+      </button>
+    </div>
+  </div>
+  <aside class="arrival-notepad" data-arrival-ui aria-label="Captain's approach notes">
+    <button type="button" class="notes-toggle" data-arrival-act="notes" aria-haspopup="dialog">
+      <span class="handwritten">Approach notes</span><span class="notes-count" data-arrival="count" aria-label="Approach achievements">0/5</span><span aria-hidden="true">↗</span>
+    </button>
+    <button type="button" class="notes-collapse" data-arrival-act="collapse" aria-label="Show or hide the approach notes list" aria-expanded="true">⌃</button>
+    <p class="notes-score" data-arrival="score" aria-label="Running score"></p>
+    <ol class="notes-mini" data-arrival="mini"></ol>
+  </aside>
+  <button type="button" class="arrival-pause" data-arrival-act="pause" data-arrival-ui aria-label="Pause the passage">Pause</button>
+
+  <dialog class="arrival-dialog paper-dialog" id="arrival-notes-dialog" aria-labelledby="notes-title" data-arrival-ui>
+    <header><h2 class="handwritten" id="notes-title">Captain’s approach notes</h2><button type="button" data-arrival-close aria-label="Close approach notes">×</button></header>
+    <p class="dialog-context">Passage paused. Five things for a good arrival.</p>
+    <ol class="notes-full" data-arrival="full"></ol>
+    <p class="notes-live" data-arrival="notes-live" role="status"></p>
+    <p class="dialog-context">These are representative game criteria, not instructions for a real vessel.</p>
+    <button type="button" class="arrival-primary" data-arrival-close>Back to the passage</button>
+  </dialog>
+
+  <dialog class="arrival-dialog" id="arrival-orders-dialog" aria-labelledby="orders-title" data-arrival-ui>
+    <header><div><span class="dialog-eyebrow">SIMON · CIPS</span><h2 id="orders-title">Ready for your arrival</h2></div><button type="button" data-arrival-close aria-label="Close provisions and bunkers">×</button></header>
+    <p class="dialog-context">The passage is paused. This is a game order; nothing is sent to CIPS.</p>
+    <form data-arrival="order-form">
+      <fieldset><legend>Provisions for arrival</legend>
+        <label><input type="checkbox" name="store" value="bread" checked> Bread and pastries</label>
+        <label><input type="checkbox" name="store" value="milk" checked> Jersey dairy</label>
+        <label><input type="checkbox" name="store" value="fruit"> Fruit and vegetables</label>
+        <label><input type="checkbox" name="store" value="fish"> Fish and shellfish</label>
+        <label><input type="checkbox" name="store" value="wine"> Wines</label>
+        <label><input type="checkbox" name="store" value="ice"> Ice</label>
+        <label><input type="checkbox" name="store" value="papers"> Papers and flowers</label>
+      </fieldset>
+      <fieldset><legend>Bunkers alongside at St Helier</legend><label><input type="checkbox" name="fuel" checked> Arrange bunkers for the onward passage</label></fieldset>
+      <label class="hamper-select">Captain’s Hamper preference<select name="hamper"><option value="produce">Jersey produce</option><option value="dairy">Jersey dairy</option><option value="sea">From the sea</option><option value="cellar">The cellar</option><option value="surprise">Simon’s surprise</option></select></label>
+      <p class="dialog-context">Arrange both provisions and bunkers for this arrival star. Five stars earns the game’s Captain’s Hamper achievement.</p>
+      <p class="order-error" data-arrival="order-error" role="alert"></p>
+      <button type="submit" class="arrival-primary" data-arrival="order-submit">Arrange in game</button>
+    </form>
+  </dialog>
+
+  <dialog class="arrival-dialog contact-dialog" id="arrival-contact-dialog" aria-labelledby="contact-title" data-arrival-ui>
+    <header><div><span class="dialog-eyebrow">REAL CONTACT, NOT A GAME ACTION</span><h2 id="contact-title">Call Simon for real</h2></div><button type="button" data-arrival-close aria-label="Close real contact options">×</button></header>
+    <p>Simon / CIPS duty contact<br><strong data-arrival="number"></strong></p>
+    <a class="contact-choice" data-arrival="phone"><b>Phone</b><small>Open your dialler. Your device handles the call.</small></a>
+    <a class="contact-choice whatsapp-choice" data-arrival="whatsapp" target="_blank" rel="noopener noreferrer"><b>WhatsApp</b><small>Open a chat. Message or call from WhatsApp.</small></a>
+    <p class="dialog-context">No game order or personal information is sent automatically. The game cannot tell whether Simon is available. The passage stays paused while you are away.</p>
+    <button type="button" class="arrival-primary" data-arrival-close>Back to the passage</button>
+  </dialog>
+
+  <dialog class="arrival-dialog" id="arrival-vts-dialog" aria-labelledby="vts-title" data-arrival-ui>
+    <header><h2 id="vts-title">VTS / Pilots</h2><button type="button" data-arrival-close aria-label="Close current instruction">×</button></header>
+    <p class="current-instruction" data-arrival="vts-detail"></p>
+    <p class="dialog-context">Game guidance only. Text remains in the VTS / Pilots button when you return. Radio voice and the scrolling handset are off in this test.</p>
+    <button type="button" class="arrival-primary" data-arrival-close>Back to the passage</button>
+  </dialog>
+
+  <dialog class="arrival-dialog" id="arrival-pause-dialog" aria-labelledby="pause-title" data-arrival-ui>
+    <header><h2 id="pause-title">Passage paused</h2></header>
+    <p>Kinship, the traffic and the clock are waiting for you.</p>
+    <button type="button" class="arrival-primary" data-arrival-close>Resume passage</button>
+  </dialog>
+
+  <button type="button" class="arrival-map" data-act="arrival-map" aria-label="Open or close the chart" title="Chart" aria-pressed="false"><span class="am-i" aria-hidden="true">▣</span><span class="am-l"> CHART</span></button>
+  <div class="plotter-box">
+    <div class="plotter-top"><span>AIS AND CHART PLOTTER</span><span class="gps">GPS ● 3D</span><button type="button" class="pfollow" data-act="follow" title="Follow the ship">⌖</button><button type="button" class="pfull" data-act="plotfull" title="Full screen chart (Esc to leave)">⛶</button></div>
+    <canvas class="plotter"></canvas>
+    <button type="button" class="ais" data-hud="ais">AIS</button>
+    <div class="pz"><button type="button" data-act="zin" title="Zoom in">+</button><button type="button" data-act="zout" title="Zoom out">−</button></div>
+    <div class="plotter-data"><div><b data-plot="sog">0.0</b><span>SOG kn</span></div><div><b data-plot="cog">110</b><span>COG °T</span></div><div><b data-plot="xte">0 m ·</b><span>XTE</span></div><div><b data-plot="dtw">—</b><span data-plot="wpt">next</span></div></div>
+  </div>
+  <!-- the comms: a VHF/DSC handset beside the plotter — everything that happens to the ship arrives here as traffic, and the two
+       buttons are the captain's calls: St Helier VTS (the hour's notice, then the report inside the line) and CIPS (Simon) -->
+  <div class="comms" data-comms hidden aria-hidden="true">
+    <div class="comms-top"><span>VHF · DSC</span><b data-comms="ch">CH 16</b><span class="rx">RX</span><button type="button" class="xclose" data-act="commsClose" aria-label="Close the handset">×</button></div>
+    <ol class="log" data-comms="log"></ol>
+    <div class="comms-btns">
+      <button type="button" class="call vts" data-act="vts"><i>📞</i><span><b>St Helier VTS</b><small data-comms="vtslabel">1 hour's notice · Ch 82</small></span></button>
+      <button type="button" class="call cips" data-act="simon"><i>☎</i><span><b>Ask Simon</b><small>CIPS · your agent</small></span></button>
+    </div>
+    <div class="menu" data-comms="menu" hidden>
+      <button type="button" data-ask="pilot">Pilot</button><button type="button" data-ask="taxi">Water taxi</button><button type="button" data-ask="crew">Crew change</button><button type="button" data-ask="fuel">Fuel</button><button type="button" data-ask="stores">Provisions</button>
+    </div>
+    <div class="stores-head" data-comms="storeshead" hidden><span>Provisions</span><i>▾</i></div>
+    <form class="stores" data-comms="stores" hidden>
+      <p class="eyebrow">What shall the taxi bring?</p>
+      <label><input type="checkbox" name="s" value="bread" checked> Fresh bread &amp; pastries</label>
+      <label><input type="checkbox" name="s" value="milk" checked> Milk, butter, cream (Jersey Dairy)</label>
+      <label><input type="checkbox" name="s" value="fruit"> Fruit &amp; vegetables (Jersey Royals in season)</label>
+      <label><input type="checkbox" name="s" value="fish"> Fish, crab &amp; oysters off the boat</label>
+      <label><input type="checkbox" name="s" value="wine"> Wines &amp; the cellar</label>
+      <label><input type="checkbox" name="s" value="ice"> Ice</label>
+      <label><input type="checkbox" name="s" value="papers"> Papers &amp; flowers</label>
+      <p class="eyebrow hamper">The Captain's Hamper — a Genuine Jersey basket, with CIPS's compliments to every captain who brings the ship safely in. Choose yours:</p>
+      <label><input type="radio" name="h" value="produce" checked> Jersey produce — Royals, tomatoes, black butter</label>
+      <label><input type="radio" name="h" value="dairy"> Jersey Dairy — butter, cream, cheese</label>
+      <label><input type="radio" name="h" value="sea"> From the sea — crab, oysters, lobster</label>
+      <label><input type="radio" name="h" value="cellar"> The cellar — local wines, cider, gin</label>
+      <label><input type="radio" name="h" value="surprise"> Simon's Surprise — leave it to your agent</label>
+      <button type="submit">Send to CIPS</button>
+    </form>
+  </div>
+  <button type="button" class="vhfbtn" data-act="commsToggle" aria-label="Open the VHF handset"><span>VHF</span><i data-hud="unread" hidden></i></button>
+  <div class="stick" data-stick><div class="pad"><i class="cross"></i><i class="knob"></i></div><div class="levers"><div class="ind thr"><i data-hud="thr" role="slider" aria-label="Thrust" aria-valuemin="-0.5" aria-valuemax="1"><b class="grip"></b></i><em class="thrtgt" data-hud="thrtgt" aria-hidden="true"></em><span>thrust</span></div><div class="ind rud"><i data-hud="rud" role="slider" aria-label="Rudder" aria-valuemin="-1" aria-valuemax="1"><b class="grip"></b></i><span>rudder</span></div></div></div>
+  <div class="bridge" data-bridge></div>   <!-- the bridge console (23 Oct 2026): replaces the joystick and the two bars on a desktop; see _shared/bridge-console.js -->
+  <!-- 25 Sep 2026, Simon (Phase 2): the pilot transfer — ported from _beats/tools/proto/pilot-boarding.html's tap-in-the-
+       green-zone mechanic. Hidden except during pilot.phase==='boarding'; game.js drives it. -->
+  <div class="pilotxfer" data-pilotxfer hidden>
+    <p class="lab">Pilot transfer</p>
+    <div class="pbarwrap"><div class="pbar" data-hud="pbar" role="button" aria-label="Time the pilot transfer — tap when the marker is in the green"><div class="pzone"></div><i class="pmk" data-hud="pmk"></i></div><span class="psafe" aria-hidden="true">Safe to board</span></div>
+    <p class="pmsg" data-hud="pmsg" hidden></p>
+    <p class="hint">tap, or Space</p>
+    <button type="button" class="pskip" data-act="pilot-skip">Let the pilot judge it</button>
+  </div>
+  <div class="telegraph"><button type="button" data-act="ahead" aria-label="More way on">▲</button><div class="tele"><i data-hud="telebar"></i><b data-hud="telegraph">Half ahead</b></div><button type="button" data-act="astern" aria-label="Less way on">▼</button></div>
+  <div class="card intro" data-card="intro">
+    <p class="eyebrow">A welcome to Jersey</p>
+    <h1>The Approaches.</h1>
+    <p class="lead">Bring <b>Kinship</b> safely around Corbière, hold station and bring the Pilot safely aboard. Your approach notes show the five achievements. Simon handles the supplies.</p>
+    <p class="keys"><kbd>A</kbd> <kbd>D</kbd> (or <kbd>←</kbd> <kbd>→</kbd>) put the rudder on, <kbd>X</kbd> centres it &nbsp;·&nbsp; <kbd>W</kbd> <kbd>S</kbd> (or <kbd>↑</kbd> <kbd>↓</kbd>) the engines &nbsp;·&nbsp; or the console; the joystick on a phone</p>
+    <label class="opt"><input type="checkbox" data-opt="live"> Real traffic — the vessels on this water now, from AIS</label>
+    <button type="button" data-act="start">Start the passage</button>
+    <button type="button" class="exitlink" data-act="exit">Not now: back to the journey</button>
+    <p class="keys small">Notices and orders here are simulated. Only <b>Call Simon for real</b> opens real contact.</p>
+    <p class="keys small">The chart, the marks and the light are the real ones (© OpenStreetMap contributors, EMODnet Bathymetry, Ports of Jersey) — a training picture, <b>not for navigation</b>.</p>
+  </div>
+  <div class="card done" data-card="done" hidden>
+    <p class="eyebrow">Pilot aboard · bringing the ship in to St Helier</p>
+    <h1 data-hud="result">—</h1>
+    <p class="lead" data-hud="verdict"></p>
+    <p class="keys" data-hud="comms"></p>
+    <div class="scene-score" data-hud="scene-score"></div>
+    <p class="keys hamper" data-hud="hamper" hidden></p>
+    <div class="btnrow"><button type="button" data-act="again">Go again</button><button type="button" class="alt" data-act="handover">Continue the scrolled journey</button></div>
+  </div>
+</div>
+<script type="module" src="game.js"></script>
+</body></html>

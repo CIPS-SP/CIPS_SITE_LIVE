@@ -1,0 +1,404 @@
+/* globe-live — HLC lab fork of globe-dotmatrix. UC-technique dot-matrix globe (Atlantic Gateway). Ported from atlantic-gateway/globe-dots.html 2026-08-21. Scoped. */
+.beat-globe-live{--gx:2vw}   /* shifts the globe right so it clears the hero copy on the left */
+.beat-globe-live [data-g="globe"]{position:absolute;inset:0;z-index:1;transform:translateX(var(--gx))}
+.beat-globe-live [data-g="globeglow"]{position:absolute;left:50%;top:50%;width:86.3vh;height:86.3vh;border-radius:50%;z-index:0;pointer-events:none;
+    transform:translate(calc(-50% + var(--gx)),-50%);
+    background:radial-gradient(circle at 50% 50%, rgba(5,8,14,0.96) 46%, rgba(5,8,14,0) 76%);
+    box-shadow:
+      inset 0 0.6vh 1vh -0.2vh #FFFFFF,     /* bright white top edge */
+      inset 0 1.9vh 2.8vh -0.8vh #FFE7D6,   /* thick warm-white */
+      inset 0 3.6vh 4.6vh -2vh #FF834A,     /* warm orange */
+      inset 0 6.5vh 8vh -3.4vh #FF5500,     /* intense pure orange (top pole) */
+      inset 0 -2.6vh 3.2vh -1vh #9CC8FF,    /* light blue bottom edge */
+      inset 0 -6.5vh 8vh -3.4vh #012FFF,    /* intense pure blue (bottom pole) */
+      inset 0 -11vh 12vh -4.5vh #021777;}
+.beat-globe-live [data-g="islands"]{position:absolute;left:50%;top:50%;transform:translate(calc(-50% + var(--gx)),-50%) scale(.78);
+    width:min(74vh,74vw);max-width:680px;aspect-ratio:1000/1284;opacity:0;pointer-events:none;z-index:2}
+.beat-globe-live [data-g="islands"] .imap{position:absolute;inset:0;width:100%;height:100%;
+    filter:drop-shadow(0 0 22px rgba(111,206,196,.4))}
+.beat-globe-live [data-g="islands"] .iflights{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:none}
+.beat-globe-live [data-g="islands"] .flight{fill:none;stroke:#FF8A1E;stroke-width:3.4;stroke-linecap:round;
+    stroke-dasharray:70 1700;filter:drop-shadow(0 0 5px rgba(255,120,0,.75));
+    animation:comet 3.6s linear infinite}
+.beat-globe-live [data-g="islands"] .f2{animation-delay:-1.2s}
+.beat-globe-live [data-g="islands"] .f3{animation-delay:-2.4s}
+@keyframes comet{from{stroke-dashoffset:1770}to{stroke-dashoffset:0}}
+.beat-globe-live [data-g="region"]{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(94vw,1180px);opacity:0;pointer-events:none;z-index:2}
+.beat-globe-live [data-g="region"] svg{width:100%;height:auto;display:block;overflow:visible}
+.beat-globe-live [data-g="region"] svg *{vector-effect:non-scaling-stroke}
+.beat-globe-live [data-g="region"] .land{fill:rgba(120,150,170,.10);stroke:#6FCEC4;stroke-width:1;stroke-opacity:.5}
+.beat-globe-live [data-g="region"] .isle{fill:#6FCEC4;fill-opacity:.9;stroke:#eafff9;stroke-width:.7}
+.beat-globe-live [data-g="region"] .mk{fill:#FF8A1E}
+.beat-globe-live [data-g="region"] .lbl{fill:#e8cbb6;font:400 9px 'Jost',sans-serif;letter-spacing:.09em;text-transform:uppercase}
+.beat-globe-live [data-g="region"] .cilbl{fill:#eafff9}
+.beat-globe-live [data-g="region"] .ilbl{font-size:8px}
+.beat-globe-live [data-g="region"] .town{fill:#b9c4d2;font:400 4.6px 'Jost',system-ui,sans-serif;letter-spacing:.02em}
+.beat-globe-live [data-g="region"] .towndot{fill:#b9c4d2}
+.beat-globe-live [data-g="region"] .rflight{fill:none;stroke-width:2.6;stroke-linecap:round;
+    stroke-dasharray:260 760;filter:drop-shadow(0 0 5px rgba(255,140,20,.75));animation:comet2 5s linear infinite}
+.beat-globe-live [data-g="region"] .rf2{animation-delay:-1.7s}
+.beat-globe-live [data-g="region"] .rf3{animation-delay:-3.4s}
+@keyframes comet2{from{stroke-dashoffset:1020}to{stroke-dashoffset:0}}
+.beat-globe-live [data-g="region"] .tssblk{fill:#FF3EA5;fill-opacity:.10;stroke:#FF3EA5;stroke-opacity:.28;stroke-width:.8}
+.beat-globe-live [data-g="region"] .tssch{fill:none;stroke:#FF3EA5;stroke-opacity:.42;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.beat-globe-live [data-g="region"] .rtitle-ey{fill:#FF8A1E;font:600 9px 'Jost',sans-serif;letter-spacing:.28em}
+.beat-globe-live [data-g="region"] .rtitle-h1{fill:#eafff9;font:700 20px 'Jost',sans-serif;letter-spacing:-.01em}
+.beat-globe-live canvas{display:block}
+.beat-globe-live .beat-stage{background:radial-gradient(circle at 50% 46%, #0c1018 0%, #070a11 55%, #04060b 100%);color:#eafff9;font-family:'Jost',system-ui,sans-serif}
+.beat-globe-live .hud{display:none}
+.beat-globe-live .hud{position:absolute;left:26px;top:22px;z-index:5;pointer-events:none}
+.beat-globe-live .hud .ey{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#6FCEC4;font-weight:600}
+.beat-globe-live .hud h1{font-size:22px;font-weight:600;margin-top:6px;color:#eafff9}
+.beat-globe-live .hud p{font-size:12.5px;color:#a9cfca;font-weight:300;margin-top:4px;max-width:34ch}
+.beat-globe-live .status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;
+    font-size:13px;color:#6FCEC4;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.beat-globe-live .hint{position:absolute;right:24px;bottom:20px;z-index:5;font-size:11px;color:#7fb2ab;font-weight:300;letter-spacing:.02em}
+.beat-globe-live .pinlabel{pointer-events:none;transition:opacity .3s}
+.beat-globe-live .pinlabel span{display:inline-block;transform:translateY(-9px);white-space:nowrap;
+    color:#d9c1ad;font:300 7px/1 'Jost',system-ui,sans-serif;letter-spacing:.07em;text-transform:uppercase;
+    text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.beat-globe-live .pinlabel.pinci span{font-weight:800;font-size:12px;color:#f4e6d6}
+.beat-globe-live .pinlabel.oceanlabel span{font-style:italic;font-weight:300;font-size:11px;letter-spacing:.18em;
+    color:rgba(200,220,255,.55);text-shadow:0 1px 6px rgba(0,0,0,.6)}
+
+/* Hero copy — ported from globe-simple, recoloured to pick up the globe's own orange/blue glow */
+.beat-globe-live .globeCopy{position:absolute;left:5vw;bottom:20%;max-width:min(560px,56vw);z-index:5;color:#fff;font-family:'Jost',system-ui,sans-serif}
+.beat-globe-live .globeCopy .eyebrow{letter-spacing:.3em;text-transform:uppercase;color:#FF8A1E;opacity:.9;font-weight:600}
+.beat-globe-live .globeCopy h1{font-family:'Jost',sans-serif;font-weight:700;font-size:clamp(34px,4.8vw,64px);
+    line-height:1.02;letter-spacing:-.01em;margin:14px 0 0;
+    background:linear-gradient(120deg,#fff 0%,#fff 40%,#FFE7D6 62%,#FF8A1E 84%,#FF5500 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+.beat-globe-live .globeCopy h1 .l2{background:none;-webkit-background-clip:initial;background-clip:initial;color:#FF8A1E}
+.beat-globe-live .globeCopy .gsub{margin-top:20px;font-size:clamp(15px,1.3vw,18px);line-height:1.6;color:#c7d8d4;max-width:46ch;font-weight:300}
+.beat-globe-live .globeCopy .gcta{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;transition:opacity .3s ease}
+.beat-globe-live .globeCopy .gcta[hidden]{display:none}
+/* Voyage Planner Phase 2 (16 Sep 2026) — the entry CTA; opens the ship finder (.lpanel) directly, no choice screen */
+.beat-globe-live .gcta-btn{background:#F45300;color:#fff;border:0;border-radius:999px;padding:14px 26px;font:600 14px 'Jost',sans-serif;
+    letter-spacing:.05em;cursor:pointer;box-shadow:0 8px 24px rgba(244,83,0,.4)}
+.beat-globe-live .gcta-btn:hover{background:#ff6a1a}
+/* nudges a captain who scrolls instead of clicking — beat.js triggers this on a wheel/keyboard scroll attempt while gated */
+.beat-globe-live .gcta-btn.pulse{animation:voyageCtaPulse 1.4s ease-in-out 2}
+@keyframes voyageCtaPulse{
+  0%{box-shadow:0 8px 24px rgba(244,83,0,.4);transform:scale(1)}
+  35%{box-shadow:0 8px 30px rgba(255,138,30,.95),0 0 34px 8px rgba(255,138,30,.6);transform:scale(1.055)}
+  100%{box-shadow:0 8px 24px rgba(244,83,0,.4);transform:scale(1)}
+}
+/* while the voyage choice hasn't been made yet, the picker (panel + colour key) stays out of the way — it only makes
+   sense once "Find your ship and start your voyage" is actually clicked; removed by beat.js the moment it resolves */
+.beat-globe-live .beat-stage.voyage-gate [data-live="panel"],
+.beat-globe-live .beat-stage.voyage-gate [data-live="key"]{display:none!important}
+/* Voyage Planner Phase 3, 2nd pass (17 Sep 2026): "Follow this ship" (live.js) hides the finder itself, independent
+   of scroll position — stage.classList.add('following'). The existing "Change ship" reopen pill (beat.js tick(),
+   voyageReopenBtn) is reused to bring it back rather than inventing a second mechanism; see the reopenA calc there. */
+.beat-globe-live .beat-stage.following [data-live="panel"]{display:none!important}
+
+/* Stats — a full-width row across the bottom of the hero, not squeezed into the copy column */
+.beat-globe-live .gstats{position:absolute;left:5vw;right:5vw;bottom:6%;z-index:5;
+    display:flex;flex-wrap:wrap;gap:0;padding-top:22px;border-top:1px solid rgba(255,255,255,.14)}
+.beat-globe-live .gstats .s{display:flex;align-items:baseline;gap:9px;flex:1 1 0;padding-right:26px;margin-right:26px;
+    border-right:1px solid rgba(255,255,255,.16)}
+.beat-globe-live .gstats .s:last-child{border-right:none;margin-right:0;padding-right:0}
+.beat-globe-live .gstats b{font-weight:700;font-size:clamp(20px,2vw,26px);color:#FF8A1E;letter-spacing:-.01em;line-height:1;white-space:nowrap}
+.beat-globe-live .gstats span{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#a9cfca;line-height:1.3}
+
+
+/* ===== LIVE layer UI (HLC lab) ===== */
+.beat-globe-live .lpanel{position:absolute;right:3vw;top:9vh;z-index:7;width:min(340px,86vw);color:#eafff9;font-family:'Jost',system-ui,sans-serif;
+    background:rgba(6,10,18,.72);border:1px solid rgba(255,255,255,.12);border-radius:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 12px 40px rgba(0,0,0,.45);padding:14px 16px 12px;pointer-events:auto}
+/* 18 Sep 2026, Simon: a scroll attempt while the finder's open but neither path is picked yet (voyagePulse(),
+   beat.js) — the panel's own outline glows orange briefly rather than the scroll just being silently eaten */
+.beat-globe-live .lpanel.gate-pulse{animation:voyagePanelGatePulse 1.4s ease-in-out 2}
+@keyframes voyagePanelGatePulse{
+  0%,100%{border-color:rgba(255,255,255,.12);box-shadow:0 12px 40px rgba(0,0,0,.45)}
+  50%{border-color:#FF8A1E;box-shadow:0 12px 40px rgba(0,0,0,.45),0 0 22px 3px rgba(255,138,30,.5)}
+}
+/* Voyage Planner (16 Sep 2026): the X that backs a captain out of the picker to the opening CTA — sits in the panel's own top-right corner */
+.beat-globe-live .lclose{position:absolute;top:9px;right:9px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+    background:transparent;border:0;color:#7fb2ab;font:400 20px/1 'Jost',sans-serif;cursor:pointer;border-radius:50%;padding:0}
+.beat-globe-live .lclose:hover{color:#fff;background:rgba(255,255,255,.1)}
+/* Voyage Planner (17 Sep 2026): the finder's collapsed stand-in once the deep-zoom fade has taken it — same corner,
+   opacity driven from beat.js (tick(), alongside panelEl's own fade) rather than CSS, since it's the inverse of it.
+   No pulse on this or .lenter below any more (Simon, same day: doesn't need it; was only ever wired to this one). */
+.beat-globe-live .lreopen{position:absolute;right:3vw;top:9vh;z-index:7;background:rgba(6,10,18,.72);color:#eafff9;
+    border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:9px 16px;font:500 11.5px 'Jost',sans-serif;
+    letter-spacing:.06em;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    box-shadow:0 8px 24px rgba(0,0,0,.35);transition:background .15s,border-color .15s,color .15s,box-shadow .15s;
+    min-width:220px;box-sizing:border-box;text-align:center}   /* 17 Sep 2026, Simon: "Find a ship to take in" and "Jump to the approaches" stack together and should read as one pair, not two different widths — shares the base .lreopen rule so both pick it up */
+.beat-globe-live .lreopen:hover{border-color:#FF8A1E;color:#FF8A1E}
+/* 17 Sep 2026, Simon: once scroll reached the p=0.82 monitor cap, both pills went solid orange/white as a permanent
+   "you've arrived" signal — reverted 18 Sep 2026 (Simon: read as too static/heavy even with the pulse below added on
+   top) in favour of the exact same "stays normal at rest" treatment the ship-finder's own gate hint uses (.lexample.
+   gate-pulse below) — voyageCapPulse() (beat.js) is the only cue left, firing per actual scroll-past-cap attempt. */
+.beat-globe-live .lreopen.gate-pulse{animation:voyageReopenGatePulse 1.4s ease-in-out 2}
+@keyframes voyageReopenGatePulse{
+  0%,100%{border-color:rgba(255,255,255,.18);color:#eafff9;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  50%{border-color:#FF8A1E;color:#FF8A1E;box-shadow:0 8px 24px rgba(0,0,0,.35),0 0 20px 3px rgba(255,138,30,.5)}
+}
+/* "Enter the approaches" (17 Sep 2026, Simon) — stacks directly under "Change ship"/"Choose a ship to enter the
+   port", same pill, only ever shown alongside it while voyageMonitorMode is active (beat.js tick()) */
+.beat-globe-live .lreopen.lenter{top:calc(9vh + 44px)}
+@media (max-width:820px){.beat-globe-live .lreopen.lenter{top:auto;bottom:calc(4vh + 44px)}}
+@media (max-width:820px){.beat-globe-live .lreopen{right:3vw;top:auto;bottom:4vh}}
+.beat-globe-live .lpanel .lhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:24px}
+.beat-globe-live .lpanel .lhead b{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#FF8A1E;font-weight:600}
+.beat-globe-live .lstatus{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#7fb2ab;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56%}
+.beat-globe-live .lstatus::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#7fb2ab;margin-right:6px;vertical-align:middle}
+.beat-globe-live .lstatus.live{color:#7CE3B4}.beat-globe-live .lstatus.live::before{background:#3ED598;box-shadow:0 0 8px #3ED598;animation:lpulse 1.6s ease-in-out infinite}
+.beat-globe-live .lstatus.sim{color:#FFB247}.beat-globe-live .lstatus.sim::before{background:#FFB247}
+.beat-globe-live .lstatus.err{color:#ff7b7b}.beat-globe-live .lstatus.err::before{background:#ff5555}
+@keyframes lpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.beat-globe-live .lstats{display:flex;gap:16px;margin:2px 0 10px}
+.beat-globe-live .lstats div{display:flex;flex-direction:column}
+.beat-globe-live .lstats b{font-size:20px;font-weight:700;color:#fff;line-height:1}
+.beat-globe-live .lstats span{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#a9cfca;margin-top:3px}
+.beat-globe-live .lsearch{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:9px;
+    padding:9px 11px;font:400 14px 'Jost',system-ui,sans-serif;outline:none}
+.beat-globe-live .lsearch:focus{border-color:#FF8A1E}
+.beat-globe-live .lsearch::placeholder{color:#7fb2ab}
+/* Voyage Planner (17 Sep 2026): the "use an example vessel" alternative, now inside the finder itself, under the search box */
+.beat-globe-live .lexample{display:block;width:100%;box-sizing:border-box;margin-top:8px;background:transparent;color:#a9cfca;
+    border:1px dashed rgba(255,255,255,.24);border-radius:9px;padding:8px 11px;font:500 11.5px 'Jost',sans-serif;letter-spacing:.04em;
+    cursor:pointer;text-align:center;transition:border-color .15s,color .15s}
+.beat-globe-live .lexample:hover{border-color:#FF8A1E;color:#FF8A1E}
+.beat-globe-live .lexample:disabled{opacity:.5;cursor:default}
+/* 18 Sep 2026, Simon: a scroll attempt before either path is picked (voyagePulse(), beat.js) — both buttons pulse
+   toward their own :hover look (outline only, not a solid fill — they're not armed yet, so reusing .armed's solid
+   orange here would misread as "already chosen"), plus a glow — this is the reference "hint style" the observe-mode
+   reopen pills (.lreopen.gate-pulse above) were changed to match. */
+.beat-globe-live .lexample.gate-pulse{animation:voyageExampleGatePulse 1.4s ease-in-out 2}
+@keyframes voyageExampleGatePulse{
+  0%,100%{border-color:rgba(255,255,255,.24);color:#a9cfca}
+  50%{border-color:#FF8A1E;color:#FF8A1E;box-shadow:0 0 20px 3px rgba(255,138,30,.5)}
+}
+/* Voyage Planner (17 Sep 2026, 4th+5th pass): the auto-zoom never worked reliably, scrapped — the button itself is
+   the prompt now. beat.js swaps its text to "Scroll to continue your journey" and adds .armed + .pulse on click.
+   18 Sep 2026, Simon: dropped the solid orange/white fill (tried, then the gate-pulse hint elsewhere made it read as
+   inconsistent) — armed now stays the button's own normal dashed-outline look at rest, and .pulse is what shows
+   which of the two buttons is selected: a CONTINUOUS orange text/outline pulse with a glow (same visual language as
+   the gate-pulse hints, just infinite instead of a 2x flash — this one has to keep signalling "this is the one"
+   for as long as it's armed and waiting for scroll, not just nudge once). */
+.beat-globe-live .lexample.armed.pulse{animation:voyageArmedPulse 1.6s ease-in-out infinite}
+@keyframes voyageArmedPulse{
+  0%,100%{border-color:rgba(255,255,255,.24);color:#a9cfca}
+  50%{border-color:#FF8A1E;color:#FF8A1E;box-shadow:0 0 20px 3px rgba(255,138,30,.5)}
+}
+.beat-globe-live .lresults{list-style:none;margin:8px 0 0;padding:0;max-height:min(30vh,240px);overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+.beat-globe-live .lresults li{display:flex;flex-direction:column;padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer}
+.beat-globe-live .lresults li:hover{background:rgba(255,138,30,.10)}
+.beat-globe-live .lresults li b{font-size:13px;font-weight:600;color:#fff}
+.beat-globe-live .lresults li span{font-size:10.5px;color:#a9cfca;letter-spacing:.03em}
+.beat-globe-live .lresults li .lline{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.beat-globe-live .lmeta{font-size:10.5px;font-weight:400;font-style:normal;color:#a9cfca;letter-spacing:.03em;text-transform:none;white-space:nowrap}   /* small, regular weight, straight after the name (list, voyage card, callouts) */
+.beat-globe-live .lcard .lname .lmeta{font-size:11.5px;font-weight:700;margin-left:6px}   /* bold beside the name on the card (14 Oct 2026, Simon) */
+.beat-globe-live .kin-callout-title .lmeta{font-size:10px;font-weight:700;letter-spacing:.03em;margin-left:4px;color:#a9cfca}
+.beat-globe-live .lresults .lempty{color:#7fb2ab;font-size:12px;cursor:default;font-weight:300}
+.beat-globe-live .lcard{display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,138,30,.35)}
+.beat-globe-live .lcard .lname{font-size:18px;font-weight:700;color:#FF8A1E;letter-spacing:-.01em;margin-bottom:2px}
+/* the distance-to-St-Helier subtitle (17 Sep 2026, Simon) — sits directly under the name, no label/row of its own
+   ("300 nm from St Helier", not "Distance: 300 nm to St Helier") */
+.beat-globe-live .lcard .ldist{font-size:12px;color:#a9cfca;font-weight:300;margin-bottom:8px}
+.beat-globe-live .lcard .lrow{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:3px 0}
+.beat-globe-live .lcard .lrow span{color:#a9cfca;font-weight:300}.beat-globe-live .lcard .lrow b{color:#fff;font-weight:500;text-align:right}
+.beat-globe-live .lactions{display:none;gap:8px;margin-top:12px}
+.beat-globe-live .lgo{flex:1;background:#F45300;color:#fff;border:0;border-radius:999px;padding:11px 16px;font:600 13px 'Jost',sans-serif;letter-spacing:.06em;cursor:pointer;
+    box-shadow:0 6px 18px rgba(244,83,0,.35)}
+.beat-globe-live .lgo:hover{background:#ff6a1a}
+.beat-globe-live .lclear{background:transparent;color:#a9cfca;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:11px 14px;font:400 12px 'Jost',sans-serif;cursor:pointer}
+/* "Change Destination: / JERSEY" (17 Sep 2026, Simon; two explicit lines as of the same day — was one line, "Take
+   me to St Helier", then "Change Destination: ST HELIER" pulsing) — the callout only (renderCallout(), live.js):
+   she has to actually be followed/centred, not just previewed in the finder card, before this shows. .ltake-l1/-l2
+   force the two lines regardless of width; l2 (the destination itself) reads as the real value, bigger/bolder than
+   the l1 label. 18 Sep 2026, Simon: dropped the solid orange fill (both here and once clicked, when the text
+   becomes "Scroll to continue your journey" — runChangeDestinationSequence(), live.js, re-adds this same .pulse) in
+   favour of the same normal-at-rest / continuous orange text+outline+glow pulse the other buttons now use. Went
+   7s -> too static/"not flashing" (that pace only worked on the old solid-fill version, where the button was always
+   visibly orange and the cycle just varied scale/shadow) -> 1.6s to match the other buttons -> "way too fast" once
+   it wasn't fighting a 7s memory any more. 1.6s suits a brief attention-grabbing nudge (a scroll attempt, a button
+   just armed) but this one is a calm, ongoing invitation the whole time she's stopped — settled on 3s, between the
+   two, fast enough to visibly read as pulsing, slow enough not to feel urgent. */
+.beat-globe-live .kin-callout-card .ltake{display:block;box-sizing:border-box;width:100%;margin-top:10px;background:transparent;color:#eafff9;border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:9px 16px;letter-spacing:.06em;text-align:center;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.beat-globe-live .kin-callout-card .ltake:hover{border-color:#FF8A1E;color:#FF8A1E}
+.beat-globe-live .kin-callout-card .ltake .ltake-l1{display:block;font:500 10px 'Jost',sans-serif;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.beat-globe-live .kin-callout-card .ltake .ltake-l2{display:block;font:700 16px 'Jost',sans-serif;letter-spacing:.05em;margin-top:1px}
+.beat-globe-live .kin-callout-card .ltake.pulse{animation:voyageLtakePulse 3s ease-in-out infinite}
+@keyframes voyageLtakePulse{
+  0%,100%{border-color:rgba(255,255,255,.24);color:#eafff9;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  50%{border-color:#FF8A1E;color:#FF8A1E;box-shadow:0 6px 18px rgba(0,0,0,.35),0 0 20px 3px rgba(255,138,30,.5)}
+}
+@media (max-width:820px){.beat-globe-live .kin-callout-card .ltake{font-size:12px;padding:9px 12px}}
+.beat-globe-live .beat-stage.has-ship .lcard,.beat-globe-live .beat-stage.has-ship .lactions{display:flex;flex-direction:column}
+.beat-globe-live .beat-stage.has-ship .lactions{flex-direction:row}
+.beat-globe-live .beat-stage.has-ship .lresults{max-height:120px}
+.beat-globe-live .pinlabel.pinship span{font-weight:700;font-size:11px;color:#FF8A1E;text-shadow:0 0 10px rgba(244,83,0,.6),0 1px 4px rgba(0,0,0,.8)}
+.beat-globe-live .lkey{position:absolute;left:5vw;top:9vh;z-index:5;display:flex;gap:14px;font:300 10px 'Jost',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#a9cfca}
+.beat-globe-live .lkey i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
+@media (max-width:820px){.beat-globe-live .lpanel{right:3vw;left:3vw;top:auto;bottom:4vh;width:auto}.beat-globe-live .globeCopy{bottom:auto;top:14vh}.beat-globe-live .globeCopy2{top:auto;bottom:4vh}.beat-globe-live .gstats{display:none}.beat-globe-live .lkey{display:none}}
+
+.beat-globe-live .pinlabel.pintown{position:relative}
+.beat-globe-live .pinlabel.pintown span{font-weight:600;font-size:11px;letter-spacing:.14em;color:#eafff9;text-shadow:0 1px 6px rgba(0,0,0,.9);transform:translate(9px,-50%);position:absolute;left:0;top:0}
+.beat-globe-live .pinlabel.pintown .pindot{position:absolute;left:0;top:0;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#FF8A1E;box-shadow:0 0 0 2px rgba(255,138,30,.28),0 0 12px 3px rgba(244,83,0,.6)}
+.beat-globe-live .pinlabel.pin-airport .pindot{width:14px;height:14px;margin:-7px 0 0 -7px;background:radial-gradient(circle,#FFB247 0%,#FF8A1E 45%,rgba(244,83,0,.35) 75%,rgba(244,83,0,0) 100%);box-shadow:0 0 18px 6px rgba(244,83,0,.45);animation:pinblob 2.4s ease-in-out infinite}
+.beat-globe-live .pinlabel.pin-airport span{font-weight:500;font-size:10px;letter-spacing:.12em;color:#ffd9a8;transform:translate(12px,-50%)}
+@keyframes pinblob{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.25);opacity:.75}}
+.beat-globe-live .globeCopy,.beat-globe-live .gstats,.beat-globe-live .lkey{transition:opacity .2s linear}
+.beat-globe-live .lshipcard{position:absolute;z-index:8;min-width:210px;max-width:260px;background:rgba(6,10,18,.86);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:10px 12px;color:#eafff9;font:400 12px/1.4 'Jost',Inter,system-ui,sans-serif;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+/* 17 Sep 2026, Simon: no commit action on this card any more (was "Go to ship"/.lshipgo) — it's a live-data preview
+   only now, closed by its own "X" or by clicking elsewhere; neither one resets anything beyond this one card. */
+.beat-globe-live .lshipcard-close{position:absolute;top:6px;right:6px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:rgba(255,255,255,.55);font-size:15px;line-height:1;cursor:pointer;padding:0}
+.beat-globe-live .lshipcard-close:hover{color:#fff;background:rgba(255,255,255,.12)}
+.beat-globe-live .lshipcard b{display:block;font-size:14px;font-weight:700;padding-right:18px}
+.beat-globe-live .lshipcard span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#a9cfca;margin:2px 0 6px}
+.beat-globe-live .lshipcard i{display:block;font-style:normal;color:#d9e2ec;font-variant-numeric:tabular-nums}
+.beat-globe-live .lhover{position:absolute;z-index:7;width:18px;height:18px;margin:-9px 0 0 -9px;border:1.5px solid #fff;border-radius:50%;pointer-events:none;box-shadow:0 0 8px rgba(255,255,255,.35)}
+
+/* Voyage Planner Phase 3, 2nd pass (17 Sep 2026): the selected ship's marker + callout now deliberately match
+   Kinship's own treatment exactly — Simon asked for "same style as the callout for kinship in the demo". The
+   pulsing ring (.lsel) and the bespoke .lcallout box are retired; the callout box below just wears Kinship's own
+   kin-callout-card/-title/-row classes directly (beat.html/beat.css, "KINSHIP AIS MARKER + CALLOUT" section) —
+   same look, zero new CSS for it. The marker (lselfx, a chevron matching Kinship's KIN_AIS_D path) is its own thing
+   below since it's positioned independently (armed the instant a ship is selected, not just once "Follow" is
+   clicked — Kinship's own chevron is scripted-path-only, this one's live-tracked off the real AIS fix). */
+.beat-globe-live .lselfx{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:7}
+.beat-globe-live .lleader{position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none;overflow:visible}
+.beat-globe-live .lleader[hidden]{display:none}
+.beat-globe-live .lleader line{stroke:rgba(255,255,255,.5);stroke-width:1.2;fill:none}
+
+/* Live / Loading pill — sits at the right end of the key row, fades with it */
+.beat-globe-live .lmode{position:absolute;left:5vw;top:calc(9vh + 22px);z-index:5;display:inline-flex;align-items:center;gap:7px;padding:4px 10px 4px 8px;border-radius:999px;background:rgba(6,10,18,.7);border:1px solid rgba(255,255,255,.12);font:500 10px 'Jost',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#a9cfca;backdrop-filter:blur(6px);transition:opacity .2s linear;pointer-events:auto}
+.beat-globe-live .lmode i{width:7px;height:7px;border-radius:50%;background:#7fb2ab}
+.beat-globe-live .lmode.wait i{background:#FFB247;animation:lpulse 1s ease-in-out infinite}
+.beat-globe-live .lmode.live{color:#7CE3B4;border-color:rgba(62,213,152,.4)}.beat-globe-live .lmode.live i{background:#3ED598;box-shadow:0 0 8px #3ED598;animation:lpulse 1.6s ease-in-out infinite}
+.beat-globe-live .lmode.sim{color:#FFB247}.beat-globe-live .lmode.sim i{background:#FFB247}
+.beat-globe-live .lmode.err{color:#ff7b7b}.beat-globe-live .lmode.err i{background:#ff5555}
+@media (max-width:820px){.beat-globe-live .lmode{top:3vh;left:3vw}}
+
+/* KINSHIP AIS MARKER + CALLOUT — TRIAL (15 Sep 2026), ported from channel-night's version (there: .cn-callout-*,
+   .cn-ais-*) onto Kinship on the sphere here. kin-fx is a plain stage-sized svg (not rotating/zooming with the globe
+   — it's positioned fresh from her live 3D position every frame, see worldToStagePx() in beat.js) holding both the
+   AIS marker (drawn via inline SVG attrs in JS, same as channel-night — no CSS needed for its fill/stroke) and the
+   callout's leader line. The card itself is a plain stage-fixed overlay, same idea as channel-night's scripted-path
+   version but with a single safe default position here (no live-rendering to calibrate a path against yet — expect
+   this needs the same kind of feedback/markup round as channel-night did). Delete this whole block (+ the kin-fx/
+   kin-callout-* markup in beat.html + the KINSHIP AIS/CALLOUT section in beat.js) to remove it for good; or leave it
+   and set calloutEnabled:false in page options to switch it off. */
+.beat-globe-live .kin-fx{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:7}
+.beat-globe-live .kin-callout-line{stroke:rgba(255,255,255,.5);stroke-width:1.2;fill:none}
+.beat-globe-live .kin-callout-card{position:absolute;z-index:8;left:5%;top:10%;width:220px;padding:10px 14px;
+  background:rgba(4,7,14,.72);border-left:2px solid #FF7A12;pointer-events:none;opacity:0}
+/* the live callout (renderCallout(), live.js — a bare .kin-callout-card, no data-g) needs real clicks for its own
+   "X" and the "Change Destination" button below; Kinship's own scripted callout (data-g="kinCallout", beat.html)
+   stays decorative/inert exactly as before — this scoping is what tells the two apart. */
+.beat-globe-live .kin-callout-card:not([data-g]){pointer-events:auto;width:260px}
+/* the X (17 Sep 2026, Simon) is clickable on BOTH callouts now — Kinship's own scripted one (data-g="kinCallout")
+   stays decorative everywhere else, just this one button opts back in to pointer-events despite the card's own
+   pointer-events:none (a child can always re-enable itself, no need to lift the whole card like the live one does
+   for its own extra button below). */
+.beat-globe-live .kin-callout-close{position:absolute;top:6px;right:6px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:rgba(255,255,255,.55);font-size:16px;line-height:1;cursor:pointer;padding:0;pointer-events:auto}
+.beat-globe-live .kin-callout-close:hover{color:#fff;background:rgba(255,255,255,.12)}
+.beat-globe-live .kin-callout-title{font:700 13px/1.3 'Montserrat',sans-serif;letter-spacing:.08em;color:#fff;margin:0 0 2px;white-space:nowrap;padding-right:20px}
+.beat-globe-live .kin-callout-dist{font:400 10px 'Inter',system-ui,sans-serif;color:#9fb1c4;margin:0 0 6px}
+.beat-globe-live .kin-callout-row{display:flex;font:400 11px/1.7 'Inter',system-ui,sans-serif;color:rgba(230,238,246,.9)}
+.beat-globe-live .kin-callout-row .k{flex:0 0 70px;color:#9fb1c4;text-transform:uppercase;letter-spacing:.05em;font-size:9px;padding-top:3px}
+.beat-globe-live .kin-callout-row .k::after{content:':'}
+.beat-globe-live .kin-callout-row .v{flex:1 1 auto;min-width:0;color:#fff}
+
+@media (max-width:820px){ .beat-globe-live .kin-callout-card{width:170px;padding:8px 11px} .beat-globe-live .kin-callout-card:not([data-g]){width:200px} .beat-globe-live .kin-callout-title{font-size:12px} .beat-globe-live .kin-callout-row{font-size:10px} }
+
+/* the picker starts MINIMISED — just the search bar (16 Sep 2026); "Ships nearby ▾" expands to the list of ships in the area;
+   typing or choosing a ship expands it too; ▴ collapses it again */
+.beat-globe-live .lpanel .lhead{flex-wrap:wrap}
+.beat-globe-live .lexpand{appearance:none;background:transparent;border:1px solid rgba(255,255,255,.18);color:#a9cfca;border-radius:999px;padding:3px 9px;font:500 10px 'Jost',sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-left:auto}
+.beat-globe-live .lexpand:hover{border-color:#FF8A1E;color:#fff}
+.beat-globe-live .lexpand i{font-style:normal;display:inline-block;transition:transform .2s}
+.beat-globe-live .lpanel.expanded .lexpand i{transform:rotate(180deg)}
+.beat-globe-live .lpanel:not(.expanded) .lresults{display:none}
+.beat-globe-live .beat-stage.has-ship .lpanel:not(.expanded) .lcard,.beat-globe-live .beat-stage.has-ship .lpanel:not(.expanded) .lactions{display:none}
+
+/* second copy block for the deep zoom (16 Sep 2026). 23 Sep 2026, Simon: sat at the same bottom:20% as the opening
+   copy (.globeCopy above), which put it right where Kinship's sprite settles (KIN.endScreen.y=0.515, roughly screen
+   centre) — she came in from below already obscured by the text. Pulled it down near the stage's own bottom edge so
+   she now arrives above it, not behind it. */
+.beat-globe-live .globeCopy2{bottom:6%;opacity:0;pointer-events:none;transform:translateY(12px);will-change:opacity,transform;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+
+/* Voyage Planner Phase 4 (17 Sep 2026): "Change Destination: Jersey" on a real selected ship — her scripted route's
+   own marker/callout reuse Kinship's kin-fx, kin-ais-... and kin-callout-... styling wholesale (beat.js: routeFxSvg/
+   routeAisCore etc.), same visual language, no new look needed. This card has no data-g attribute (built in JS, not
+   beat.html, since unlike Kinship's it has no fixed content) but isn't the clickable live one either — pointer-
+   events:none like Kinship's own, overriding the live callout's :not([data-g]) opt-in (beat.css, above) which would
+   otherwise also match it. */
+.beat-globe-live .kin-callout-card.voyage-route-callout{pointer-events:none}
+
+/* 19 Sep 2026, Simon: text kept getting highlighted by accident while scrolling/dragging the globe. Nothing in the beat needs copying except what's typed in the finder. */
+.beat-globe-live, .beat-globe-live *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.beat-globe-live input, .beat-globe-live textarea{-webkit-user-select:text;user-select:text}
+
+/* 19 Sep 2026, Simon: the globe should stay draggable when the cursor is over the hero text/stats. They're display only, so let pointer events fall through to the globe; the CTA button opts back in. */
+.beat-globe-live .globeCopy, .beat-globe-live .gstats, .beat-globe-live .lkey{pointer-events:none}
+.beat-globe-live .globeCopy .gcta-btn{pointer-events:auto}
+
+/* ===== 3 Oct 2026, Simon: the vessel card lives in the ship finder ("the finder stays open as the vessel routes but displays what is
+   currently shown on the vessel card before and during the voyage") =====
+   beat.js (tick()) puts stage.voyage-mode on while a vessel is being followed/sailed; the Kinship, routed-ship and live-ship callout cards are
+   re-parented into .lvoyage (beat.html) and restyled here as a plain in-panel card — same content and update logic as before, no floating
+   position or leader line. The :is(#beats,body) prefix on these rules is deliberate: site/js/globe-enhancements.js (Howard's presentation
+   layer) styles the same panel with ID-scoped !important rules, and an ID is the only way to out-rank them without editing his file. Everything
+   is scoped to .vcard-panel, which beat.js adds only when options.voyageCardInFinder isn't false — drop that to get the old floating cards back. */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage, :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lchange{display:none}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lvoyage{display:block;position:relative;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,138,30,.35)}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lchange{display:inline-flex;align-items:center;margin-left:auto;margin-right:0;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:transparent;color:rgba(255,255,255,.8);font:600 10px 'Jost',system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lchange:hover{border-color:#FF8A1E;color:#FF8A1E}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode [data-live="search"],
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lexample,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lresults,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lcard,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lactions,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lexpand,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lstatus,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .choose-hint,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .choose-or,
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode [data-live="results"]{display:none!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode.following [data-live="panel"]{display:block!important}   /* "Go to ship" used to hide the finder (the rule above); it now keeps it as the voyage card */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-card{position:static!important;left:auto!important;top:auto!important;width:auto!important;margin:0;padding:0;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;transform:none!important;pointer-events:auto}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-close{display:none}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-title{font:700 18px/1.2 'Jost',system-ui,sans-serif;color:#FF8A1E;letter-spacing:-.01em;white-space:normal;margin:0 0 2px;padding-right:26px}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-dist{font:300 12px 'Jost',system-ui,sans-serif;color:#a9cfca;margin:0 0 8px}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-row{font:400 12px/1.5 'Jost',system-ui,sans-serif;padding:2px 0}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-row .k{flex:0 0 92px;font-size:10px;padding-top:2px}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .lvtoggle{position:absolute;top:6px;right:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:#7fb2ab;font-size:13px;line-height:1;cursor:pointer;padding:0;transition:transform .2s;z-index:1}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .lvtoggle:hover{color:#fff;background:rgba(255,255,255,.1)}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage.compact .lvtoggle{transform:rotate(-90deg)}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage.compact .kin-callout-row,:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage.compact .kin-callout-dist{display:none}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .kin-callout-line,:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lleader{display:none!important}
+
+/* the scroll cue (.lcue — below the card, where "Change ship" used to sit; Change ship now lives in the header, 4 Oct 2026) and the empty-slot rule — 3 Oct 2026 */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue{display:none}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lcue:not([hidden]){display:flex;align-items:center;justify-content:center;gap:10px;position:absolute;left:-1px;right:-1px;top:calc(100% + 15px);box-sizing:border-box;margin:0;padding:12px 16px;border-radius:0;border:1px solid #fff;background:#fff;color:#1A1D22;font:600 12px 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;transition:opacity .35s}   /* 28 Oct 2026, Simon: the white button style, a down arrow either side, and the orange glow pulse while it is waiting (.flash) */
+/* 31 Oct 2026, Simon: the button sits BELOW the voyage card, not inside it, so the card ends under the text with no room left where the button was (it is positioned off the panel's bottom edge, the panel being position:absolute). On a small screen the panel sits at the bottom, so it is lifted to make room for the button under it. */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lpanel{overflow:visible!important}   /* (the finder scrolls when it is tall, see globe-enhancements.js; the short voyage card must not, or it would clip the button that hangs below it) */
+@media (max-width:820px){:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lpanel:has(.lcue:not([hidden])){bottom:calc(4vh + 62px)}}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue i, :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue::before{font-style:normal;display:inline-block;color:#FF8A1E}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue::before{content:"↓"}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue.flash i, :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue.flash::before{animation:voyageCueBob 1.2s ease-in-out infinite}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue.flash{animation:voyageCueGlow 1.6s ease-in-out infinite}
+@keyframes voyageCueGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,138,30,0)}50%{box-shadow:0 0 22px 4px rgba(255,138,30,.7)}}
+@keyframes voyageCueBob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes voyageCueFlash{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,138,30,.0)}50%{opacity:.55;box-shadow:0 0 12px 2px rgba(255,138,30,.55)}}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lvoyage[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue,:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue i,:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lcue::before{animation:none!important}}
+
+/* 4 Oct 2026, Simon: choosing a vessel (demo or live) puts the globe straight onto her and the details in the finder's card.
+   - the hero "Start your voyage" button only belongs to the very first screen: once the finder is open (and from then on, vessel or not) it gives way to just the "Skip to CIPS" link
+   - a live ship's own in-card "Scroll to see your route" prompt hands over to the header cue (beat.js .cue-moved)
+   - a scroll attempt before the route is started pulses "Simulate route to Jersey" (beat.js voyagePulse -> .gate-pulse) */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel:not(.voyage-gate):not(.globe-intro) [data-g="voyageCta"]{display:flex!important;margin-top:18px!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel:not(.voyage-gate):not(.globe-intro) [data-g="voyageCtaBtn"]{display:none!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel:not(.voyage-gate):not(.globe-intro) .skip-globe{margin-left:0!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .ltake.cue-moved{display:none!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .ltake.gate-pulse{animation:voyageCtaPulse 1.4s ease-in-out 2!important}
+
+/* 4 Oct 2026, Simon: with a ship selected the X in the finder is replaced by "Change ship" (header, right-hand end); the cue steps aside while scrolling */
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lclose{display:none!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lhead{padding-right:0!important}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel.voyage-mode .lcue.away{opacity:0;pointer-events:none;animation:none!important}

@@ -1,0 +1,97 @@
+<div data-g="globeglow"></div>
+  <!-- CIPS/site copy, 16 Sep 2026: the lab's markup (colour key, live stats, the captain's picker) plus Simon's Kinship callout.
+       With options.ais unset the beat removes the key and the picker from the DOM. Copy/stats are placeholders (DOCS/HANDOFF-Simon.md). -->
+  <div data-g="globe"></div>
+  <div data-g="islands">
+    <img class="imap" data-src="assets/channel-islands.svg" alt="Channel Islands" />
+  </div>
+  <div data-g="region"></div>
+  <div class="lkey" data-live="key" aria-hidden="true"><span><i style="background:#4fd15a"></i>Cargo</span><span><i style="background:#ff4d4d"></i>Tanker</span><span><i style="background:#3d8bff"></i>Passenger</span><span><i style="background:#ffe14d"></i>High speed</span><span><i style="background:#3ee6e0"></i>Tug &amp; pilot</span><span><i style="background:#ff9a3d"></i>Fishing</span><span><i style="background:#ff5cf0"></i>Yacht</span><span><i style="background:#F45300;box-shadow:0 0 8px #FF8A1E"></i>Your ship</span></div>
+  <div class="globeCopy">
+    <p class="eyebrow text-[12px]">The Atlantic Gateway&nbsp;C.I.</p>
+    <h1>Your ship.<br><span class="l2">Our islands.</span></h1>
+    <p class="gsub">Every vessel on the feed is on this globe. Find yours, and we will show you the way in — past the busiest lanes in the world to a port that is expecting you.</p>
+    <!-- Voyage Planner Phase 2 (16 Sep 2026): the CTA is what unlocks scrolling into the fly-in — see the scroll gate
+         in beat.js. Before it's resolved the globe is still fully drag/orbit-able, just not scrollable past this point.
+         Clicking it opens the ship finder (.lpanel) directly — no intermediate choice screen (17 Sep 2026, Simon: the
+         two-button choice was an extra step; "use an example vessel" now lives inside the finder itself, see below). -->
+    <div class="gcta" data-g="voyageCta">
+      <button type="button" class="gcta-btn" data-g="voyageCtaBtn">Choose your ship and start your voyage</button>
+    </div>
+  </div>
+  <!-- the second line, for the deep zoom (from ~82%, as "Your ship. Our islands." has gone) — Howard, 16 Sep 2026. Placeholder copy. -->
+  <div class="globeCopy globeCopy2" data-g="copy2" aria-hidden="true">
+    <p class="eyebrow text-[12px]">The Channel &middot; live</p>
+    <h1>Some ships pass by.<br><span class="l2">Some call in.</span></h1>
+    <p class="gsub">Every one of them is on this map. The ones that call are met on the quay by CIPS.</p>
+  </div>
+  <div class="gstats">
+    <div class="s"><b data-live="count">—</b><span>vessels live on the globe</span></div>
+    <div class="s"><b data-live="channel">—</b><span>in the Channel &amp; approaches now</span></div>
+    <div class="s"><b>24/7</b><span>tidal access &middot; up to ~130m LOA</span></div>
+  </div>
+  <div class="lpanel" data-live="panel">
+    <!-- Voyage Planner (16 Sep 2026): closes the picker and takes the captain back to the opening CTA, gate re-engaged. -->
+    <button type="button" class="lclose" data-live="panelClose" aria-label="Close and start over">&times;</button>
+    <div class="lhead"><b>Find your ship</b><span class="lstatus wait" data-live="status">connecting…</span><button class="lexpand" data-live="expand" type="button" aria-expanded="false" title="Ships in the area">Ships nearby <i>&#9662;</i></button></div>
+    <input class="lsearch" data-live="search" type="search" placeholder="Vessel name or MMSI" autocomplete="off" spellcheck="false" />
+    <button type="button" class="lexample" data-g="voyageExample">Bring in a demo vessel</button>
+    <!-- 17 Sep 2026, Simon: a second, neutral way in — same scroll-unlock mechanism as "Bring in a demo vessel"
+         (below, beat.js), just without picking any particular ship as the story — and Kinship's own scripted
+         marker/callout are suppressed for real (voyageMonitorMode, placeKinship()) so it's genuinely vessel-free,
+         not just unnamed. Lets a captain (or Simon, showing someone round) explore the Channel Islands' own
+         deep-zoom views without a vessel selected/followed. -->
+    <button type="button" class="lexample" data-g="voyageMonitor">Observe the Channel Islands</button>
+    <ul class="lresults" data-live="results"><li class="lempty">Listening…</li></ul>
+    <div class="lcard" data-live="card"></div>
+    <!-- 3 Oct 2026, Simon: "the callout card... doesn't actually appear as a card linked to and following the vessel... maybe the text
+         appears in the ship finder, below the vessel search field... so the ship finder stays open as the vessel routes but displays what
+         is currently shown on the vessel card before and during the voyage." While a voyage is under way (stage.voyage-mode, beat.js
+         tick()) the finder collapses to this slot: the Kinship / routed-ship / live-ship callout cards are re-parented in here (beat.js,
+         live.js) and restyled in-panel (beat.css) — same content and update logic, no floating card or leader line. Reversible: set
+         voyageCardInFinder:false in the page options (beat.js reads it at mount). -->
+    <div class="lvoyage" data-g="voyageSlot"><button type="button" class="lvtoggle" data-g="voyageToggle" aria-expanded="true" aria-label="Show or hide the voyage details">&#9662;</button></div>
+    <!-- 3 Oct 2026, Simon: "we've lost the cue/hint for scroll to continue your journey... how and where can we include that now?" — the cue used to be
+         the armed demo button / the live route's pulsing .ltake, both of which the voyage-mode collapse hid or buried. Lives here, in the voyage card,
+         above "Change ship": shown (beat.js tick()) from the moment the demo vessel is armed until the first real scroll, and again if they scroll back
+         to the top. The live route's own pulsing "Scroll to see your route" button stays in its card (no longer hidden by the compact toggle). -->
+    <span class="lcue" data-g="voyageCue" hidden aria-live="polite" title="Scroll to continue your journey"><span>Scroll to continue</span><i aria-hidden="true">&darr;</i></span>   <!-- moved into .lhead (beside the "Your voyage" title) by beat.js -->
+    <button type="button" class="lchange" data-g="voyageChange">Change ship</button>
+    <!-- Voyage Planner Phase 3, 2nd pass (17 Sep 2026): selecting a ship now automatically centres/marks her (beat.js
+         faceQuat + live.js's pulsing chevron) — no "Show her" step needed. "Follow this ship" (was "Take me in") is
+         the one committing action left on the card: hides the finder (stage.following, see beat.css) and opens her
+         Kinship-style callout. "Take me in"'s old job (scroll-unlock + the page's own auto-ride) is deliberately
+         disconnected from this button for now — Simon's moving it elsewhere. Dropped "Show her"/"Back to the
+         Gateway" — the panel's own X already backs all the way out. -->
+    <div class="lactions"><button class="lgo" data-live="follow" type="button">Go to ship &rarr;</button><button class="lclear" data-live="clear" type="button">Clear</button></div>
+  </div>
+  <!-- Voyage Planner (17 Sep 2026): the finder fades out by p=0.58 so Kinship's arrival gets the stage uncluttered —
+       but Simon flagged that leaves no way to abort or change vessel once you're into the deep zoom. Compromise
+       rather than keeping the whole panel up throughout (which would undercut that reveal): this small pill fades in
+       exactly as the finder fades out, and reopens it (forced fully visible from then on) on click. See
+       voyagePanelForced in beat.js. -->
+  <button type="button" class="lreopen" data-g="voyageReopenPanel" aria-label="Change ship" style="opacity:0;pointer-events:none">Change ship</button>
+  <!-- 17 Sep 2026, Simon: a second option, stacked under "Change ship"/"Choose a ship to enter the port" —
+       "Observe the Channel Islands" needed a way to carry on toward the port without picking a vessel first. Only
+       shown while voyageMonitorMode is active (beat.js tick()); jumps straight to seaway-wake's own p=0 (relabelled
+       "Jump to the approaches" from "Enter the approaches" same day). -->
+  <button type="button" class="lreopen lenter" data-g="voyageEnterApproaches" aria-label="Jump to the approaches" style="opacity:0;pointer-events:none">Jump to the approaches</button>
+  <!-- KINSHIP AIS MARKER + CALLOUT — TRIAL (15 Sep 2026), ported from channel-night's version onto Kinship here.
+       Positioned every frame from her live 3D position (see worldToStagePx() in beat.js), same idea as channel-night's
+       2D projection but for the sphere. No directional chevron here (channel-night's pointed in her heading) — that
+       needed a second screen-space projection to compute a bearing, so this trial uses a plain pulsing disc instead;
+       easy to add if wanted. Reversible: set calloutEnabled:false in page options, or delete this block + the
+       kin-callout-*/kin-ais-* rules in beat.css + the KINSHIP AIS/CALLOUT section in beat.js. -->
+  <svg class="kin-fx" data-g="kinfx" aria-hidden="true"></svg>
+  <div class="kin-callout-card" data-g="kinCallout">
+    <!-- 17 Sep 2026, Simon: the example-vessel flow needed its own "X" too, same cancel-and-restart as the live
+         callout's — wired in beat.js next to voyagePanelClose. -->
+    <button type="button" class="kin-callout-close" data-g="kinCalloutClose" aria-label="Cancel and start over">&times;</button>
+    <div class="kin-callout-title" data-g="kinCalloutTitle"></div>
+    <div class="kin-callout-row" data-g="kinCalloutRow0"></div>
+    <div class="kin-callout-row" data-g="kinCalloutRow1"></div>
+    <div class="kin-callout-row" data-g="kinCalloutRow2"></div>
+    <div class="kin-callout-row" data-g="kinCalloutRow3"></div>
+  </div>
+  <div class="status" data-g="status">Building the matrix…</div>
+  <div class="hint" data-g="hint" style="opacity:0">Scroll &darr; to approach the islands &middot; or choose your ship</div>

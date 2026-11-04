@@ -1,0 +1,32 @@
+/* video-moment.css — the footage viewport that sits above the chart plotter (26 Oct 2026, Simon: layout B, "viewport above the plotter, same width",
+   with an Expand button to a wider size). Same frame and header style as the plotter (nav-plotter.css) so the two read as one instrument stack. */
+.vm-box{position:absolute;left:5vw;bottom:calc(5vh + 330px);z-index:6;width:250px;max-width:calc(100vw - 16px);border-radius:12px;background:#1d2226;
+  box-shadow:0 12px 34px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden;font-family:'Jost',system-ui,sans-serif;
+  opacity:0;visibility:hidden;pointer-events:none;transform:translateY(14px);
+  transition:opacity .4s ease,transform .4s ease,width .3s ease,visibility 0s linear .4s}
+.vm-box.on{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .4s ease,transform .4s ease,width .3s ease,visibility 0s}
+.vm-box.wide{width:380px}
+.vm-top{position:relative;display:flex;align-items:center;gap:8px;padding:6px 64px 5px 10px;font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.18em;color:#9fb3bf;white-space:nowrap}
+.vm-top .vm-tag{flex:none}
+.vm-top .vm-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;letter-spacing:.06em;text-transform:none;font-weight:500;font-size:10px;color:#c6d4db}
+.vm-top button{position:absolute;top:2px;appearance:none;border:0;background:rgba(255,255,255,.1);color:#eaf4f5;border-radius:6px;width:20px;height:16px;font:600 11px/1 system-ui;cursor:pointer;padding:0}
+.vm-top .vm-x{right:8px}.vm-top .vm-big{right:32px;font-size:12px}
+.vm-top button:hover{background:rgba(255,255,255,.22)}
+.vm-top button:focus-visible{outline:2px solid #FF8A1E;outline-offset:1px}
+.vm-frame{position:relative;aspect-ratio:16/9;background:#000}
+.vm-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#000}
+.vm-v.cur{display:block}
+.vm-play{position:absolute;inset:0;display:none;align-items:center;justify-content:center;appearance:none;border:0;background:rgba(0,0,0,.28);cursor:pointer;color:#fff;padding:0}
+.vm-play i{width:44px;height:44px;border-radius:50%;background:rgba(255,138,30,.95);position:relative}
+.vm-play i::after{content:"";position:absolute;left:17px;top:13px;border-left:14px solid #1a1408;border-top:9px solid transparent;border-bottom:9px solid transparent}
+.vm-box.still .vm-play{display:flex}
+.vm-bar{height:3px;background:rgba(255,255,255,.12)}
+.vm-bar i{display:block;height:100%;width:0;background:#FF8A1E}
+@media (max-width:820px){.vm-box{transform-origin:left bottom;transform:translateY(14px) scale(.72)}.vm-box.on{transform:scale(.72)}}
+@media (prefers-reduced-motion:reduce){.vm-box,.vm-box.on{transition:opacity .2s ease,visibility 0s;transform:none}}
+@media (prefers-reduced-motion:reduce) and (max-width:820px){.vm-box,.vm-box.on{transform:scale(.72)}}
+/* full screen footage (31 Oct 2026, Simon: the departure that ends the journey): across the whole stage, under the chart plotter (z-index 6) */
+.vm-full{position:absolute;inset:0;z-index:4;background:#000;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .9s ease,visibility 0s linear .9s}
+.vm-full.on{opacity:1;visibility:visible;transition:opacity 0s,visibility 0s}
+.vm-fv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+@media (prefers-reduced-motion:reduce){.vm-full,.vm-full.on{transition:opacity .2s ease,visibility 0s}}

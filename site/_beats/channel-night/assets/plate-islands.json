@@ -1,0 +1,13 @@
+{
+ "file": "plate-islands.jpg",
+ "width": 4096,
+ "height": 4881,
+ "bounds": {
+  "west": -3.05,
+  "east": -1.25,
+  "south": 48.55,
+  "north": 49.95
+ },
+ "metresPerPixel": 31.93,
+ "generated": "2026-09-13T09:04"
+}

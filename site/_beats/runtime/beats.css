@@ -1,0 +1,12 @@
+/* Base layout every beat shares: a tall track + one sticky 100vh stage. Beat-specific CSS lives in <beat>/beat.css. */
+html { scrollbar-gutter: stable; } /* reserves the scrollbar's width always, so a beat that toggles body{overflow:hidden} (e.g. globe-live's voyage gate) doesn't cause a horizontal layout jump when it unlocks */
+.beat { position: relative; z-index: 1; }
+.beat-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: paint; }
+.beat-failed .beat-stage { background: #04070e; }
+@media (prefers-reduced-motion: reduce) { .beat { height: 100vh !important; } .beat-stage { position: relative; } }
+/* pinned groups: one sticky stage, beats stacked as full-size layers */
+.beat-group { position: relative; z-index: 1; }
+.beat-group > .beat-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: paint; }
+.beat-group .beat-layer { position: absolute; inset: 0; }
+.beat-group .beat-layer > .beat-stage { position: absolute; inset: 0; height: auto; overflow: hidden; }
+/* reduced motion: groups stay pinned (the story needs the single stage); beats read ctx.reduced and calm their own motion */

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reviews — Channel Island Port Services</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/brand/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="256x256" href="images/brand/favicon-256.png" />
+<link rel="apple-touch-icon" href="images/brand/favicon-180.png" />
+<meta name="description" content="Reviewed by the captains, crew and operators who have actually called Jersey with CIPS. Verified port-call performance — communication, coordination, responsiveness and more." />
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  body{font-family:'Inter',system-ui,sans-serif;background:#FBFAF7;color:#1e293b}
+  .font-display{font-family:'Montserrat',system-ui,sans-serif;font-weight:600;letter-spacing:-.015em}
+  .eyebrow{letter-spacing:.28em;text-transform:uppercase;font-weight:600}
+  .hero-bg{background:
+    radial-gradient(1200px 600px at 78% -10%, rgba(74,144,194,.35), transparent 60%),
+    radial-gradient(900px 500px at 8% 110%, rgba(0,128,192,.18), transparent 55%),
+    linear-gradient(160deg,#1A1D22 0%,#23262C 45%,#30343C 100%);}
+  .lat-lines{background-image:repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 64px)}
+  .btn-gold{background:linear-gradient(180deg,#4FB0E4,#0080C0);color:#fff}
+  .btn-gold:hover{filter:brightness(1.05)}
+  .card-hover{transition:transform .35s, box-shadow .35s}
+  .card-hover:hover{transform:translateY(-4px);box-shadow:0 24px 50px -24px rgba(10,26,47,.35)}
+  .nav-link{position:relative}
+  .nav-link::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;background:#0080C0;transition:width .3s}
+  .nav-link:hover::after{width:100%}
+  /* stars */
+  .stars{position:relative;display:inline-block;font-size:18px;line-height:1;white-space:nowrap}
+  .stars::before{content:"\2605\2605\2605\2605\2605";color:#E7DFCB;letter-spacing:2px}
+  .stars i{position:absolute;left:0;top:0;height:100%;overflow:hidden;white-space:nowrap}
+  .stars i::before{content:"\2605\2605\2605\2605\2605";color:#0080C0;letter-spacing:2px}
+  .stars.dark::before{color:rgba(255,255,255,.22)}
+  .stars.dark i::before{color:#4FB0E4}
+  .barwrap{height:7px;border-radius:99px;background:#EEE9DE;overflow:hidden}
+  .barwrap.dark{background:rgba(255,255,255,.12)}
+  .barwrap i{display:block;height:100%;background:#0080C0;border-radius:99px}
+  .tile { position: relative; overflow: hidden; border-radius: 1.25rem; }
+  .tile img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition: transform .8s ease; }
+  .tile:hover img { transform: scale(1.06); }
+  .tile-shade { position:absolute; inset:0; background: linear-gradient(180deg, rgba(8,17,31,0) 30%, rgba(8,17,31,0.35) 55%, rgba(8,17,31,0.92) 100%); }
+  .tile-num { font-family:'Montserrat',serif; }
+</style>
+<link rel="stylesheet" href="css/tailwind.css">
+</head>
+<body class="antialiased">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="cipsMark" viewBox="0 0 186 188"><image href="data:image/png;base64,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" width="186" height="188"/></symbol><symbol id="cipsMarkW" viewBox="0 0 186 188"><image href="data:image/png;base64,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" width="186" height="188"/></symbol><symbol id="cipsWordmark" viewBox="0 0 440.65 83.83"><g id="Layer_3" data-name="Layer 3">
+    <g id="Layer_1-2" data-name="Layer 1">
+      <g>
+        <g>
+          <path fill="currentColor" d="M123.88,34.09c-2.44,0-4.71-.4-6.8-1.2-2.1-.8-3.91-1.94-5.45-3.41-1.54-1.48-2.74-3.21-3.59-5.2-.86-1.99-1.29-4.17-1.29-6.56s.43-4.57,1.29-6.56c.86-1.99,2.06-3.72,3.62-5.2,1.55-1.48,3.37-2.61,5.45-3.41s4.36-1.2,6.83-1.2c2.74,0,5.22.47,7.44,1.42,2.21.95,4.08,2.34,5.58,4.18l-4.7,4.34c-1.09-1.24-2.29-2.16-3.62-2.78-1.33-.62-2.77-.93-4.34-.93-1.48,0-2.83.24-4.07.72-1.24.48-2.31,1.18-3.21,2.08s-1.61,1.97-2.1,3.21c-.5,1.24-.75,2.61-.75,4.12s.25,2.88.75,4.11c.5,1.24,1.2,2.31,2.1,3.21s1.97,1.6,3.21,2.08c1.24.48,2.59.72,4.07.72,1.57,0,3.01-.31,4.34-.93,1.33-.62,2.53-1.56,3.62-2.83l4.7,4.34c-1.51,1.84-3.37,3.24-5.58,4.21-2.22.96-4.71,1.45-7.48,1.45Z"/>
+          <path fill="currentColor" d="M154.61,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V0h7.05v15.96l-1.58-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M177.26,33.91c-1.9,0-3.53-.32-4.88-.97s-2.4-1.53-3.12-2.65c-.72-1.11-1.08-2.37-1.08-3.75s.35-2.71,1.06-3.8,1.83-1.94,3.37-2.55c1.54-.62,3.54-.93,6.01-.93h6.47v4.11h-5.7c-1.66,0-2.8.27-3.41.81-.62.54-.93,1.22-.93,2.03,0,.9.35,1.62,1.06,2.15.71.53,1.68.79,2.92.79s2.23-.28,3.17-.84c.93-.56,1.61-1.38,2.04-2.46l1.08,3.25c-.51,1.57-1.45,2.76-2.8,3.57-1.36.81-3.11,1.22-5.25,1.22ZM184.68,33.55v-4.75l-.45-1.04v-8.5c0-1.51-.46-2.68-1.38-3.53-.92-.84-2.33-1.27-4.23-1.27-1.3,0-2.57.2-3.82.61s-2.31.96-3.19,1.65l-2.53-4.93c1.33-.93,2.92-1.66,4.79-2.17s3.77-.77,5.7-.77c3.71,0,6.59.87,8.64,2.62,2.05,1.75,3.07,4.48,3.07,8.18v13.88h-6.6Z"/>
+          <path fill="currentColor" d="M211.15,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M241.11,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M268.45,33.91c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M283.79,33.55V0h7.05v33.55h-7.05Z"/>
+          <path fill="currentColor" d="M309.79,33.55V1.9h7.33v31.65h-7.33Z"/>
+          <path fill="currentColor" d="M331.75,33.91c-2.08,0-4.08-.25-5.99-.75-1.91-.5-3.43-1.12-4.54-1.88l2.35-5.06c1.11.69,2.43,1.26,3.96,1.7,1.52.44,3.02.66,4.5.66,1.63,0,2.78-.2,3.46-.59.68-.39,1.02-.93,1.02-1.63,0-.57-.26-1-.79-1.29-.53-.29-1.23-.5-2.1-.66-.88-.15-1.83-.3-2.87-.45-1.04-.15-2.09-.35-3.14-.61-1.05-.26-2.02-.64-2.89-1.15-.87-.51-1.58-1.21-2.1-2.08s-.79-2-.79-3.39c0-1.54.44-2.89,1.33-4.07.89-1.18,2.18-2.1,3.87-2.78,1.69-.68,3.71-1.02,6.06-1.02,1.66,0,3.35.18,5.06.54,1.72.36,3.15.89,4.29,1.58l-2.35,5.02c-1.18-.69-2.36-1.17-3.55-1.42-1.19-.26-2.34-.38-3.46-.38-1.57,0-2.71.21-3.44.63-.72.42-1.08.97-1.08,1.63,0,.6.26,1.06.79,1.36.53.3,1.23.54,2.1.72.87.18,1.83.34,2.87.47s2.09.34,3.14.61c1.05.27,2.01.66,2.87,1.15.86.5,1.56,1.18,2.1,2.03.54.86.81,1.98.81,3.37,0,1.51-.45,2.84-1.36,4s-2.21,2.07-3.91,2.74c-1.7.66-3.78.99-6.22.99Z"/>
+          <path fill="currentColor" d="M346.73,33.55V0h7.05v33.55h-7.05Z"/>
+          <path fill="currentColor" d="M366.67,33.91c-1.9,0-3.53-.32-4.88-.97s-2.4-1.53-3.12-2.65c-.72-1.11-1.08-2.37-1.08-3.75s.35-2.71,1.06-3.8,1.83-1.94,3.37-2.55c1.54-.62,3.54-.93,6.01-.93h6.47v4.11h-5.7c-1.66,0-2.8.27-3.41.81-.62.54-.93,1.22-.93,2.03,0,.9.35,1.62,1.06,2.15.71.53,1.68.79,2.92.79s2.23-.28,3.17-.84c.93-.56,1.61-1.38,2.04-2.46l1.08,3.25c-.51,1.57-1.45,2.76-2.8,3.57-1.36.81-3.11,1.22-5.25,1.22ZM374.09,33.55v-4.75l-.45-1.04v-8.5c0-1.51-.46-2.68-1.38-3.53-.92-.84-2.33-1.27-4.23-1.27-1.3,0-2.57.2-3.82.61s-2.31.96-3.19,1.65l-2.53-4.93c1.33-.93,2.92-1.66,4.79-2.17s3.77-.77,5.7-.77c3.71,0,6.59.87,8.64,2.62,2.05,1.75,3.07,4.48,3.07,8.18v13.88h-6.6Z"/>
+          <path fill="currentColor" d="M400.57,8.86c1.93,0,3.66.38,5.18,1.15,1.52.77,2.72,1.94,3.59,3.53.87,1.58,1.31,3.61,1.31,6.08v13.93h-7.05v-12.84c0-1.96-.43-3.41-1.29-4.34-.86-.93-2.07-1.4-3.64-1.4-1.12,0-2.12.23-3.01.7-.89.47-1.58,1.18-2.08,2.15-.5.96-.75,2.2-.75,3.71v12.03h-7.05V9.22h6.74v6.74l-1.27-2.04c.87-1.63,2.12-2.88,3.75-3.75,1.63-.87,3.48-1.31,5.56-1.31Z"/>
+          <path fill="currentColor" d="M426.32,33.91c-2.29,0-4.36-.52-6.19-1.56-1.84-1.04-3.29-2.49-4.36-4.36-1.07-1.87-1.61-4.07-1.61-6.6s.54-4.78,1.61-6.65c1.07-1.87,2.52-3.32,4.36-4.34,1.84-1.02,3.9-1.54,6.19-1.54,2.05,0,3.84.45,5.38,1.36s2.73,2.28,3.57,4.11c.84,1.84,1.27,4.19,1.27,7.05s-.41,5.18-1.22,7.03c-.81,1.85-1.98,3.23-3.5,4.14-1.52.9-3.35,1.36-5.49,1.36ZM427.54,28.12c1.15,0,2.19-.27,3.12-.81.93-.54,1.68-1.32,2.24-2.33s.84-2.21.84-3.59-.28-2.62-.84-3.62-1.3-1.76-2.24-2.31c-.93-.54-1.97-.81-3.12-.81s-2.23.27-3.17.81c-.93.54-1.68,1.31-2.24,2.31s-.84,2.2-.84,3.62.28,2.58.84,3.59,1.3,1.79,2.24,2.33c.93.54,1.99.81,3.17.81ZM433.91,33.55v-4.97l.14-7.23-.45-7.19V0h7.05v33.55h-6.74Z"/>
+          <path fill="currentColor" d="M108.73,83.29v-31.65h13.7c2.83,0,5.28.46,7.33,1.38,2.05.92,3.63,2.24,4.75,3.96,1.11,1.72,1.67,3.77,1.67,6.15s-.56,4.39-1.67,6.1c-1.12,1.72-2.7,3.04-4.75,3.96s-4.49,1.38-7.33,1.38h-9.63l3.26-3.3v12.03h-7.33ZM116.05,72.07l-3.26-3.48h9.22c2.26,0,3.95-.48,5.06-1.45,1.12-.96,1.67-2.31,1.67-4.02s-.56-3.1-1.67-4.07-2.8-1.45-5.06-1.45h-9.22l3.26-3.48v17.95Z"/>
+          <path fill="currentColor" d="M151.45,83.65c-2.59,0-4.89-.54-6.9-1.63-2-1.09-3.59-2.57-4.75-4.45s-1.74-4.03-1.74-6.44.58-4.6,1.74-6.49,2.74-3.36,4.75-4.43c2-1.07,4.3-1.6,6.9-1.6s4.85.54,6.87,1.6c2.02,1.07,3.6,2.54,4.75,4.41s1.72,4.04,1.72,6.51-.57,4.56-1.72,6.44-2.73,3.37-4.75,4.45c-2.02,1.08-4.31,1.63-6.87,1.63ZM151.45,77.86c1.18,0,2.23-.27,3.17-.81.93-.54,1.67-1.32,2.22-2.33.54-1.01.81-2.21.81-3.59s-.27-2.62-.81-3.62c-.54-1-1.28-1.76-2.22-2.31-.93-.54-1.99-.81-3.17-.81s-2.23.27-3.17.81c-.93.54-1.68,1.31-2.24,2.31-.56,1-.84,2.2-.84,3.62s.28,2.58.84,3.59c.56,1.01,1.3,1.79,2.24,2.33.93.54,1.99.81,3.17.81Z"/>
+          <path fill="currentColor" d="M168.38,83.29v-24.33h6.74v6.87l-.95-1.99c.72-1.72,1.88-3.02,3.48-3.91,1.6-.89,3.54-1.33,5.83-1.33v6.51c-.3-.03-.57-.05-.81-.07-.24-.01-.5-.02-.77-.02-1.93,0-3.49.55-4.68,1.65-1.19,1.1-1.79,2.81-1.79,5.13v11.48h-7.05Z"/>
+          <path fill="currentColor" d="M184.86,64.93v-5.43h16.87v5.43h-16.87ZM197.7,83.65c-2.86,0-5.09-.73-6.69-2.19s-2.4-3.64-2.4-6.53v-21.34h7.05v21.25c0,1.02.27,1.82.81,2.37.54.56,1.28.84,2.22.84,1.11,0,2.06-.3,2.85-.9l1.9,4.97c-.72.51-1.59.9-2.6,1.15-1.01.26-2.06.38-3.14.38Z"/>
+          <path fill="currentColor" d="M230.21,83.83c-2.53,0-4.96-.34-7.28-1.02-2.32-.68-4.19-1.56-5.61-2.65l2.49-5.52c1.36.97,2.96,1.76,4.82,2.37,1.85.62,3.73.93,5.63.93,1.45,0,2.61-.14,3.5-.43.89-.29,1.54-.69,1.97-1.2.42-.51.63-1.1.63-1.76,0-.84-.33-1.51-.99-2.01-.66-.5-1.54-.9-2.62-1.22s-2.28-.62-3.59-.9c-1.31-.29-2.62-.64-3.93-1.06-1.31-.42-2.51-.96-3.59-1.63-1.08-.66-1.97-1.54-2.65-2.62-.68-1.08-1.02-2.47-1.02-4.16,0-1.81.49-3.46,1.47-4.95s2.46-2.68,4.43-3.57c1.97-.89,4.45-1.33,7.44-1.33,1.99,0,3.95.23,5.88.7,1.93.47,3.63,1.17,5.11,2.1l-2.26,5.56c-1.48-.84-2.96-1.47-4.43-1.88-1.48-.41-2.92-.61-4.34-.61s-2.58.17-3.48.5c-.9.33-1.55.76-1.94,1.29s-.59,1.14-.59,1.83c0,.81.33,1.47,1,1.97.66.5,1.54.9,2.62,1.2,1.08.3,2.28.6,3.59.9,1.31.3,2.62.65,3.93,1.04,1.31.39,2.51.92,3.59,1.58,1.09.66,1.97,1.54,2.65,2.62.68,1.08,1.02,2.46,1.02,4.11,0,1.78-.5,3.41-1.49,4.88-1,1.48-2.48,2.67-4.45,3.57-1.97.9-4.47,1.36-7.48,1.36Z"/>
+          <path fill="currentColor" d="M259.57,83.65c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M274.85,83.29v-24.33h6.74v6.87l-.95-1.99c.72-1.72,1.88-3.02,3.48-3.91,1.6-.89,3.54-1.33,5.83-1.33v6.51c-.3-.03-.57-.05-.81-.07-.24-.01-.5-.02-.77-.02-1.93,0-3.49.55-4.68,1.65-1.19,1.1-1.79,2.81-1.79,5.13v11.48h-7.05Z"/>
+          <path fill="currentColor" d="M301.21,83.29l-10.22-24.33h7.28l8.5,20.93h-3.62l8.82-20.93h6.78l-10.26,24.33h-7.28Z"/>
+          <path fill="currentColor" d="M324.29,55.57c-1.3,0-2.35-.38-3.17-1.13-.81-.75-1.22-1.69-1.22-2.8s.41-2.05,1.22-2.8c.81-.75,1.87-1.13,3.17-1.13s2.35.35,3.17,1.06c.81.71,1.22,1.62,1.22,2.74,0,1.18-.4,2.15-1.2,2.92s-1.86,1.15-3.19,1.15ZM320.77,83.29v-24.33h7.05v24.33h-7.05Z"/>
+          <path fill="currentColor" d="M344.87,83.65c-2.62,0-4.96-.53-7.01-1.6s-3.66-2.55-4.82-4.45-1.74-4.05-1.74-6.47.58-4.6,1.74-6.49,2.77-3.36,4.82-4.43c2.05-1.07,4.39-1.6,7.01-1.6s4.79.54,6.69,1.6c1.9,1.07,3.3,2.6,4.21,4.59l-5.47,2.94c-.63-1.14-1.42-1.99-2.37-2.53-.95-.54-1.98-.81-3.1-.81-1.21,0-2.29.27-3.26.81-.96.54-1.73,1.31-2.28,2.31-.56,1-.84,2.2-.84,3.62s.28,2.62.84,3.62c.56,1,1.32,1.76,2.28,2.31.96.54,2.05.81,3.26.81,1.11,0,2.15-.26,3.1-.79.95-.53,1.74-1.38,2.37-2.55l5.47,2.98c-.9,1.96-2.31,3.47-4.21,4.54-1.9,1.07-4.13,1.6-6.69,1.6Z"/>
+          <path fill="currentColor" d="M370.77,83.65c-2.77,0-5.21-.54-7.3-1.63-2.09-1.09-3.71-2.57-4.86-4.45s-1.72-4.03-1.72-6.44.56-4.6,1.7-6.49c1.13-1.88,2.67-3.36,4.63-4.43,1.96-1.07,4.17-1.6,6.65-1.6s4.53.5,6.44,1.51c1.91,1.01,3.43,2.46,4.54,4.34s1.67,4.14,1.67,6.76c0,.27-.02.58-.04.93-.03.35-.06.67-.09.97h-19.76v-4.11h16.05l-2.71,1.22c0-1.27-.26-2.37-.77-3.3-.51-.93-1.22-1.67-2.13-2.19-.9-.53-1.96-.79-3.17-.79s-2.27.26-3.19.79c-.92.53-1.64,1.27-2.15,2.22-.51.95-.77,2.07-.77,3.37v1.08c0,1.33.29,2.49.88,3.5.59,1.01,1.42,1.78,2.49,2.31,1.07.53,2.33.79,3.78.79,1.3,0,2.43-.2,3.41-.59s1.88-.98,2.69-1.76l3.75,4.07c-1.12,1.27-2.52,2.24-4.21,2.92-1.69.68-3.63,1.02-5.83,1.02Z"/>
+          <path fill="currentColor" d="M394.6,83.65c-2.08,0-4.08-.25-5.99-.75-1.91-.5-3.43-1.12-4.54-1.88l2.35-5.06c1.11.69,2.43,1.26,3.96,1.7,1.52.44,3.02.66,4.5.66,1.63,0,2.78-.2,3.46-.59.68-.39,1.02-.93,1.02-1.63,0-.57-.26-1-.79-1.29-.53-.29-1.23-.5-2.1-.66-.88-.15-1.83-.3-2.87-.45-1.04-.15-2.09-.35-3.14-.61-1.05-.26-2.02-.64-2.89-1.15-.87-.51-1.58-1.21-2.1-2.08s-.79-2-.79-3.39c0-1.54.44-2.89,1.33-4.07.89-1.18,2.18-2.1,3.87-2.78,1.69-.68,3.71-1.02,6.06-1.02,1.66,0,3.35.18,5.06.54,1.72.36,3.15.89,4.29,1.58l-2.35,5.02c-1.18-.69-2.36-1.17-3.55-1.42-1.19-.26-2.34-.38-3.46-.38-1.57,0-2.71.21-3.44.63-.72.42-1.08.97-1.08,1.63,0,.6.26,1.06.79,1.36.53.3,1.23.54,2.1.72.87.18,1.83.34,2.87.47s2.09.34,3.14.61c1.05.27,2.01.66,2.87,1.15.86.5,1.56,1.18,2.1,2.03.54.86.81,1.98.81,3.37,0,1.51-.45,2.84-1.36,4s-2.21,2.07-3.91,2.74c-1.7.66-3.78.99-6.22.99Z"/>
+        </g>
+        <g>
+          <path fill="currentColor" fill-rule="evenodd" d="M6.26,47.18c10.86-12.13.07-22.73.07-22.73L.04,30.26l-.04-21.59,21.81.04-5.61,5.55c20.83,25.01-.02,42.42-.02,42.42l-9.93-9.5Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M36.19,14.93c12.13,10.86,22.73.07,22.73.07l-5.81-6.29,21.59-.04-.04,21.81-5.55-5.61c-25.01,20.83-42.42-.02-42.42-.02l9.5-9.93Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M68.44,44.86c-10.86,12.13-.07,22.73-.07,22.73l6.29-5.81.04,21.59-21.81-.04,5.61-5.55c-20.83-25.01.02-42.42.02-42.42l9.93,9.5Z"/>
+          <path fill="currentColor" fill-rule="evenodd" d="M38.51,77.11c-12.13-10.86-22.73-.07-22.73-.07l5.81,6.29-21.59.04.04-21.81,5.55,5.61c25.01-20.83,42.42.02,42.42.02l-9.5,9.93Z"/>
+        </g>
+      </g>
+    </g>
+  </g></symbol></svg>
+
+<!-- announcement -->
+<div class="bg-ink text-cream/90 text-[13px]">
+  <div class="max-w-8xl mx-auto px-5 sm:px-8 py-2.5 flex items-center justify-between gap-4">
+    <p class="hidden sm:flex items-center gap-2 tracking-wide"><span class="text-gold">⚓</span> The Atlantic Gateway C.I. — Jersey · Guernsey · Alderney</p>
+    <a href="tel:+447797720723" class="ml-auto flex items-center gap-2 hover:text-goldl"><span class="font-medium tracking-wide">+44 7797 720 723</span></a>
+  </div>
+</div>
+
+<!-- header -->
+<header class="sticky top-0 z-50 bg-ink/95 backdrop-blur border-b border-white/5">
+  <div class="max-w-8xl mx-auto px-5 sm:px-8">
+    <div class="flex items-center justify-between h-[74px]">
+      <a href="index.html" class="flex items-center group" aria-label="Channel Island Port Services — home">
+        <img src="images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-9 sm:h-10 w-auto" />
+      </a>
+      <nav class="hidden lg:flex items-center gap-8 text-[15px] text-cream/85">
+        <a href="index.html#services" class="nav-link hover:text-white">Services</a>
+        <a href="index.html#refresh" class="nav-link hover:text-white">Islands Refresh</a>
+        <a href="index.html#sectors" class="nav-link hover:text-white">Sectors</a>
+        <a href="reviews.html" class="nav-link text-white">Reviews</a>
+        <a href="index.html#contact" class="nav-link hover:text-white">Contact</a>
+      </nav>
+      <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="hidden lg:inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all" aria-label="Message CIPS on WhatsApp">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
+        WhatsApp
+      </a>
+      <a href="index.html" class="lg:hidden text-cream text-sm">← Home</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO + SUMMARY -->
+<section class="relative hero-bg text-white overflow-hidden">
+  <div class="absolute inset-0 lat-lines opacity-50"></div>
+  <div class="relative max-w-8xl mx-auto px-5 sm:px-8 py-20 lg:py-24">
+    <div class="max-w-3xl">
+      <p class="eyebrow text-[12px] text-gold mb-5">Reviews · Verified performance</p>
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-[56px] leading-[1.05] font-500">Reviewed by the ships we serve.</h1>
+      <p class="mt-6 text-lg text-cream/80 max-w-2xl leading-relaxed">Not anonymous opinions — feedback from the captains, crew and operators who have actually called Jersey with CIPS. Widely respected for visible excellence.</p>
+    </div>
+
+    <div class="mt-12 grid sm:grid-cols-3 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/10 max-w-3xl">
+      <div class="bg-white/[0.03] p-7">
+        <div class="flex items-center gap-3"><span class="font-display text-4xl text-white">5.0</span><span class="stars dark" style="font-size:20px"><i style="width:100%"></i></span></div>
+        <div class="mt-2 text-sm text-cream/60">on the CIPS Port Call Index</div>
+      </div>
+      <div class="bg-white/[0.03] p-7">
+        <div class="font-display text-4xl text-white">500<span class="text-gold">+</span></div>
+        <div class="mt-2 text-sm text-cream/60">port calls handled in recent years</div>
+      </div>
+      <div class="bg-white/[0.03] p-7">
+        <div class="font-display text-4xl text-white">1986</div>
+        <div class="mt-2 text-sm text-cream/60">trusted in Jersey since</div>
+      </div>
+    </div>
+  </div>
+  <div class="relative -mb-1"><svg class="w-full h-[70px]" viewBox="0 0 1440 90" preserveAspectRatio="none" fill="#FBFAF7"><path d="M0,48 C240,90 480,10 720,40 C960,70 1200,20 1440,52 L1440,90 L0,90 Z"/></svg></div>
+</section>
+
+<!-- WHAT CAPTAINS TELL US MATTERS -->
+<section class="bg-paper py-16 lg:py-20" id="prioritiesSection" style="display:none">
+  <div class="max-w-8xl mx-auto px-5 sm:px-8">
+    <p class="eyebrow text-xs text-gold mb-3">What captains tell us</p>
+    <h2 class="font-display text-3xl sm:text-4xl text-ink leading-tight max-w-2xl">Why captains choose CIPS, and why they stay.</h2>
+    <p class="mt-4 text-slate-500 max-w-2xl leading-relaxed">Told to us through the same reviews process — showing Jersey as a trusted transit home port, the one they return to every time they're nearing the Atlantic Gateway.</p>
+
+    <div class="mt-12">
+      <h3 class="font-display text-xl text-ink">Why captains choose the Channel Islands</h3>
+      <p class="mt-2 text-slate-500 max-w-2xl leading-relaxed">This is what captains have told us — and what we continue to invest in.</p>
+      <p class="mt-2 flex items-center gap-2 text-sm text-slate-500" id="chooseStarsLine" style="display:none"><span id="chooseStarsText"></span><span class="text-gold tracking-widest" id="chooseStars"></span></p>
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-6" id="prioritiesChoose"></div>
+    </div>
+
+    <div class="mt-14">
+      <h3 class="font-display text-xl text-ink">Why they come back, or stay longer</h3>
+      <p class="mt-2 text-slate-500 max-w-2xl leading-relaxed">The supplementary reasons captains tell us keep them here.</p>
+      <p class="mt-2 flex items-center gap-2 text-sm text-slate-500" id="returnStarsLine" style="display:none"><span id="returnStarsText"></span><span class="text-gold tracking-widest" id="returnStars"></span></p>
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="prioritiesReturn"></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY LIGHTBOX (shared by the priority cards) -->
+<div id="galleryLightbox" class="fixed inset-0 z-[100] bg-black/90 hidden items-center justify-center p-4 sm:p-8" style="display:none">
+  <button id="galleryClose" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center" aria-label="Close">&times;</button>
+  <button id="galleryPrev" class="absolute left-2 sm:left-6 text-white/80 hover:text-white text-4xl leading-none w-12 h-12 flex items-center justify-center" aria-label="Previous">&#8249;</button>
+  <img id="galleryImg" src="" alt="" class="max-h-[80vh] max-w-full rounded-lg object-contain">
+  <button id="galleryNext" class="absolute right-2 sm:right-6 text-white/80 hover:text-white text-4xl leading-none w-12 h-12 flex items-center justify-center" aria-label="Next">&#8250;</button>
+  <div id="galleryThumbs" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+</div>
+<script>
+(function(){
+  var lb = document.getElementById('galleryLightbox');
+  var imgEl = document.getElementById('galleryImg');
+  var thumbsEl = document.getElementById('galleryThumbs');
+  var current = { images: [], index: 0 };
+  function render(){
+    imgEl.src = current.images[current.index];
+    thumbsEl.innerHTML = current.images.map(function(src, i){
+      return '<span style="width:8px;height:8px;border-radius:99px;display:inline-block;background:' + (i === current.index ? '#fff' : 'rgba(255,255,255,.4)') + '"></span>';
+    }).join('');
+  }
+  window.openGallery = function(images, startIndex){
+    current.images = images; current.index = startIndex || 0;
+    render();
+    lb.style.display = 'flex';
+  };
+  document.getElementById('galleryClose').addEventListener('click', function(){ lb.style.display = 'none'; });
+  lb.addEventListener('click', function(e){ if (e.target === lb) lb.style.display = 'none'; });
+  document.getElementById('galleryPrev').addEventListener('click', function(){ current.index = (current.index - 1 + current.images.length) % current.images.length; render(); });
+  document.getElementById('galleryNext').addEventListener('click', function(){ current.index = (current.index + 1) % current.images.length; render(); });
+  document.addEventListener('keydown', function(e){
+    if (lb.style.display !== 'flex') return;
+    if (e.key === 'Escape') lb.style.display = 'none';
+    if (e.key === 'ArrowLeft') document.getElementById('galleryPrev').click();
+    if (e.key === 'ArrowRight') document.getElementById('galleryNext').click();
+  });
+  window.initCardGalleries = function(root){
+    (root || document).querySelectorAll('.gallery-trigger').forEach(function(el){
+      if (el.dataset.galleryBound) return;
+      el.dataset.galleryBound = '1';
+      var images = JSON.parse(el.dataset.images);
+      var img = el.querySelector('.gallery-img');
+      var shown = 0;
+      if (images.length > 1) {
+        setInterval(function(){ shown = (shown + 1) % images.length; img.src = images[shown]; }, 4000);
+      }
+      el.addEventListener('click', function(){ window.openGallery(images, shown); });
+    });
+  };
+})();
+</script>
+
+<!-- THE CIPS PORT CALL INDEX -->
+<section class="bg-ink text-white py-20 lg:py-24 relative overflow-hidden">
+  <div class="absolute inset-0 lat-lines opacity-40"></div>
+  <div class="relative max-w-8xl mx-auto px-5 sm:px-8">
+    <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+      <div class="lg:col-span-5">
+        <p class="eyebrow text-xs text-gold mb-4">The CIPS Port Call Index</p>
+        <h2 class="font-display text-3xl sm:text-4xl leading-tight">How did we do on that?</h2>
+        <p class="mt-5 text-cream/70 leading-relaxed">This is how they told us — after she sails, the vessel's master receives a <span class="text-cream">private, secure link</span> — 60&nbsp;seconds, no account — to rate the six things that define a good agent. Every score is tied to a real booking, verified by our team, then published here. Evidence, not memory.</p>
+        <ol class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-xs text-cream/55">
+          <li class="flex items-center gap-2"><span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-goldl/15 text-goldl font-semibold">1</span> Private link after departure</li>
+          <li class="flex items-center gap-2"><span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-goldl/15 text-goldl font-semibold">2</span> Master rates the call</li>
+          <li class="flex items-center gap-2"><span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-goldl/15 text-goldl font-semibold">3</span> Verified &amp; published</li>
+        </ol>
+        <div class="mt-8 space-y-4 max-w-md" id="pciBars">
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">Presence &amp; relationship</span><span class="font-semibold">4.9</span></div><div class="barwrap dark"><i style="width:98%"></i></div></div>
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">Excellence</span><span class="font-semibold">4.8</span></div><div class="barwrap dark"><i style="width:96%"></i></div></div>
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">Port &amp; berth</span><span class="font-semibold">4.9</span></div><div class="barwrap dark"><i style="width:98%"></i></div></div>
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">Replenish &amp; repair</span><span class="font-semibold">5.0</span></div><div class="barwrap dark"><i style="width:100%"></i></div></div>
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">Overall</span><span class="font-semibold">4.8</span></div><div class="barwrap dark"><i style="width:96%"></i></div></div>
+        </div>
+        <p class="mt-6 text-xs text-cream/40" id="pciBarsCaption">Sample figures — the Port Call Index is being rolled out across CIPS calls.</p>
+      </div>
+
+      <div class="lg:col-span-7 space-y-4" id="pciCards">
+        <article class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs text-cream/60"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-goldl/15 text-goldl font-semibold">✓ Verified Master</span> General cargo vessel · Jersey · Jul 2026</div>
+            <span class="stars dark"><i style="width:100%"></i></span>
+          </div>
+          <p class="mt-4 text-cream/90 leading-relaxed">"Excellent information before arrival and someone available whenever required. The call ran exactly to plan."</p>
+          <div class="mt-4 pl-4 border-l-2 border-gold text-sm text-cream/70"><span class="text-goldl font-semibold text-xs uppercase tracking-wide">CIPS response</span><br>Thank you — we were pleased to assist the vessel and crew.</div>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs text-cream/60"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-goldl/15 text-goldl font-semibold">✓ Verified Master</span> Passenger / cruise vessel · Jersey · Jun 2026</div>
+            <span class="stars dark"><i style="width:96%"></i></span>
+          </div>
+          <p class="mt-4 text-cream/90 leading-relaxed">"Very responsive when our programme changed at short notice. Ground handling and clearances were seamless."</p>
+        </article>
+        <article class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs text-cream/60"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-goldl/15 text-goldl font-semibold">✓ Verified Operator</span> Offshore support vessel · Jersey · Jun 2026</div>
+            <span class="stars dark"><i style="width:100%"></i></span>
+          </div>
+          <p class="mt-4 text-cream/90 leading-relaxed">"PDA was accurate and the FDA arrived promptly with full supporting documentation. Will appoint again."</p>
+          <div class="mt-4 pl-4 border-l-2 border-gold text-sm text-cream/70"><span class="text-goldl font-semibold text-xs uppercase tracking-wide">CIPS response</span><br>Appreciated — transparent accounting is something we hold ourselves to on every appointment.</div>
+        </article>
+        <p class="text-xs text-cream/40" id="pciCaption">Illustrative examples of the verified port-call format.</p>
+        <a href="all-reviews.html" class="inline-flex text-sm font-semibold text-goldl hover:text-white">See all verified reviews →</a>
+      </div>
+      <script src="review/config.js"></script>
+      <script>
+      (function(){
+        function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+        function starsHtml(n){ var pct = Math.max(0, Math.min(5, n||0)) / 5 * 100; return '<span class="stars dark"><i style="width:'+pct+'%"></i></span>'; }
+        fetch((window.REVIEW_API || '') + '/api/reviews').then(function(r){ return r.json(); }).then(function(data){
+          var reviews = (data && data.reviews) ? data.reviews : [];
+          if (data && data.priorities) {
+            var pr = data.priorities;
+            var fallbackPhotos = {
+              fuel: ['images/bunkers.jpg'],
+              infrastructure: ['images/priorities/tidal-access-entering-port.jpg', 'images/priorities/tidal-2.jpg', 'images/priorities/pontoon-berths.jpg', 'images/priorities/berths-2.jpg', 'images/priorities/superyacht-ready-badge.png'],
+              gateway: ['images/priorities/atlantic-gateway-aerial.jpg'],
+              presence: ['images/priorities/visible-presence.jpg', 'images/priorities/presence-2.jpg'],
+              airport: ['images/priorities/airport.jpg'],
+              services: ['images/furnishing.jpg'],
+              repair: ['images/technical.jpg'],
+              windfarm: ['images/priorities/windfarm-hub.jpg'],
+              cruising: ['images/priorities/cruising-ground.jpg']
+            };
+            var tileKeys = Object.keys(fallbackPhotos);
+            Promise.all(tileKeys.map(function(k){
+              return Promise.resolve(null);   // static host: no folder listing, the fixed photo lists below are used
+            })).then(function(lists){
+            // live folder listing wins whenever it has at least one photo — drop a new file in images/priorities/tiles/<key>/ and it appears here automatically
+            var photos = {};
+            tileKeys.forEach(function(k, i){
+              var live = lists[i] && lists[i].images;
+              photos[k] = (live && live.length) ? live : fallbackPhotos[k];
+            });
+            function tile(p, num, photoKey){
+              var images = photoKey && photos[photoKey];
+              var src = images ? images[0] : '';
+              var galleryAttrs = images ? (' data-images=\''+JSON.stringify(images)+'\'') : '';
+              return '<div class="tile-card rounded-2xl overflow-hidden bg-white border border-slate-200 gallery-trigger group cursor-pointer"'+galleryAttrs+'>'
+                + '<div class="tile h-44 relative">'
+                + '<img src="'+src+'" alt="" class="gallery-img" loading="lazy">'
+                + '<div class="tile-shade"></div>'
+                + '<div class="absolute inset-0 p-5 flex flex-col justify-end">'
+                + '<span class="tile-num text-goldl/80 text-sm mb-1">'+num+'</span>'
+                + '<h4 class="font-display text-xl leading-snug text-white">'+esc(p.label)+'</h4>'
+                + '</div></div>'
+                + '<div class="p-5"><p class="text-sm text-slate-600 leading-relaxed">'+esc(p.desc)+'</p></div>'
+                + '</div>';
+            }
+            function starsLine(prefixId, textId, starsId, items) {
+              var rated = items.filter(function(p){ return p.stat; });
+              if (!rated.length) return;
+              var avg = rated.reduce(function(s, p){ return s + p.stat.avg; }, 0) / rated.length;
+              var n = Math.round(avg);
+              document.getElementById(textId).textContent = 'The top reasons — given ' + n + ' star' + (n === 1 ? '' : 's') + ': ';
+              document.getElementById(starsId).textContent = '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n);
+              document.getElementById(prefixId).style.display = '';
+            }
+            var gateway = { label: 'The Atlantic Gateway', desc: 'Caribbean and Mediterranean routes connect straight past the Channel Islands as the Atlantic Gateway to and from Northern Europe.' };
+            var infraStats = [pr.tidal, pr.berths].filter(function(p){ return p && p.stat; });
+            var infrastructure = infraStats.length ? {
+              label: 'Berth & Access',
+              desc: '24/7 tidal access to ~160m of highly accessible superyacht pontoons and fendered berths for vessels up to ~130m.',
+              stat: { avg: infraStats.reduce(function(s, p){ return s + p.stat.avg; }, 0) / infraStats.length }
+            } : null;
+            var services = { label: 'Quality services & suppliers', desc: 'Furniture to fuel, engineering to logistics — everything a ship needs just before or after the sea passage, cruising grounds or shipyard.' };
+            var repair = { label: 'Repair & refurbishment', desc: 'The reason many stay longer — technical work, refits and refurbishment handled alongside the call.' };
+            var windfarm = { label: 'Project Coordination & Hub', desc: 'The coordination hub for windfarm projects — transport, accommodation and berths, plus quayside storage, craneage and light engineering.' };
+            var cruising = { label: 'Cruising Ground & Turnaround Port', desc: 'Jersey as a destination in its own right — a genuine cruising ground, and a proven turnaround port for guest changes and provisioning.' };
+            var chooseItems = [pr.fuel, gateway, infrastructure].filter(function(p){ return p && (p.stat || p === gateway); });
+            var returnItems = [pr.presence, pr.airport, services, repair, windfarm, cruising].filter(function(p){ return p && (p.stat || p === services || p === repair || p === windfarm || p === cruising); });
+            var hasData = chooseItems.some(function(p){ return p.stat; }) || returnItems.some(function(p){ return p.stat; });
+            if (hasData) {
+              if (chooseItems.length) document.getElementById('prioritiesChoose').innerHTML = chooseItems.map(function(p, i){
+                var key = p === gateway ? 'gateway' : (p === infrastructure ? 'infrastructure' : (p === pr.fuel ? 'fuel' : null));
+                return tile(p, String(i + 1).padStart(2, '0'), key);
+              }).join('');
+              if (returnItems.length) document.getElementById('prioritiesReturn').innerHTML = returnItems.map(function(p, i){
+                var key = p === pr.presence ? 'presence' : (p === pr.airport ? 'airport' : (p === services ? 'services' : (p === repair ? 'repair' : (p === windfarm ? 'windfarm' : (p === cruising ? 'cruising' : null)))));
+                return tile(p, String(i + 1).padStart(2, '0'), key);
+              }).join('');
+              starsLine('chooseStarsLine', 'chooseStarsText', 'chooseStars', chooseItems);
+              starsLine('returnStarsLine', 'returnStarsText', 'returnStars', returnItems);
+              document.getElementById('prioritiesSection').style.display = '';
+              if (window.initCardGalleries) window.initCardGalleries(document.getElementById('prioritiesSection'));
+            }
+            });
+          }
+          if (data && data.averages) {
+            var rows = Object.keys(data.averages).map(function(k){ return data.averages[k]; }).filter(function(a){ return a.value !== null; });
+            if (rows.length) {
+              document.getElementById('pciBars').innerHTML = rows.map(function(a){
+                var pct = Math.max(0, Math.min(5, a.value)) / 5 * 100;
+                return '<div><div class="flex justify-between text-sm mb-1.5"><span class="text-cream/80">'+esc(a.label)+'</span><span class="font-semibold">'+a.value.toFixed(1)+'</span></div><div class="barwrap dark"><i style="width:'+pct+'%"></i></div></div>';
+              }).join('');
+              document.getElementById('pciBarsCaption').textContent = 'Live average across '+(data.count||0)+' verified port call'+(data.count===1?'':'s')+'.';
+            }
+          }
+          if (!reviews.length) return; // keep the illustrative example cards — no real reviews to show yet
+          var wrap = document.getElementById('pciCards');
+          var cards = reviews.slice(0, 3).map(function(r){
+            var who = r.ship ? ('✓ Verified · M/Y ' + esc(r.ship)) : '✓ Verified Master';
+            var meta = [r.port, r.when].filter(Boolean).map(esc).join(' · ');
+            var quote = (r.didWell && r.didWell.trim())
+              ? ('"'+esc(r.didWell)+'"')
+              : ('Rated '+(r.overall||'-')+'/5 on the CIPS Port Call Index.'+(r.appoint==='Yes'?' Will appoint again.':''));
+            return '<article class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">'
+              + '<div class="flex items-center justify-between">'
+              + '<div class="flex items-center gap-2 text-xs text-cream/60"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-goldl/15 text-goldl font-semibold">'+who+'</span>'+(meta?(' '+meta):'')+'</div>'
+              + starsHtml(r.overall)
+              + '</div>'
+              + '<p class="mt-4 text-cream/90 leading-relaxed">'+quote+'</p>'
+              + '</article>';
+          }).join('');
+          wrap.innerHTML = cards;
+          var cap = document.getElementById('pciCaption');
+          if (cap) { cap.textContent = 'Real captain feedback from the CIPS Port Call Index.'; wrap.insertAdjacentElement('beforeend', cap); }
+        }).catch(function(){ /* keep the illustrative examples on any error */ });
+      })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="bg-paper py-20">
+  <div class="max-w-8xl mx-auto px-5 sm:px-8">
+    <div class="rounded-3xl border border-cream bg-white p-10 lg:p-14 shadow-[0_40px_80px_-50px_rgba(10,26,47,0.4)] grid lg:grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="eyebrow text-xs text-gold mb-3">The agency that delivers more</p>
+        <h2 class="font-display text-3xl lg:text-4xl text-ink leading-tight">Planning a call to the Channel Islands?</h2>
+        <p class="mt-4 text-slate-500 text-lg">Join the captains and crews who rate CIPS for visible excellence — day or night.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row lg:justify-end gap-4">
+        <a href="tel:+447797720723" class="btn-gold px-7 py-4 rounded-full font-semibold text-center">Call +44 7797 720 723</a>
+        <a href="index.html#contact" class="px-7 py-4 rounded-full border border-ink/15 text-ink font-semibold text-center hover:bg-ink hover:text-white transition-all">Send an enquiry</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- footer -->
+<footer class="bg-[#08111f] text-cream/70">
+  <div class="max-w-8xl mx-auto px-5 sm:px-8 py-14">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <a href="index.html" class="flex items-center">
+        <img src="images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-10 w-auto" />
+      </a>
+      <nav class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <a href="index.html#services" class="hover:text-white">Services</a>
+        <a href="index.html#sectors" class="hover:text-white">Sectors</a>
+        <a href="reviews.html" class="hover:text-white">Reviews</a>
+        <a href="index.html#contact" class="hover:text-white">Contact</a>
+      </nav>
+    </div>
+    <div class="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <p class="text-sm text-cream/60">Had a port call with CIPS? Look out for your review link by email after you sail.</p>
+    </div>
+    <div class="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-cream/45">
+      <p>&copy; <span id="yr">2026</span> Channel Island Port Services. All rights reserved.</p>
+      <p>Jersey · Guernsey · Alderney — The Atlantic Gateway&nbsp;C.I.</p>
+    </div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

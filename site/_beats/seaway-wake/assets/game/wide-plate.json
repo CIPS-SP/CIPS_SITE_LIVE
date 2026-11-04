@@ -1,0 +1,14 @@
+{
+ "file": "wide-plate.webp",
+ "source": "Esri World Imagery z15 via _beats/tools/chart.html, water cut out by the OpenStreetMap water mask (alpha), at half resolution",
+ "w": 2816,
+ "h": 1792,
+ "bounds": {
+  "west": -2.3291015625,
+  "east": -2.08740234375,
+  "north": 49.231947298545556,
+  "south": 49.131408413998585
+ },
+ "mPerPx": 6.245715337308007,
+ "note": "the wide plate: the whole south-west corner of Jersey from St Ouen to Noirmont for the opening pull-back; sw-plate.webp (1.56 m/px) is drawn over it"
+}

@@ -1,0 +1,386 @@
+/* _beats/seaway-wake/game.css — The Crossing (seaway game, HLC Globe Lab, 16 Sep 2026) */
+html,body{margin:0;height:100%;background:#02484b;overflow:hidden;font-family:'Jost',system-ui,sans-serif;color:#eaf4f5;-webkit-user-select:none;user-select:none;touch-action:none}
+.game{position:fixed;inset:0;overflow:hidden}
+.game canvas.sea{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* the plan: the flat world (sprites, particles) drawn in plan pixels on a layer three screens wide and high centred on the
+   screen, then tilted as one piece with CSS 3D to match the sea camera exactly — so the DOM sits on the water in 3D */
+.game .plan{position:absolute;left:-100vw;top:-100vh;width:300vw;height:300vh;pointer-events:none;transform-origin:50% 50%;transform-style:preserve-3d;will-change:transform}
+.game .world{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d}
+.game canvas.fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.game canvas.coast{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.game .scene{position:absolute;inset:0;perspective-origin:50% 50%}   /* perspective (the sea camera's focal length in px) is set from the script */
+.game.shake .scene{animation:shake .45s cubic-bezier(.36,.07,.19,.97) both}
+.game.nudge .scene{animation:nudge .7s ease-out both}
+@keyframes nudge{20%{transform:translate(4px,0) rotate(.4deg)}55%{transform:translate(-2px,0) rotate(-.2deg)}}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(3px,-1px)}30%,50%,70%{transform:translate(-5px,2px)}40%,60%{transform:translate(5px,-2px)}}
+
+/* everything on the water is a positioned element, centred on its own point, rotated to its heading (0 = up) */
+.world .ob{position:absolute;left:0;top:0;transform-origin:50% 50%;will-change:transform}
+.world .ob img{display:block;width:100%;height:auto;pointer-events:none}
+.world .hull{position:absolute;left:0;top:0;transform-origin:50% 50%;will-change:transform;filter:drop-shadow(0 6px 10px rgba(0,20,25,.45))}
+.world .hull img{display:block;width:100%;height:auto}
+.world .shadow{position:absolute;left:0;top:0;transform-origin:50% 50%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(0,22,26,.55),rgba(0,22,26,0) 70%);pointer-events:none}
+.world .ob.dolphin img{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
+.world .ob.under img{opacity:.42;filter:blur(.6px) saturate(.6) brightness(.7)}
+.world .ob.boat > img{filter:drop-shadow(0 4px 6px rgba(0,20,25,.4))}
+/* partner / operator logos on the vessels — the partners' own files, sized to the sprite */
+.world .brand{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;pointer-events:none}
+.world .brand img{display:block;width:100%;height:auto}
+.world .brand b{font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#0f2a5c;white-space:nowrap;background:rgba(255,255,255,.85);padding:2px 4px;border-radius:3px}
+.world .brand b[hidden],.world .brand img[hidden]{display:none}
+/* every mark sits ON the boat, within her length (Howard, 18 Sep): a wide mark on a narrow boat runs along the deck, not across it */
+.world .ob.dfds .brand{width:72%}.world .ob.iu .brand{width:64%}.world .ob.pilot .brand{width:16%}
+.world .ob.taxi .brand{width:62%;left:50%!important;top:70%!important;transform:translate(-50%,-50%)}.world .ob.taxi .brand img{background:none;border-radius:50%;padding:0}
+/* the pilot launch flies the H flag — white and red vertical halves — from a short mast abaft the wheelhouse */
+.world .ob.pilot .hflag{position:absolute;left:44%;top:6%;width:9%;height:22%;background:linear-gradient(90deg,#fff 50%,#e0242b 50%);border:1px solid rgba(0,0,0,.35);box-shadow:0 1px 2px rgba(0,0,0,.4);transform-origin:0 100%;animation:flutter .9s ease-in-out infinite alternate}
+@keyframes flutter{from{transform:skewY(-4deg)}to{transform:skewY(4deg)}}
+/* overflights: above everything, a little larger (they are high), their shadow well off on the water */
+.world .ob.plane{z-index:6;filter:drop-shadow(0 0 2px rgba(0,0,0,.25))}
+.world .ob.plane .brand{width:30%;left:50%;top:42.5%;transform:translate(-50%,-50%) rotate(90deg)}   /* the name painted on the fuselage itself (nose up in the sprite): no banner, no pill (Howard, 18 Sep) */
+.world .ob.plane .brand img{background:none;border-radius:0;padding:0;box-shadow:none;filter:drop-shadow(0 0 1px rgba(255,255,255,.9))}.world .ob.plane .brand b{background:none;color:#1d3a6e;font:700 13px/1 'Segoe UI','Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;padding:0;white-space:nowrap;text-rendering:geometricPrecision}
+.world .shadow.air{background:url(assets/game/airliner-v2.svg) center/contain no-repeat;filter:brightness(0) blur(1.6px)}   /* 24 Oct 2026: the shadow on the water is the plane's own outline, soft */
+/* St Brelade's Bay — the satellite plate with its water masked out so the game sea shows through */
+.world .bay{position:absolute;left:0;top:0;pointer-events:none;opacity:.97;will-change:transform}
+.world .bay img{display:block;width:100%;height:100%}
+/* the pilot station mark (25 Sep 2026, Simon: was the anchorage ring, moved to the boarding waypoint) */
+.world .stationring{position:absolute;left:0;top:0;border:2px dashed rgba(242,182,74,.55);border-radius:50%;pointer-events:none;display:flex;align-items:center;justify-content:center;transition:border-color .4s,box-shadow .4s}
+/* 26 Sep 2026, Simon: "make the 'pilot boarding' text visible at the start of being able to see the pilot zone" —
+   the ring itself has shown as soon as it's in frame since the last round; this label was still waiting for the
+   separate, later .live (close-in) trigger. Shows with the ring now; .live still reserved for the closer pulse. */
+.world .stationring span{font:600 11px/1 'Jost',system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#f2b64a;opacity:1;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.world .stationring.live{border-color:#f2b64a;box-shadow:0 0 0 6px rgba(242,182,74,.12),0 0 30px rgba(242,182,74,.25);animation:stationring-pulse 1.6s ease-in-out infinite}
+@keyframes stationring-pulse{0%,100%{box-shadow:0 0 0 6px rgba(242,182,74,.12),0 0 30px rgba(242,182,74,.25)}50%{box-shadow:0 0 0 14px rgba(242,182,74,.05),0 0 40px rgba(242,182,74,.35)}}
+.world .wakeline{position:absolute;left:0;top:0;transform-origin:50% 0;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));border-radius:999px;pointer-events:none;filter:blur(1px)}
+/* 26 Sep 2026, Simon: the pilot transfer on the water, not just the HUD bar — a glowing rail on the launch's near
+   gunwale (ported from proto/pilot-boarding.html) and the pilot's own figure pacing it; see drawPilotBoatGlow() */
+.world .pilotglow{position:absolute;left:0;top:0;transform-origin:50% 50%;border-radius:999px;pointer-events:none;background:rgba(95,224,162,.32);box-shadow:inset 0 0 0 1.5px rgba(95,224,162,.7),0 0 6px rgba(95,224,162,.4)}
+.world .pilotglow.hot{background:rgba(95,224,162,.6);box-shadow:inset 0 0 0 1.5px #5fe0a2,0 0 16px rgba(95,224,162,.85);animation:pilotglow-pulse 1s ease-in-out infinite}
+@keyframes pilotglow-pulse{0%,100%{box-shadow:inset 0 0 0 1.5px #5fe0a2,0 0 12px rgba(95,224,162,.7)}50%{box-shadow:inset 0 0 0 1.5px #5fe0a2,0 0 22px rgba(95,224,162,1)}}
+.world .pilotperson{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;background:#ff8a1e;box-shadow:0 0 0 1.5px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.4)}
+/* the pierheads: two breakwater arms with their lights — the finish line */
+.world .pier{position:absolute;left:0;top:0;transform-origin:50% 50%;pointer-events:none}
+.world .pier .arm{position:absolute;background:#7d8288;box-shadow:0 0 0 2px rgba(255,255,255,.18),0 0 18px rgba(255,255,255,.18);border-radius:6px}
+.world .pier .light{position:absolute;width:12px;height:12px;border-radius:50%;box-shadow:0 0 14px 4px currentColor;background:currentColor;animation:blink 2.4s infinite}
+.world .pier .light.red{color:#ff4d4d}.world .pier .light.green{color:#3ed598;animation-delay:1.2s}
+@keyframes blink{0%,12%{opacity:1}18%,100%{opacity:.35}}
+
+/* HUD */
+.hud{position:absolute;left:0;right:0;top:0;padding:max(14px,env(safe-area-inset-top)) 22px 0;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.hud b{display:block;font-size:26px;font-weight:600;letter-spacing:.02em;line-height:1}
+.hud span{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.75;margin-top:4px}
+.hud-c{text-align:center}.hud-c span b{display:inline;font-size:13px;letter-spacing:.04em}
+.hud-c i{display:block;width:min(38vw,320px);height:3px;margin:8px auto 8px;background:rgba(255,255,255,.18);border-radius:2px;position:relative;overflow:hidden}
+.hud-c i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--k,0%);background:#f2b64a;border-radius:2px;transition:width .3s linear}
+.hud-r{text-align:right}
+.toast{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);padding:10px 18px;border-radius:999px;background:rgba(6,20,24,.7);backdrop-filter:blur(6px);font-size:15px;letter-spacing:.06em;font-weight:500;pointer-events:none;animation:toast 1.6s ease-out both;white-space:nowrap}
+.toast.bad{background:rgba(120,20,30,.72)}.toast.good{background:rgba(20,110,80,.72)}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-30%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%)}}
+
+/* cards */
+.card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,520px);padding:32px 34px 30px;border-radius:14px;background:rgba(4,22,26,.78);backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.45);text-align:center}
+.card .eyebrow{margin:0 0 8px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#f2b64a}
+.card h1{margin:0 0 12px;font-size:clamp(28px,5vw,44px);line-height:1.05;font-weight:600}
+.card .lead{margin:0 auto 18px;max-width:420px;font-size:15px;line-height:1.5;opacity:.85}
+.card .keys{margin:0 0 18px;font-size:13px;opacity:.75}
+kbd{display:inline-block;min-width:16px;padding:2px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.35);font:inherit;font-size:12px;line-height:1.2;background:rgba(255,255,255,.08)}
+.card button{appearance:none;border:0;cursor:pointer;padding:12px 28px;border-radius:999px;background:#f2b64a;color:#1a1408;font:600 15px/1 'Jost',system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 8px 24px rgba(242,182,74,.35)}
+.card button:hover{filter:brightness(1.06)}
+.card[hidden]{display:none}
+.game.playing .hud{opacity:1}.game:not(.playing) .hud{opacity:.35}
+/* 28 Sep 2026, Simon: "when the page starts and ends... the dialogue boxes and chart, mute pause buttons are
+   visible but the other controls, and plotter are hidden. Can we make sure the dialogues and buttons are also
+   hidden at same time" — .plotter-box/.stick already gate on .game.playing (see below); these four just never
+   had the same gate. The arrival notes panel (.arrival-notepad) is untouched — stays visible throughout. */
+.arrival-map,.sndbtn,.arrival-pause{transition:opacity .3s}
+.game:not(.playing) .arrival-map,.game:not(.playing) .sndbtn,.game:not(.playing) .arrival-pause,.game:not(.playing) .arrival-contacts{opacity:0;pointer-events:none}
+
+
+/* the marks at the channel: Corbière's light (isophase, 10 s, white/red sectors) and the west cardinal's quick 9 */
+.world .ob.light,.world .ob.wcard{z-index:3}
+.world .ob.light .beam{position:absolute;left:50%;top:47%;width:220%;height:220%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,244,200,.55) 0%,rgba(255,244,200,.18) 30%,rgba(255,244,200,0) 62%);animation:iso 10s steps(1) infinite}
+@keyframes iso{0%{opacity:1}50%{opacity:0}100%{opacity:0}}
+.world .ob.wcard .q9{position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);border-radius:50%;background:#fff;box-shadow:0 0 10px 4px rgba(255,255,255,.8);pointer-events:none;animation:q9 10s steps(1) infinite}
+@keyframes q9{0%,4%,8%,12%,16%,20%,24%,28%,32%{opacity:1}2%,6%,10%,14%,18%,22%,26%,30%,34%,100%{opacity:0}}
+/* the chartplotter, bottom-left */
+.plotter-box{position:absolute;left:18px;bottom:max(18px,env(safe-area-inset-bottom));width:250px;border-radius:12px;background:#1d2226;box-shadow:0 12px 34px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden;pointer-events:auto;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s;touch-action:none;cursor:grab}
+.game.playing .plotter-box{opacity:1;transform:none}
+.plotter-top{display:flex;justify-content:space-between;padding:6px 10px 5px;font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.18em;color:#9fb3bf}
+.plotter-top .gps{color:#3ed598}
+.plotter-box canvas.plotter{display:block;width:250px;height:250px}
+.plotter-top{position:relative}.plotter-top .pfollow,.plotter-top .pfull{position:absolute;right:38px;top:2px;appearance:none;border:0;background:rgba(255,255,255,.1);color:#eaf4f5;border-radius:6px;width:20px;height:16px;font:600 11px/1 system-ui;cursor:pointer}.plotter-top .pfull{right:62px;font-size:12px}.plotter-top .pfollow:hover,.plotter-top .pfull:hover{background:rgba(255,255,255,.22)}
+/* the chart full screen (Howard, 17 Sep): the box takes the window under the clock and inside the telegraph; the canvas takes the box */
+/* 29 Sep 2026, Simon: "I maximised the chart but could only just reach the close chart button" — .arrival-notepad
+   (z-index 44, always on top, stays visible everywhere per an earlier fix) sits at right:14px, width:248px — the
+   old right:74px margin here left a ~188px strip where the fullscreen chart's own exit/follow buttons (.pfull/
+   .pfollow, positioned relative to this box's own right edge) were sitting right underneath the notes panel,
+   only a sliver actually clickable. Widened past the notes panel's full width so nothing sits under it. */
+.game.plotfull .plotter-box{left:18px;right:270px;top:56px;bottom:max(18px,env(safe-area-inset-bottom));width:auto;display:flex;flex-direction:column;z-index:30;transform:none}
+.game.plotfull .plotter-top{font-size:11px;padding:9px 14px 8px}.game.plotfull .plotter-top .pfollow,.game.plotfull .plotter-top .pfull{top:5px;width:24px;height:20px;font-size:13px}.game.plotfull .plotter-top .pfull{right:112px;font-size:14px}.game.plotfull .plotter-top .pfollow{right:82px}
+.game.plotfull canvas.plotter{width:100%;height:auto;flex:1;min-height:0}
+.game.plotfull .plotter-data b{font-size:19px}.game.plotfull .plotter-data span{font-size:9px}.game.plotfull .plotter-data div{padding:9px 6px}
+.game.plotfull .comms{visibility:hidden}
+
+.plotter-box .ais{appearance:none;border:0;cursor:pointer;position:absolute;left:8px;top:32px;font:600 8px/1 'Jost',system-ui,sans-serif;letter-spacing:.14em;color:#8a9ba6;background:rgba(20,26,30,.72);padding:4px 7px;border-radius:999px;pointer-events:auto;text-transform:uppercase}.plotter-box .ais.on{color:#3ed598}.plotter-box .ais.on{color:#3ed598}
+.plotter-box .pz{position:absolute;right:8px;top:32px;display:flex;flex-direction:column;gap:4px}.plotter-box .pz button{appearance:none;border:0;width:22px;height:22px;border-radius:6px;background:rgba(20,26,30,.82);color:#eaf4f5;font:600 15px/1 system-ui;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4)}.plotter-box .pz button:hover{background:rgba(40,50,56,.95)}
+.game.plotfull .plotter-box .ais{top:44px;left:12px;font-size:10px}.game.plotfull .plotter-box .pz{top:44px;right:12px}.game.plotfull .plotter-box .pz button{width:30px;height:30px;font-size:19px}
+/* the live AIS vessels: her name and speed on a tag under the sprite */
+.world .aistag{position:absolute;left:0;top:0;font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.06em;color:#fff;background:rgba(0,28,36,.6);padding:3px 6px;border-radius:999px;white-space:nowrap;pointer-events:none;text-shadow:0 1px 1px rgba(0,0,0,.5)}
+.world .ob.live > img{filter:drop-shadow(0 4px 6px rgba(0,20,25,.4)) saturate(.92)}
+.plotter-data{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#14181b}
+.plotter-data div{padding:6px 4px 6px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
+.plotter-data b{display:block;font:600 15px/1 'Jost',system-ui,sans-serif;color:#eaf4f5;letter-spacing:.02em;white-space:nowrap}
+.plotter-data span{display:block;font-size:8px;letter-spacing:.14em;color:#8a9ba6;margin-top:3px;text-transform:uppercase}
+@media (max-width:640px){.plotter-box{transform:scale(.72);transform-origin:left bottom;left:8px}.game.playing .plotter-box{transform:scale(.72)}}
+@media (max-width:640px), (max-height:520px){.game.plotfull .plotter-box,.game.playing.plotfull .plotter-box{transform:none;left:8px;right:195px;top:48px}}   /* 29 Sep 2026: widened past the mobile-width arrival-notepad (width:179px, right:8px — see arrival.css) so its exit/follow buttons don't sit underneath it, same fix as the desktop rule above */
+/* the telegraph, bottom-right: wheel / ↑↓ / the buttons */
+/* the bridge console (23 Oct 2026, Simon): one console for every screen. It takes the joystick's corner; the old joystick, bars and telegraph go (phones and coarse pointers keep the joystick for now) */
+.bridge{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));width:clamp(380px,42vw,540px);z-index:30;opacity:0;transition:opacity .4s;pointer-events:auto;touch-action:none;filter:drop-shadow(0 8px 22px rgba(0,0,0,.45))}
+.game.playing .bridge{opacity:1}
+.stick{display:none!important}
+@media (pointer:coarse),(max-width:760px){.stick{display:flex!important}.bridge{display:none}}
+.telegraph{display:none!important}   /* the old telegraph column has gone: the joystick and its thrust bar do the job (Howard, 18 Sep) */
+.telegraph{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;transition:opacity .4s}
+.game.playing .telegraph{opacity:1}
+.telegraph button{appearance:none;border:0;cursor:pointer;width:44px;height:36px;border-radius:10px;background:rgba(4,22,26,.72);color:#eaf4f5;font:600 14px/1 system-ui;backdrop-filter:blur(6px)}
+.telegraph .tele{width:44px;height:110px;border-radius:10px;background:rgba(4,22,26,.72);position:relative;overflow:hidden;backdrop-filter:blur(6px)}
+.telegraph .tele i{position:absolute;left:0;right:0;bottom:0;height:var(--k,50%);background:linear-gradient(180deg,#f2b64a,#e8590c);transition:height .25s}
+.telegraph .tele b{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);white-space:nowrap;font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+/* Corbière's light at the edge of the screen */
+.lightglow{position:absolute;left:0;top:0;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;pointer-events:none;opacity:0;--c:255,246,215;background:radial-gradient(circle,rgba(var(--c),.6) 0%,rgba(var(--c),.18) 35%,rgba(var(--c),0) 65%)}
+/* La Corbière — the light in the world: tower, halo on the water, beam toward the ship; --c the sector colour, --iso 0..1 the isophase, --k the scale */
+.world .lighthouse{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;--c:255,246,215;--iso:1;--k:1}
+.world .lighthouse .tower{position:absolute;left:0;top:0;width:calc(9px * var(--k));height:calc(9px * var(--k));margin:calc(-4.5px * var(--k)) 0 0 calc(-4.5px * var(--k));border-radius:50%;background:#f4f1ea;border:calc(1.5px * var(--k)) solid #c8362d;box-shadow:0 0 calc(10px * var(--k)) rgba(var(--c),calc(.9 * var(--iso)))}
+.world .lighthouse .halo{position:absolute;left:0;top:0;width:calc(260px * var(--k));height:calc(260px * var(--k));margin:calc(-130px * var(--k)) 0 0 calc(-130px * var(--k));border-radius:50%;opacity:var(--iso);background:radial-gradient(circle,rgba(var(--c),.9) 0%,rgba(var(--c),.35) 22%,rgba(var(--c),.1) 45%,rgba(var(--c),0) 65%);mix-blend-mode:screen}
+.world .lighthouse .beam{position:absolute;left:0;top:0;width:calc(90px * var(--k));height:600px;margin-left:calc(-45px * var(--k));transform-origin:50% 0;opacity:calc(.8 * var(--iso));background:linear-gradient(to bottom,rgba(var(--c),.75),rgba(var(--c),.3) 40%,rgba(var(--c),0));clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);mix-blend-mode:screen}
+.world .lighthouse b{position:absolute;left:calc(10px * var(--k));top:calc(-8px * var(--k));font-weight:600;font-size:11px;letter-spacing:.06em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);white-space:nowrap;line-height:1.2}
+.world .lighthouse b span{font-weight:400;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#cfe8ee}
+
+/* the comms handset, beside the plotter */
+.comms{position:absolute;left:18px;bottom:calc(max(18px,env(safe-area-inset-bottom)) + 336px);width:250px;max-height:calc(100vh - 372px);display:flex;flex-direction:column;border-radius:12px;background:#1d2226;box-shadow:0 12px 34px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08);overflow:hidden;pointer-events:auto;opacity:0;transform:translateY(12px);transition:opacity .4s,transform .4s;color:#dfe8ea;font:13px/1.4 'Jost',system-ui,sans-serif}
+.game.playing .comms,.game.done .comms{opacity:1;transform:none}
+.comms-top{display:flex;align-items:center;gap:10px;padding:7px 12px;background:#12161a;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#8fa1aa}
+.comms-top b{margin-left:auto;font:700 12px/1 'Jost',system-ui,sans-serif;color:#7fe3d2;letter-spacing:.1em}.comms-top .rx{color:#5a6a72}
+.comms .log{list-style:none;margin:0;padding:8px 12px;height:118px;min-height:56px;flex:0 1 auto;overflow-y:auto;scroll-behavior:smooth;background:#0f1316}
+.comms .log li{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;line-height:1.35}
+.comms .log li time{color:#7fe3d2;font-variant-numeric:tabular-nums;margin-right:6px;font-size:11px}
+.comms .log li b{color:#f2b64a;font-weight:600;margin-right:4px}.comms .log li.me b{color:#bfefff}.comms .log li.bad{color:#ffb4a8}.comms .log li.bad b{color:#ff8a7a}
+.comms-btns{display:flex;gap:6px;padding:8px 10px}
+.comms .call{flex:1;display:flex;align-items:center;gap:6px;appearance:none;border:0;border-radius:10px;padding:8px 8px;cursor:pointer;text-align:left;color:#fff;font:inherit;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.comms .call i{font-style:normal;font-size:16px}.comms .call b{display:block;font-size:12px;font-weight:700;line-height:1.1}.comms .call small{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-top:2px}
+.comms .call.vts{background:#1d6fa8}.comms .call.cips{background:#e8590c}.comms .call:disabled{opacity:.45;cursor:default}
+.comms .menu{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px}.comms .menu button{appearance:none;border:1px solid rgba(255,255,255,.14);background:#2a3136;color:#eef4f6;font:600 12px 'Jost',system-ui,sans-serif;padding:7px 10px;border-radius:999px;cursor:pointer}.comms .menu button:hover{border-color:#e8590c}
+.comms [hidden]{display:none!important}   /* the display:flex rules below would otherwise beat the hidden attribute — the menu never closed and the list never collapsed (Howard, 17 Sep) */
+.comms .stores{padding:6px 12px 12px;display:flex;flex-direction:column;gap:3px;max-height:min(210px,34vh);overflow-y:auto;flex:0 1 auto;background:#151a1e}
+.comms .stores-head{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:#151a1e;border-top:1px solid rgba(255,255,255,.06);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#f2b64a;cursor:pointer}.comms .stores-head i{font-style:normal;transition:transform .2s}.comms .stores-head.open i{transform:rotate(180deg)}
+.comms .stores .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#f2b64a;margin:4px 0 2px}.comms .stores .eyebrow.hamper{color:#7fe3d2;margin-top:8px;line-height:1.4;letter-spacing:.08em}
+.comms .stores label{display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer}.comms .stores input{accent-color:#e8590c}
+.comms .stores button{align-self:flex-start;margin-top:8px;appearance:none;border:0;background:#e8590c;color:#fff;font:700 12px 'Jost',system-ui,sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer}
+.card .keys.hamper{color:#f2b64a}
+/* 26 Sep 2026, Simon: the skill score behind the same five tasks — the star stays "did you do it" (arrival
+   notes), this is "how well" (game/scoring.js), shown on the finishing card as just this scene's own total. */
+.scene-score{margin:0 0 18px;padding:12px 16px;border-radius:10px;background:rgba(255,255,255,.06);text-align:left}
+.scene-score .score-total{margin:0 0 8px;font:700 20px/1 'Jost',system-ui,sans-serif;color:#f2b64a;text-align:center}
+.scene-score .score-total small{font:500 11px/1 system-ui;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-left:4px}
+/* 28 Sep 2026, Simon: "should show the logic or criteria for how the points were calculated and what they were
+   out of" — each row is now a small stack: the label/score line as before (score gets its own "/ 1000" instead
+   of a bare number), plus a quieter criteria line underneath explaining how that score was actually earned. */
+.score-row{padding:5px 0 6px;border-bottom:1px solid rgba(255,255,255,.08)}.score-row:last-child{border-bottom:0}
+.score-row-head{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;opacity:.9}
+.score-row-head b{font-variant-numeric:tabular-nums;color:#eaf4f5}
+.score-row-head b small{font-weight:500;opacity:.6;font-variant-numeric:tabular-nums}
+.score-criteria{margin:2px 0 0;font-size:10.5px;line-height:1.35;color:#9fb3bf;opacity:.85}
+@media (max-height:760px){.comms .log{height:80px}}
+@media (max-width:900px){.comms{bottom:calc(max(18px,env(safe-area-inset-bottom)) + 250px);width:250px}.comms .log{height:80px}}
+/* PHONES (Howard, 18 Sep: 'a mobile-friendly app'): the handset is a bottom sheet behind a VHF button; the plotter is small (⛶ for the
+   whole chart); the intro card scrolls; everything is a thumb-sized target */
+.vhfbtn{display:none;position:absolute;left:12px;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 196px);width:54px;height:54px;border-radius:50%;border:0;background:#e8590c;color:#fff;font:700 11px/1 'Jost',system-ui,sans-serif;letter-spacing:.12em;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;opacity:0;transition:opacity .4s;z-index:31}
+.game.playing .vhfbtn{opacity:1}.vhfbtn i{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#7fe3d2;color:#062;font:700 10px/18px system-ui;text-align:center}
+.comms .xclose{display:none;appearance:none;border:0;background:rgba(255,255,255,.1);color:#fff;width:28px;height:28px;border-radius:8px;font:600 18px/1 system-ui;margin-left:8px}
+@media (max-width:760px), (max-height:520px){   /* phones, portrait or landscape */
+  .vhfbtn{display:block}
+  .comms{display:none}
+  .game.comms-open .comms{display:flex;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));width:auto;max-height:min(78vh,78dvh);z-index:40;box-shadow:0 -10px 50px rgba(0,0,0,.6)}
+  .game.comms-open .comms .log{height:min(34vh,220px)}
+  .comms .xclose{display:block}
+  .comms .comms-btns button{min-height:48px}.comms .menu button{min-height:40px;padding:8px 12px}.comms .stores label{min-height:36px}
+  .plotter-box{transform:scale(.66);transform-origin:left bottom;left:8px;bottom:max(8px,env(safe-area-inset-bottom))}.game.playing .plotter-box{transform:scale(.66)}
+  .game.plotfull .plotter-box,.game.playing.plotfull .plotter-box{transform:none;left:8px;right:195px;top:48px}   /* 29 Sep 2026: same fix as the desktop rule above — cleared the arrival-notepad's mobile width so the fullscreen chart's own buttons aren't hidden under it */
+  .telegraph{right:10px;gap:8px}.telegraph button{width:52px;height:46px;font-size:18px}.telegraph .tele{width:52px}
+  .card{width:min(94vw,520px);max-height:min(86vh,86dvh);overflow:auto;padding:22px 20px 20px}.card .lead{font-size:14px}
+  .hud{padding-left:14px;padding-right:14px}
+}
+.card .keys.hamper{opacity:1}.card .keys.hamper a{color:#fff;text-decoration:underline}
+/* Corbière's sectors on the water, and the stood-up tower */
+.world .lighthouse{--r:600px;--rot:0deg}
+.world .lighthouse .sectors,.world .lighthouse .mine{position:absolute;left:0;top:0;width:calc(var(--r) * 2);height:calc(var(--r) * 2);margin:calc(var(--r) * -1) 0 0 calc(var(--r) * -1);border-radius:50%;transform:rotate(var(--rot));
+  -webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 0%,rgba(0,0,0,.55) 30%,rgba(0,0,0,.15) 65%,rgba(0,0,0,0) 100%);mask-image:radial-gradient(circle,rgba(0,0,0,1) 0%,rgba(0,0,0,.55) 30%,rgba(0,0,0,.15) 65%,rgba(0,0,0,0) 100%)}
+.world .lighthouse .sectors{opacity:calc(.6 + .4 * var(--iso))}
+.world .lighthouse .mine{opacity:var(--iso)}
+.world .lighthouse .tower{display:none}
+.world .lighthouse .tower3d{position:absolute;left:0;bottom:0;width:calc(72px * var(--k));height:auto;transform:translate(-50%,calc(-4px * var(--k)));filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+.world .lighthouse b{left:calc(18px * var(--k));top:calc(-46px * var(--k))}
+
+/* Bring Her In (the polish, 18 Sep): the intro's real-traffic option and the hand-over — the end card's own
+   star grid moved to the arrival notes panel, 25 Sep 2026 (Simon) */
+.card .opt{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 16px;font-size:12px;opacity:.8;cursor:pointer}.card .opt input{accent-color:#e8590c}
+.card .keys.small{font-size:11px;opacity:.55;margin:16px 0 0}
+.card button.alt{background:rgba(255,255,255,.12);color:#fff;margin-left:8px}
+.card .btnrow{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:14px;margin-top:22px}.card .btnrow button,.card .btnrow button.alt{margin:0;flex:1 1 210px}   /* 24 Oct 2026, Simon: the spacing between Go again and Continue needed looking at */
+@media (max-width:760px){.card button.alt{margin:10px 0 0}.card .btnrow{flex-direction:column}.card .btnrow button{width:100%}}
+
+/* the compass ribbon and the instruments across the top (GAME-POLISH.md): heading tape, SOG, charted depth and under-keel */
+.ribbon{width:min(46vw,320px);height:44px;margin:0 auto 4px;overflow:hidden;border-radius:8px;background:rgba(4,22,26,.55);backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}.ribbon canvas{width:100%;height:100%;display:block}
+.hud .inst{display:flex;justify-content:center;gap:14px;margin-top:6px}.hud .inst span{display:block;font-size:8px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}.hud .inst b{display:block;font-size:15px;letter-spacing:.02em;line-height:1.1;font-weight:600}
+/* the joystick: left/right the rudder, up/down the thrust; the knob springs back to centre, the bars keep the state */
+.stick{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:16px;opacity:0;transition:opacity .4s;pointer-events:auto;touch-action:none}
+/* 28 Sep 2026, Simon: "rearrange... so the rudder control is directly below (or above) the throttle, not split
+   by the joystick" — rudder and thrust used to sit either side of the pad (.rud had order:-1 to land on its
+   left); grouped as their own stacked column instead, so the joystick is a single, separate control alongside
+   the lever pair rather than sitting between them. */
+.stick .levers{display:flex;flex-direction:column;align-items:center;gap:14px}
+.game.playing .stick{opacity:1}.stick .pad{width:118px;height:118px;border-radius:50%;background:rgba(4,22,26,.72);backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.35);position:relative;cursor:grab;margin-bottom:74px}   /* 28 Sep 2026, Simon: "joystick can be moved up so its aligned at the mid point of the throttle slider" — bottom-anchored like the levers, so a margin nudges it up rather than centring against the whole (taller) levers column, which would land low of the throttle bar's own middle */
+.stick .cross{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.12),rgba(255,255,255,.12)) center/1px 70% no-repeat,linear-gradient(rgba(255,255,255,.12),rgba(255,255,255,.12)) center/70% 1px no-repeat;border-radius:50%}
+.stick .knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb46a,#e8590c 70%);box-shadow:0 4px 12px rgba(0,0,0,.45);transition:transform .15s}
+.stick.held .knob{transition:none}
+.stick .ind{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:8px;max-width:64px;text-align:center;letter-spacing:.14em;text-transform:uppercase;color:#9fb3bf}
+/* 28 Sep 2026, Simon: "a little indicator next to the throttle slider that shows what target speed you have
+   selected" — rides beside the grip (its top comes from game.js, in px off the bar's own live height, not a
+   CSS calc(), since this sits outside the bar as a sibling of it, not a child). */
+.stick .thrtgt{position:absolute;left:calc(50% + 21px);transform:translateY(-50%);font-style:normal;font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;color:#f2b64a;white-space:nowrap;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6);opacity:0;transition:opacity .4s ease}
+.stick .thrtgt.show{opacity:1;transition:opacity .1s ease}   /* 28 Sep 2026, Simon: fades out on release; snaps in fast at the start of a drag so it doesn't lag the grip */
+/* 28 Sep 2026, Simon: "the joystick is also obscuring the left hand edge of the rudder slider" — true: .ind's
+   64px max-width was sized for the old 70px rudder bar (barely overflowing either side, unnoticeable); tripling
+   the bar to 150px meant it overflowed its own 64px-wide box by ~43px a side, pushing its rendered left edge
+   back under the pad. Widened .ind.rud to actually fit the bar (its own max-width already caps the bar itself
+   at every breakpoint, so one generous value covers all of them) instead of letting it overflow uncontained. */
+.stick .ind.rud{max-width:172px}
+.stick .ind i{display:block;background:rgba(4,22,26,.72);border-radius:6px;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);cursor:grab;touch-action:none}
+/* 25 Sep 2026, Simon: these are draggable sliders now, not just readouts — linked to the joystick both ways (game.js) */
+.stick .rud i{width:150px;height:14px}
+/* 28 Sep 2026, Simon: "the red and green that fills in, doesnt fill in all the way, there is like a black area
+   right next to the white slider" — the fill used to size itself off a hardcoded 35px half-width, a stale
+   number left over from before the track was widened; the grip itself (below) has always travelled the bar's
+   full width via --hxf. Deriving the fill's own span from that same --hxf instead means it always reaches
+   exactly to the grip, at any track width across the responsive breakpoints, with no separate constant to keep
+   in sync. */
+.stick .rud i::after{content:"";position:absolute;top:0;bottom:0;background:var(--c,#7fe3d2);
+  left:min(50%,calc((100% - 13px) * var(--hxf,50) / 100 + 6.5px));
+  right:calc(100% - max(50%,calc((100% - 13px) * var(--hxf,50) / 100 + 6.5px)))}   /* red to port, green to starboard (Howard, 18 Sep) */
+.stick .rud i::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,.35)}
+.stick .thr i{width:16px;height:150px}.stick .thr i::after{content:"";position:absolute;left:0;right:0;bottom:var(--bot,0%);height:var(--k,0%);background:var(--tc,#f2b64a)}
+.stick .thr i::before{content:"";position:absolute;left:0;right:0;bottom:var(--zero,33%);height:1px;background:rgba(255,255,255,.35)}   /* the zero mark: throttle's range isn't symmetric (−0.5..1), so this isn't the bar's midpoint */
+/* 28 Sep 2026, Simon: "the throttle is still way too sensitive and twitchy... add something you actually drag up
+   and down sitting across the power bar, like a throttle or telegraph handle" — these bars were already
+   draggable (barDrag() in game.js), just short (70px) and unmarked, so a small pointer move meant a big throttle
+   swing and nothing read as "grab here". Tripled the throttle bar's travel and gave both bars a real grip — a
+   drawn handle riding at the live value (--ty/--hx, set in drawStick()) — so there's an obvious lever to pull,
+   not just an abstract fill, and the same physical drag now moves the value much less per pixel.
+   28 Sep 2026, Simon: "I can't actually see the grip handles" — they were there, but ::after (the fill) paints
+   after normal children in the same stacking context, so it sat on top of the grip and hid most of it. z-index
+   pulls the grip above the fill; sized up and given a groove-lines look so it unmistakably reads as a handle. */
+.stick .ind i .grip{position:absolute;z-index:2;pointer-events:none;background:#fefcf6;border-radius:5px;box-shadow:0 1px 6px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.25)}
+/* 28 Sep 2026, Simon: "the throttle slider shift/jumps a bit when you slide it up to full power" — plain
+   percentage positioning put the grip's CENTRE at 0%/100% at the extremes, so its own 13px body ran past the
+   track's edge there (nowhere else) — read as a jump right at full power. --hxf/--tyf are unitless 0..100 now
+   (game.js), and this insets the travel by the grip's own size so its edges never leave the track. */
+.stick .rud i .grip{top:-9px;bottom:-9px;width:13px;left:calc((100% - 13px) * var(--hxf,50) / 100 + 6.5px);margin-left:-6.5px;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 1.5px,transparent 1.5px 4px)}
+.stick .thr i .grip{left:-9px;right:-9px;height:13px;top:calc((100% - 13px) * var(--tyf,66.67) / 100 + 6.5px);margin-top:-6.5px;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1.5px,transparent 1.5px 4px)}
+/* 25 Sep 2026, Simon (Phase 2): the pilot transfer — ported from the Chapter 1 prototype's tap-in-the-green-zone
+   bar. Bottom-centre, clear of the joystick (still needed — speed/heading must stay safe throughout the tap
+   window too) and the plotter. Hidden except while pilot.phase==='boarding' (game.js toggles [hidden]). */
+.pilotxfer{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(4,22,26,.72);backdrop-filter:blur(6px);border-radius:14px;padding:10px 16px 12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.35);pointer-events:auto;cursor:pointer}
+.pilotxfer .lab{margin:0;font:600 10px/1 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fb3bf}
+.pilotxfer .pbarwrap{position:relative}
+.pilotxfer .pbar{width:64px;height:150px;position:relative;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);cursor:pointer;touch-action:none;transition:box-shadow .15s}
+.pilotxfer .pbar.safe{box-shadow:inset 0 0 0 1px rgba(95,224,162,.6),0 0 14px rgba(95,224,162,.45)}
+.pilotxfer .pzone{position:absolute;left:0;right:0;top:calc(50% - var(--half,15%));height:calc(var(--half,15%) * 2);background:rgba(95,224,162,.32);border-top:2px solid #5fe0a2;border-bottom:2px solid #5fe0a2}
+.pilotxfer .pmk{position:absolute;left:-3px;right:-3px;top:50%;height:8px;margin-top:-4px;background:#fff;border-radius:4px;box-shadow:0 0 8px #fff;transition:top .06s linear}
+/* 26 Sep 2026, Simon: "put the 'safe to board' text back in the slider" — was in the original prototype, dropped
+   when the bar was ported into the game; same position (right of the bar, centred on the green zone). */
+.pilotxfer .psafe{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:8px;width:62px;font:600 9px/1.35 'Jost',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5fe0a2;text-align:left}
+.pilotxfer .hint{margin:0;font:500 10px/1.3 system-ui;color:#9fb3bf;text-align:center;max-width:80px}
+.pilotxfer .pskip{font:600 10px/1 'Jost',system-ui,sans-serif;letter-spacing:.06em;color:#eaf4f5;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);border-radius:8px;padding:6px 10px;cursor:pointer}
+.pilotxfer .pskip:hover{background:rgba(255,255,255,.18)}
+/* 24 Oct 2026, Simon: when the pilot is crossing (or has taken it over after three misses) the slider stops, the panel fades and says so */
+.pilotxfer .pmsg{margin:0;max-width:150px;text-align:center;font:600 11px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#5fe0a2}
+.pilotxfer.judged .pmsg{color:#f2c26e}
+.pilotxfer.xfer,.pilotxfer.judged{cursor:default}.pilotxfer.xfer .pbarwrap,.pilotxfer.judged .pbarwrap{opacity:.4;filter:grayscale(.7)}.pilotxfer.xfer .hint,.pilotxfer.judged .hint,.pilotxfer.xfer .pskip,.pilotxfer.judged .pskip{display:none}
+.pilotxfer.xfer .pbar,.pilotxfer.judged .pbar{box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+@media (pointer:coarse), (max-width:760px){.stick{right:12px}.telegraph{display:none}.ribbon{width:min(60vw,260px);height:38px}.hud .inst{gap:10px}.hud .inst b{font-size:13px}.hud-c span b{font-size:11px}.pilotxfer{bottom:max(150px,calc(env(safe-area-inset-bottom) + 150px))}.stick .thr i{height:120px}.stick .rud i{width:120px}.stick .pad{margin-bottom:59px}}   /* 28 Sep 2026: re-centres the joystick on the shorter mobile throttle bar (120px, not 150px) — the desktop margin-bottom:74px overshoots here */
+@media (max-width:760px){.hud-l b,.hud-r b{font-size:20px}.hud .inst{display:grid;grid-template-columns:repeat(4,auto)}}
+
+/* the gulls, wheeling; the shoal under the surface */
+.world .ob.gull{z-index:6}.world .ob.gull img{filter:drop-shadow(0 7px 5px rgba(0,0,0,.35));animation:flap .5s ease-in-out infinite alternate}
+@keyframes flap{from{transform:scaleX(1)}to{transform:scaleX(.72)}}
+.world .ob.shoal img{opacity:.8;filter:none}
+
+/* sound: muted until tapped, remembered */
+.sndbtn{position:absolute;right:18px;top:calc(max(14px,env(safe-area-inset-top)) + 52px);width:36px;height:36px;border-radius:50%;border:0;background:rgba(4,22,26,.6);color:#fff;font-size:16px;cursor:pointer;pointer-events:auto;backdrop-filter:blur(6px);opacity:.85}
+@media (max-width:760px){.sndbtn{right:12px;top:calc(max(14px,env(safe-area-inset-top)) + 46px)}}
+
+/* the DFDS mark runs lengthways along the hull (Howard, 18 Sep) */
+.world .ob.dfds .brand{width:78%;left:50%!important;top:40%!important;transform:translate(-50%,-50%)}.world .ob.ropax .brand{width:70%;left:50%!important;top:44%!important;transform:translate(-50%,-50%)}
+.world .ob.iu .brand{width:130%;left:50%!important;top:56%!important;transform:translate(-50%,-50%) rotate(90deg)}
+.world .ob.dfds .brand img,.world .ob.ropax .brand img{background:none;border-radius:4px;padding:0}.world .ob.iu .brand img{background:rgba(255,255,255,.92);border-radius:3px;padding:2px 4px}
+
+@media (max-height:520px){
+  .ribbon{width:min(40vw,240px);height:32px}.hud .inst{margin-top:2px}.hud .inst b{font-size:12px}.hud-c i{margin:4px auto}
+  .stick .pad{width:92px;height:92px}.stick .knob{width:38px;height:38px;margin:-19px 0 0 -19px}.stick .thr i{height:90px}.stick .rud i{width:90px}
+  .plotter-box{transform:scale(.56)}.game.playing .plotter-box{transform:scale(.56)}
+  .vhfbtn{bottom:calc(max(10px,env(safe-area-inset-bottom)) + 168px);width:46px;height:46px;font-size:10px}
+  .game.comms-open .comms{max-height:min(86vh,86dvh)}.game.comms-open .comms .log{height:min(30vh,120px)}
+  .card{padding:14px 18px 16px}.card h1{font-size:24px;margin-bottom:6px}.card .lead{font-size:12.5px;margin-bottom:8px}.card .keys{margin-bottom:8px}.card .opt{margin-bottom:8px}
+}
+/* Development-only Game Director (?director). */
+.game-director{position:absolute;z-index:80;right:12px;top:12px;width:min(330px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;background:rgba(5,25,29,.94);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:12px;font:13px/1.35 Jost,sans-serif;backdrop-filter:blur(10px)}
+.game-director header,.game-director footer,.game-director label span{display:flex;align-items:center;justify-content:space-between;gap:8px}.game-director header{font-size:15px;margin-bottom:6px}.game-director button{font:inherit;color:inherit;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:7px 9px}.game-director header button{padding:2px 8px}.game-director .dmeta{opacity:.72;margin-bottom:10px;overflow-wrap:anywhere}.game-director label{display:block;margin:8px 0}.game-director label input{width:100%}.game-director output{font-variant-numeric:tabular-nums;opacity:.75}.game-director footer{justify-content:flex-start;flex-wrap:wrap;margin-top:10px}
+
+/* Director v2 only. No player UI style changes. */
+.game-director {position:fixed;z-index:10000;right:12px;top:12px;bottom:12px;width:min(365px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;background:#132d34;color:#f3f4ef;border:1px solid #527077;border-radius:10px;padding:14px;font:14px/1.4 system-ui,sans-serif;box-shadow:0 8px 32px #0008;touch-action:pan-y;}
+.game-director[hidden],.director-reopen[hidden]{display:none;}
+.game-director header,.game-director footer {display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.game-director .dcontrols {display:block;overflow:visible;max-height:none;padding:0;}
+.game-director .dcontrols details {border-top:1px solid #486169;padding:8px 0;}
+.game-director summary {cursor:pointer;font-weight:600;min-height:28px;}
+.game-director label {display:grid;grid-template-columns:1fr auto;gap:5px;margin:8px 0;}
+.game-director label input[type=range] {grid-column:1/3;width:100%;min-height:28px;}
+.game-director label output {font-variant-numeric:tabular-nums;}
+.game-director button,.game-director select,.game-director input[type=text],.game-director input[type=file],.director-reopen {font:inherit;min-height:36px;border:1px solid #7d9398;border-radius:5px;padding:6px 9px;background:#f4f4ed;color:#193038;}
+.game-director input[type=file]{max-width:100%;font-size:12px;}
+.game-director .dmeta {font-size:11px;overflow-wrap:anywhere;}
+.game-director .dnote {font-size:12px;color:#c3d2d4;}
+.game-director .dstatus {padding:8px;background:#214550;font-size:12px;min-height:36px;}
+.game-director :focus-visible,.director-reopen:focus-visible {outline:3px solid #f2b64a;outline-offset:2px;}
+.director-reopen{position:fixed;z-index:10001;right:12px;top:12px;}
+
+/* Development-only Comms editor. Player controls and layout are unchanged. */
+.game-director textarea{grid-column:1/3;width:100%;resize:vertical;font:13px/1.4 system-ui,sans-serif;padding:8px;background:#f4f4ed;color:#193038;border:1px solid #7d9398;border-radius:5px;min-height:70px;box-sizing:border-box}
+.game-director select{max-width:100%}.game-director label span{overflow-wrap:anywhere}
+
+/* screen passes (20 Sep): the crew's easyJet and the BA finale, drawn over the scene */
+.pass-jet{position:absolute;left:0;top:0;z-index:40;pointer-events:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25))}
+.pass-jet img{display:block;width:100%;height:auto}
+.pass-jet b{position:absolute;left:50%;top:42.5%;white-space:nowrap;font:700 20px/1 'Segoe UI','Helvetica Neue',Arial,sans-serif;letter-spacing:.06em;text-rendering:geometricPrecision}   /* the name is centred on the wing root, sized to the plane in game.js */
+.pass-jet-shadow{position:absolute;left:0;top:0;z-index:5;pointer-events:none;background:url(assets/game/airliner-v2.svg) center/contain no-repeat;filter:brightness(0) blur(4px);opacity:.3}
+
+/* TWILIGHT (20 Sep): dusk over the sea, the coast and the traffic; Corbière's light stays at full strength so it glows, a little
+   warmer and reaching further; the dolphins catch the last light. Off with ?day. */
+.game.twilight canvas.sea{filter:brightness(.86) saturate(.96) hue-rotate(5deg)}
+.game.twilight canvas.coast{filter:brightness(.74) saturate(.85) hue-rotate(-6deg) sepia(.1)}
+.game.twilight .world > :not(.lighthouse):not(.dolphin):not(.plane):not(.stationring){filter:brightness(.86) saturate(.9)}
+.game.twilight .scene::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:radial-gradient(120% 90% at 0% 45%,rgba(255,150,95,.13),rgba(255,150,95,0) 55%),linear-gradient(180deg,rgba(28,34,92,.13),rgba(8,18,52,.2));mix-blend-mode:multiply}
+.game.twilight .world .lighthouse{--c:255,236,188;z-index:4}
+.game.twilight .world .lighthouse .beam{height:900px;opacity:calc(.95 * var(--iso))}
+.game.twilight .world .lighthouse .halo{width:calc(340px * var(--k));height:calc(340px * var(--k));margin:calc(-170px * var(--k)) 0 0 calc(-170px * var(--k))}
+.game.twilight .lightglow{--c:255,236,188}
+.game.twilight .world .ob.dolphin img{animation:glisten 2.8s ease-in-out infinite}
+.game.twilight .world .ob.dolphin:nth-child(2n) img{animation-delay:-1.1s}
+.game.twilight .world .ob.dolphin:nth-child(3n) img{animation-delay:-2s}
+@keyframes glisten{0%,100%{filter:brightness(1) drop-shadow(0 0 0 rgba(255,240,215,0))}45%{filter:brightness(1.28) drop-shadow(0 0 2px rgba(255,240,215,.85))}55%{filter:brightness(1.12) drop-shadow(0 0 1px rgba(255,240,215,.5))}}
+.game.twilight .scene > .plan{z-index:4}   /* the dusk wash tints the sea; the plan (coast, traffic, Corbière) has its own dimming, so the light keeps its full glow */
+
+/* 21 Oct 2026, Simon: "i thought we added a button to exit the passage and return to scrolled?": the beat's overlay has its own pill (top left), but it was easy to miss and absent when game.html is opened directly. A plain exit link on the start card, and a pill in the top-left when the game is the whole page. */
+.card button.exitlink{display:block;margin:12px auto 0;padding:6px 10px;background:none;color:#cfe3e5;font:500 12px/1 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-decoration:underline;text-underline-offset:3px;opacity:.85}
+.card button.exitlink:hover{opacity:1;filter:none}
+.exitpill{position:fixed;left:18px;top:max(14px,env(safe-area-inset-top));z-index:60;appearance:none;border:0;cursor:pointer;padding:9px 14px;border-radius:999px;background:rgba(4,22,26,.7);color:#eaf4f5;font:500 12px/1 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}

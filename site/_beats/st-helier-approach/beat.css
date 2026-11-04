@@ -1,0 +1,275 @@
+/* st-helier-approach (derived from noirmont-transit, 4 Oct 2026) — scoped to .beat-st-helier-approach. Base ocean/hull/scrim/copy rules mirror seaway-wake's own
+   (the same real sea, same hull sprite, same look — continuing the crossing, not a new visual language). */
+.beat-st-helier-approach { background:#02484b; }
+.beat-st-helier-approach .beat-stage { background:#02484b; }
+.beat-st-helier-approach .socean { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.beat-st-helier-approach .sfallback { position:absolute; inset:0; background:#02484b center/cover; display:none; }
+.beat-st-helier-approach .sship { position:absolute; left:50%; top:50%; z-index:2; width:48.7rem; transform:translate(-50%,-50%); transform-origin:center; will-change:transform; pointer-events:none; filter:none; }
+.beat-st-helier-approach .sship img { display:block; width:100%; height:auto; transform-origin:center; }
+.beat-st-helier-approach .sscrim { position:absolute; inset:0; z-index:3; pointer-events:none; background:linear-gradient(180deg,rgba(4,7,14,.35) 0%,transparent 28%,transparent 70%,rgba(4,7,14,.55) 100%); }
+.beat-st-helier-approach .scopy { position:absolute; z-index:4; left:6vw; bottom:12vh; max-width:34rem; opacity:0; transform:translateY(18px); color:#e8f3f4; }
+.beat-st-helier-approach .beat-eyebrow { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:#e6fbf9; opacity:.85; margin:0 0 .6rem; }
+.beat-st-helier-approach .beat-sub { font-size:1.05rem; line-height:1.5; margin:0; }
+.beat-st-helier-approach.nogl .socean, .beat-st-helier-approach .nogl .socean { display:none; }
+.beat-st-helier-approach.nogl .sfallback, .beat-st-helier-approach .nogl .sfallback { display:block; }
+@media (max-width:767px){ .beat-st-helier-approach .sship { width:60vw; } }
+
+/* landmarks — Noirmont Point / Elizabeth Castle, positioned by JS relative to the hull as she passes each one
+   (real bearing/distance from her current lat/lng, not a fixed screen-x reveal — see beat.js's landmarkScreen()) */
+.beat-st-helier-approach .slandmark { position:absolute; z-index:4; display:flex; align-items:center; gap:8px; opacity:0;
+  pointer-events:none; transform:translate(-4px,-50%); transition:opacity .4s; }   /* the dot (7px) sits ON the projected point, label to its right — was centred on the whole dot+label, which pushed the dot off the spot */
+/* 3 Oct 2026, Simon: "apply the same label treatment to the elizabeth castle label and dot" — the dot now has the nav-aid dots' own
+   7px core + 3px ring + 6px glow (warm amber instead of a light colour), and the label the same outlined 13px/600 name at 60%. */
+.beat-st-helier-approach .slandmark::before { content:""; width:7px; height:7px; border-radius:50%; background:#f2b64a; box-shadow:0 0 0 3px rgba(242,182,74,.25), 0 0 6px rgba(242,182,74,.7); flex:none; }
+.beat-st-helier-approach .slandmark .name { margin:0; opacity:.6; font:600 13px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#fff; white-space:nowrap;
+  text-shadow:-2px 0 #031a1e,2px 0 #031a1e,0 -2px #031a1e,0 2px #031a1e,-1.5px -1.5px #031a1e,1.5px -1.5px #031a1e,-1.5px 1.5px #031a1e,1.5px 1.5px #031a1e,0 0 8px rgba(0,0,0,.8); }
+
+/* nav-aid marks (1 Oct 2026) — real charted marks from seamarks.json (NAVAID_NAMES, beat.js), positioned by true
+   3D projection (worldOffsetTo + camera.project), not the stylised bearing-offset slandmark technique above.
+   Each mark is either a cardinal icon (cardinalIcon(), inline SVG), a tower (Noirmont Point only), or — for a
+   plain lit lateral buoy with neither — just its own blinking dot. */
+/* 2 Oct 2026, Simon: "something's up with the nav aids... they jolt as you scroll, wobble back and forwards,
+   they need to be solid like the land" — real cause: left/top had their own CSS transition here, but JS already
+   sets accurate left/top every single frame from the real 3D projection (same as Corbière/the pilot station in
+   seaway-wake, and .slandmark just above, neither of which transitions left/top) — animating toward a target
+   that's already being updated every frame fights itself, lagging behind the true position and reading as a
+   wobble, worse the faster she moves on screen. Only opacity (the fade in/out) still transitions. */
+/* 3 Oct 2026: the mark is now a zero-size anchor sitting exactly on the projected lat/lng; the icon is centred on it and
+   the label hangs beside it (.name below). Before, the whole icon+label row was centred on the point, so the wider the
+   label got the further the icon was dragged off its real position (--half = half the icon's width, set from beat.js). */
+.beat-st-helier-approach .snavaid { position:absolute; z-index:1; width:0; height:0; opacity:0; --half:10px;
+  pointer-events:none; transition:opacity .4s; }
+/* the light sits physically on top of the real structure, so .mark-visual stacks the dot above whatever icon
+   (cardinal pillar / tower) follows it, instead of the two sitting side by side. */
+.beat-st-helier-approach .snavaid .mark-visual { position:absolute; left:0; top:0; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:2px; }
+.beat-st-helier-approach .snavaid svg { flex:none; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+.beat-st-helier-approach .snavaid img.tower { width:40px; min-width:40px; max-width:none; height:auto; flex:none; filter:drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+.beat-st-helier-approach .snavaid i.dot { width:7px; height:7px; border-radius:50%; flex:none; background:var(--lc,#fff);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--lc,#fff) 25%, transparent), 0 0 6px color-mix(in srgb, var(--lc,#fff) 70%, transparent);
+  transition:opacity .15s linear; }
+/* green lights: same 7px core and same glow footprint as the other colours (Simon: greens looked bigger than reds) — only the colour is brighter
+   and the glow a touch more intense, not wider */
+.beat-st-helier-approach .snavaid i.dot.g { box-shadow:0 0 0 3px rgba(61,255,122,.30), 0 0 6px rgba(61,255,122,.95); }
+/* a static (non-blinking) marker for a genuinely unlit mark with no cardinal/tower icon either (Oyster Beacon) */
+.beat-st-helier-approach .snavaid i.plain { width:6px; height:6px; border-radius:50%; flex:none; background:#d8f1fa; box-shadow:0 0 0 3px rgba(216,241,250,.22); }
+/* all lights (22 Oct 2026, Simon: "kept visible, outlined but dim, between flashes"): the marker is always there with a dark rim and a dim core; a flash brightens the core and lights the glow */
+.beat-st-helier-approach .snavaid i.dot.solid { background:color-mix(in srgb, var(--lc,#fff) 38%, rgba(6,20,26,.9)); box-shadow:0 0 0 1.5px rgba(6,20,26,.85), 0 0 0 3px color-mix(in srgb, var(--lc,#fff) 16%, transparent); }
+.beat-st-helier-approach .snavaid i.dot.solid.lit { background:var(--lc,#fff); box-shadow:0 0 0 1.5px rgba(6,20,26,.85), 0 0 0 4px color-mix(in srgb, var(--lc,#fff) 50%, transparent), 0 0 12px 2px color-mix(in srgb, var(--lc,#fff) 95%, transparent); }
+/* 3 Oct 2026, Simon: "make the labels that show the light sequences more visible, they are a bit hard to see/read" —
+   was 10.5px pale-blue text with only a faint shadow, sitting straight on bright satellite imagery. Now a dark
+   translucent pill (reads on any ground), 13px/600 white name, and the light sequence as its own larger
+   monospace span in a warm light colour, divided from the name by a hairline. */
+.beat-st-helier-approach .snavaid .name { position:absolute; top:0; left:calc(var(--half) + 8px); transform:translateY(-50%); margin:0; display:flex; align-items:center; gap:8px; padding:0; opacity:.6;   /* 3 Oct 2026, Simon: "now that they are outlined, fade them a bit"; 60% after a second pass — on the label only, so the mark's own show/hide fade (opacity on .snavaid) is untouched */
+ 
+  font:600 13px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#fff; white-space:nowrap;
+  /* 3 Oct 2026, Simon: "what if we just outline the text" — pill dropped for a dark outline (8-way 1.5px ring) + soft halo */
+  text-shadow:-2px 0 #031a1e,2px 0 #031a1e,0 -2px #031a1e,0 2px #031a1e,-1.5px -1.5px #031a1e,1.5px -1.5px #031a1e,-1.5px 1.5px #031a1e,1.5px 1.5px #031a1e,0 0 8px rgba(0,0,0,.8); }
+.beat-st-helier-approach .snavaid.lab-left .name { left:auto; right:calc(var(--half) + 8px); }   /* Noirmont Point: Pignonet is close on its east side, so its label goes west */
+.beat-st-helier-approach .snavaid .name .chr { font:600 12.5px/1.1 ui-monospace,Menlo,Consolas,monospace; letter-spacing:.03em; text-transform:none; color:#ffe7a3;
+  padding-left:0; border-left:0; }
+
+/* 4 Oct 2026: chapter copy sits top-left (the plotter owns the bottom-left corner here) and the door pills bottom-centre */
+.beat-st-helier-approach .scopy { top:9vh; bottom:auto; }
+/* the doors into the mini-games (28 Oct 2026, Simon: 'Take the helm' over the game's name, a play ring with 'Mini-game' under it; 'or keep scrolling' centred underneath) */
+.beat-st-helier-approach .splay { position:absolute; z-index:5; left:50%; bottom:9vh; transform:translate(-50%,0); appearance:none; border:0; background:none; padding:0; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:9px; color:#fff; font-family:'Jost',system-ui,sans-serif;
+  opacity:0; transition:opacity .35s, transform .35s; pointer-events:none; }
+.beat-st-helier-approach .splay.on { opacity:1; pointer-events:auto; }
+.beat-st-helier-approach .splay:hover { transform:translate(-50%,-2px); }
+.beat-st-helier-approach .splay .sp-door { position:relative; display:flex; align-items:stretch; background:rgba(6,10,18,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 10px 30px rgba(0,0,0,.35); }
+.beat-st-helier-approach .splay .sp-door::before { content:""; position:absolute; inset:0; padding:1px; background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.1)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.beat-st-helier-approach .splay .sp-door::after { content:""; position:absolute; left:0; bottom:-1px; height:3px; width:0; background:#FF8A1E; transition:width .25s ease; }
+.beat-st-helier-approach .splay:hover .sp-door::after, .beat-st-helier-approach .splay:focus-visible .sp-door::after { width:100%; }
+.beat-st-helier-approach .splay .sp-ic { min-width:62px; padding:8px 6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border-right:1px solid rgba(255,255,255,.2); }
+.beat-st-helier-approach .splay .sp-ic i { width:26px; height:26px; border:1.6px solid #fff; border-radius:50%; position:relative; flex:none; }
+.beat-st-helier-approach .splay .sp-ic i::after { content:""; position:absolute; left:9px; top:6.5px; border-left:8px solid #fff; border-top:5px solid transparent; border-bottom:5px solid transparent; }
+.beat-st-helier-approach .splay .sp-ic em { font:600 7.5px/1 'Jost',system-ui,sans-serif; font-style:normal; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.78); white-space:nowrap; }
+.beat-st-helier-approach .splay .sp-tx { padding:11px 20px 11px 15px; display:flex; flex-direction:column; justify-content:center; gap:6px; text-align:left; }
+.beat-st-helier-approach .splay .sp-tx b { font:600 10px/1 'Jost',system-ui,sans-serif; letter-spacing:.2em; text-transform:uppercase; color:#FF8A1E; white-space:nowrap; }
+.beat-st-helier-approach .splay .sp-tx .sp-name { font:600 15px/1.1 'Jost',system-ui,sans-serif; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+.beat-st-helier-approach .splay .sp-keep { font:500 11px/1 'Jost',system-ui,sans-serif; font-style:normal; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.72); text-shadow:0 1px 6px rgba(0,0,0,.6); text-align:center; }
+.beat-st-helier-approach .splay .sp-keep::before, .beat-st-helier-approach .splay .sp-keep::after { content:"↓"; display:inline-block; margin:0 .7em; color:#FF8A1E; font-size:13px; letter-spacing:0; }   /* a down arrow either side of 'or keep scrolling' */
+.beat-st-helier-approach .splay[hidden] { display:none; }
+
+/* the leading lights (22 Oct 2026): faint lead lines on the water, and a small panel showing what the master sees: the two lights stack when she is on the line */
+.beat-st-helier-approach .slead-lines { position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; overflow:visible; }
+/* the leading lines (31 Oct 2026): thin strips moved by a transform (see placeLeads), dashes drawn by a gradient from the end at the rear light; the dark one under the light one is the shadow the old SVG filter gave */
+.beat-st-helier-approach .lead-strip { position:absolute; left:0; top:0; z-index:1; pointer-events:none; will-change:transform; }
+.beat-st-helier-approach .lead-sh { height:4px; margin-top:-2px; background:repeating-linear-gradient(270deg, rgba(2,28,30,.5) 0 7px, transparent 7px 14px); }
+.beat-st-helier-approach .lead-ln { height:1.6px; margin-top:-.8px; background:repeating-linear-gradient(270deg, #e8f4ff 0 7px, transparent 7px 14px); }
+.beat-st-helier-approach .slead-hud { position:absolute; right:24px; bottom:28px; z-index:6; width:178px; padding:10px 8px 12px; background:rgba(8,16,22,.72); border:1px solid rgba(255,255,255,.18); border-radius:10px; backdrop-filter:blur(6px); text-align:center; color:#e8f4ff; pointer-events:none; opacity:0; font-family:ui-monospace,Menlo,Consolas,monospace; }
+.beat-st-helier-approach .slead-hud p { margin:0; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; }
+.beat-st-helier-approach .slead-hud .lh-title { color:#cfe3ee; margin-bottom:2px; }
+.beat-st-helier-approach .slead-hud .lh-state { margin-top:2px; color:#ffd98a; }
+.beat-st-helier-approach .slead-hud.on-line .lh-state { color:#7fe3d0; }
+.beat-st-helier-approach .slead-hud svg { display:block; margin:0 auto; overflow:visible; }
+.beat-st-helier-approach .slead-hud .lh-axis { stroke:rgba(255,255,255,.22); stroke-width:1; stroke-dasharray:3 4; }
+.beat-st-helier-approach .slead-hud circle { fill:color-mix(in srgb, var(--lc,#fff) 38%, rgba(6,20,26,.9)); stroke:rgba(6,20,26,.9); stroke-width:1.6; }
+.beat-st-helier-approach .slead-hud circle.lit { fill:var(--lc,#fff); filter:drop-shadow(0 0 5px var(--lc,#fff)); }
+
+/* channel markers (the red and green lateral buoys): smaller and dimmer than the lights that matter (22 Oct 2026, Simon) */
+.beat-st-helier-approach .snavaid.chan i.dot.solid { width:5px; height:5px; box-shadow:0 0 0 1.2px rgba(6,20,26,.8), 0 0 0 2.5px color-mix(in srgb, var(--lc,#fff) 12%, transparent); }
+.beat-st-helier-approach .snavaid.chan i.dot.solid.lit { background:color-mix(in srgb, var(--lc,#fff) 75%, rgba(6,20,26,.9)); box-shadow:0 0 0 1.2px rgba(6,20,26,.8), 0 0 0 3px color-mix(in srgb, var(--lc,#fff) 32%, transparent), 0 0 7px 1px color-mix(in srgb, var(--lc,#fff) 60%, transparent); }
+.beat-st-helier-approach .snavaid.chan .name { opacity:.4; font-size:11px; gap:6px; }
+.beat-st-helier-approach .snavaid.chan .name .chr { font-size:10px; }
+
+/* Hold the Line, flown in the scene (23 Oct 2026). The look follows "Play the arrival" (seaway-wake game.css / arrival.css): its title card, instrument strip, Harbour Master call card and slider bars with a grip. */
+.beat-st-helier-approach .sg { position:absolute; inset:0; z-index:8; pointer-events:none; font-family:'Jost',system-ui,sans-serif; color:#eaf4f5; }
+.beat-st-helier-approach .sg[hidden] { display:none; }
+.beat-st-helier-approach .sg button { pointer-events:auto; cursor:pointer; font:inherit; }
+.beat-st-helier-approach .sg-choice, .beat-st-helier-approach .sg-end { position:absolute; inset:0; display:none; align-items:center; justify-content:center; }
+.beat-st-helier-approach .sg-choice.on, .beat-st-helier-approach .sg-end.on { display:flex; }
+.beat-st-helier-approach .sg-card { pointer-events:auto; width:min(520px, calc(100vw - 32px)); max-height:calc(100% - 32px); overflow:auto; box-sizing:border-box; padding:30px 34px 26px; border-radius:14px; background:rgba(4,22,26,.78); backdrop-filter:blur(10px); box-shadow:0 20px 60px rgba(0,0,0,.45); text-align:center; }
+.beat-st-helier-approach .sg-eyebrow { margin:0 0 8px; font-size:11px; letter-spacing:.28em; text-transform:uppercase; color:#f2b64a; }
+.beat-st-helier-approach .sg-card h3 { margin:0 0 12px; font-size:clamp(26px,4vw,36px); line-height:1.08; font-weight:600; }
+.beat-st-helier-approach .sg-lead { margin:0 auto 18px; max-width:420px; font-size:15px; line-height:1.5; opacity:.85; }
+.beat-st-helier-approach .sg-btns { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.beat-st-helier-approach .sg-btn { appearance:none; border:0; padding:12px 26px; border-radius:999px; background:#f2b64a; color:#1a1408; font:600 15px/1 'Jost',system-ui,sans-serif; letter-spacing:.12em; text-transform:uppercase; box-shadow:0 8px 24px rgba(242,182,74,.35); }
+.beat-st-helier-approach .sg-btn:hover { filter:brightness(1.06); } .beat-st-helier-approach .sg-btn.alt { background:rgba(255,255,255,.12); color:#fff; box-shadow:none; }
+.beat-st-helier-approach .sg-stars { margin:0 0 6px; font-size:19px; line-height:1.5; color:#f2b64a; }
+.beat-st-helier-approach .sg-card dl { display:grid; grid-template-columns:auto auto; gap:4px 18px; margin:0 0 18px; font-size:14px; text-align:left; } .beat-st-helier-approach .sg-card dt { color:#9fc0c4; } .beat-st-helier-approach .sg-card dd { margin:0; text-align:right; }
+.beat-st-helier-approach .sg-hud { position:absolute; top:76px; left:max(50%,575px);   /* below the site header and clear of the AIS / flights pills on the left and Skip to CIPS on the right */
+   transform:translateX(-50%); display:flex; align-items:stretch; padding:7px 4px 8px; background:linear-gradient(180deg,rgba(18,26,30,.92),rgba(8,13,16,.92)); border:1px solid rgba(255,255,255,.1); border-radius:11px; box-shadow:0 6px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06); }
+.beat-st-helier-approach .sg-hud .g { position:relative; display:block; padding:0 13px; text-align:center; }
+.beat-st-helier-approach .sg-hud .g + .g::before { content:""; position:absolute; left:0; top:12%; bottom:12%; width:1px; background:rgba(255,255,255,.14); }
+.beat-st-helier-approach .sg-hud b { display:inline; font-size:24px; font-weight:700; color:#f4faf9; letter-spacing:.01em; line-height:1; font-variant-numeric:tabular-nums; }
+.beat-st-helier-approach .sg-hud i { font-style:normal; font-size:11px; font-weight:600; color:#8fd6c4; margin-left:2px; }
+.beat-st-helier-approach .sg-hud em { display:block; font-style:normal; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8399a4; margin-top:2px; }
+.beat-st-helier-approach .sg-hud .g.warn b { color:#f2b64a; } .beat-st-helier-approach .sg-hud .g.bad b { color:#ff8a7a; } .beat-st-helier-approach .sg-hud .g.ok b { color:#f4faf9; }
+.beat-st-helier-approach .sg:not(.playing) .sg-hud, .beat-st-helier-approach .sg:not(.playing) .sg-ctl, .beat-st-helier-approach .sg:not(.playing) .sg-wind, .beat-st-helier-approach .sg:not(.playing) .sg-vhf, .beat-st-helier-approach .sg:not(.playing) .sg-con, .beat-st-helier-approach .sg:not(.on) .sg-exit, .beat-st-helier-approach .sg.ended .sg-exit { display:none; }
+.beat-st-helier-approach .sg-vhf { position:absolute; left:24px; bottom:24px; width:250px; max-width:calc(100vw - 32px); display:flex; flex-direction:column; justify-content:flex-end; align-items:stretch; gap:8px; }   /* left / bottom are set from the plotter's box (placeVhf) so the calls stack up from just above it */
+.beat-st-helier-approach .sg-msg { display:grid; grid-template-columns:48px 1fr; grid-template-rows:19px auto; column-gap:9px; align-content:center; min-height:64px; padding:8px 12px 8px 8px; border:1px solid #93b8c96b; border-radius:13px; background:linear-gradient(125deg,#103249f2,#103f58e8); color:#f4fafb; box-shadow:0 3px 12px #001b2e38; font:13px/1.3 system-ui,sans-serif; box-sizing:border-box; animation:sgRise .35s ease; transition:opacity .45s, max-height .3s, min-height .3s, padding .3s; overflow:hidden; }
+.beat-st-helier-approach .sg-msg img { grid-row:1/3; width:48px; height:54px; border-radius:8px; object-fit:cover; align-self:center; }
+.beat-st-helier-approach .sg-msg b { font-size:12px; font-weight:750; letter-spacing:.07em; text-transform:uppercase; align-self:center; }
+.beat-st-helier-approach .sg-msg span { align-self:center; color:#e4f0f4; overflow-wrap:break-word; }
+.beat-st-helier-approach .sg-msg.noface { grid-template-columns:1fr; padding-left:12px; }
+.beat-st-helier-approach .sg-wind { position:absolute; right:24px; bottom:214px; box-sizing:border-box; width:178px; display:flex; align-items:center; gap:10px; padding:7px 12px 8px; background:linear-gradient(180deg,rgba(18,26,30,.92),rgba(8,13,16,.92)); border:1px solid rgba(255,255,255,.1); border-radius:11px; box-shadow:0 6px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06); }
+.beat-st-helier-approach .sg-wind .w-ring { fill:none; stroke:rgba(255,255,255,.28); stroke-width:1.2; } .beat-st-helier-approach .sg-wind .w-n { font:700 7px 'Jost',system-ui,sans-serif; fill:#8399a4; } .beat-st-helier-approach .sg-wind g line { stroke:#8fd6c4; stroke-width:2.2; stroke-linecap:round; } .beat-st-helier-approach .sg-wind g path { fill:#8fd6c4; }
+.beat-st-helier-approach .sg-wind em { display:block; font-style:normal; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:#8399a4; } .beat-st-helier-approach .sg-wind b { display:block; font-size:20px; font-weight:700; color:#f4faf9; line-height:1.15; font-variant-numeric:tabular-nums; } .beat-st-helier-approach .sg-wind b i { font-style:normal; font-size:11px; font-weight:600; color:#8fd6c4; margin-left:2px; }
+.beat-st-helier-approach .cur-g { transition:opacity .4s; pointer-events:none; } .beat-st-helier-approach .cur-line { stroke:#c4f1f2; stroke-width:1.8; stroke-linecap:round; stroke-dasharray:6 9; fill:none; filter:drop-shadow(0 0 3px rgba(2,30,34,.7)); } .beat-st-helier-approach .cur-head { fill:none; stroke:#c4f1f2; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 3px rgba(2,30,34,.7)); }
+.beat-st-helier-approach .cur-txt { font:600 10px 'Jost',system-ui,sans-serif; letter-spacing:.14em; text-transform:uppercase; fill:#c4f1f2; paint-order:stroke; stroke:rgba(2,30,34,.75); stroke-width:3px; }
+.beat-st-helier-approach .sg-msg.old { opacity:.5; }
+.beat-st-helier-approach .sg-msg.out { opacity:0; max-height:0; min-height:0; padding-top:0; padding-bottom:0; border-width:0; }
+@keyframes sgRise { from { opacity:0; max-height:0; min-height:0; transform:translateY(16px); } to { opacity:1; max-height:96px; min-height:64px; transform:none; } }
+@keyframes sgIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.beat-st-helier-approach .sg-ctl { position:absolute; right:24px; bottom:24px; width:clamp(380px, calc(100vw - 540px), 520px); pointer-events:auto; touch-action:none; filter:drop-shadow(0 8px 22px rgba(0,0,0,.45)); }   /* the bridge console (_shared/bridge-console.js): left of the lead panel, clear of the plotter */
+.beat-st-helier-approach .sg-small { position:absolute; padding:8px 12px; border:1px solid #bad3de48; border-radius:8px; background:#133748e6; color:#eef8fc; font:600 11px system-ui,sans-serif; cursor:pointer; }
+.beat-st-helier-approach .sg-small:hover { background:#1a4a60; }
+.beat-st-helier-approach .sg-con { left:auto; right:540px; bottom:24px; transform:none; } .beat-st-helier-approach .sg-exit { right:16px; top:122px; }
+.beat-st-helier-approach .sg.near-l::before, .beat-st-helier-approach .sg.near-r::before { content:''; position:absolute; top:0; bottom:0; width:22%; background:linear-gradient(90deg, rgba(255,150,70,.32), transparent); } .beat-st-helier-approach .sg.near-r::before { right:0; background:linear-gradient(270deg, rgba(255,150,70,.32), transparent); }
+.beat-st-helier-approach .lane-fill { fill:rgba(125,255,232,.07); stroke:none; opacity:0; }
+.beat-st-helier-approach .lane-edge { fill:none; stroke:#7dffe8; stroke-width:2; stroke-linecap:round; opacity:0; filter:drop-shadow(0 0 5px rgba(125,255,232,.85)); transition:stroke .15s; } .beat-st-helier-approach .lane-edge.hot { stroke:#ffb347; filter:drop-shadow(0 0 7px rgba(255,179,71,.95)); }
+@media (max-width:760px) { .beat-st-helier-approach .sg-ctl { right:auto; left:16px; bottom:150px; } .beat-st-helier-approach .sg-vhf { display:none; } }
+
+/* chapter 4, the quay at work (26 Oct 2026): the fuel readout, bottom right, in the same glass as the Hold the Line HUD */
+.beat-st-helier-approach .sq-read { position:absolute; right:24px; bottom:24px; z-index:5; opacity:0; pointer-events:none; display:grid; gap:2px; min-width:200px; padding:11px 18px 12px; background:linear-gradient(180deg,rgba(18,26,30,.92),rgba(8,13,16,.92)); border:1px solid rgba(255,255,255,.1); border-radius:10px; color:#f4faf9; box-shadow:0 12px 34px rgba(0,0,0,.4); }
+.beat-st-helier-approach .sq-read span { font-size:9px; letter-spacing:.16em; color:#8399a4; }
+.beat-st-helier-approach .sq-read b { font-size:30px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; letter-spacing:.01em; }
+.beat-st-helier-approach .sq-read i { font-style:normal; font-size:10px; letter-spacing:.06em; color:#8399a4; }
+/* the quay checklist (chapter 4, 26 Oct 2026): fuel, provisions, fresh water, waste; a row dims until its job starts, runs a bar while it goes, and ticks when it is done */
+.beat-st-helier-approach .sq-list { position:absolute; right:16px; top:124px; z-index:5; opacity:0; pointer-events:none; width:min(300px,calc(100vw - 48px)); padding:14px 16px 8px; color:#f4faf9; }
+.beat-st-helier-approach .sq-list::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(18,26,30,.93),rgba(8,13,16,.93)); border:1px solid rgba(255,255,255,.1); border-radius:10px; box-shadow:0 12px 34px rgba(0,0,0,.4); }
+.beat-st-helier-approach .sq-frame { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.beat-st-helier-approach .sq-frame rect { x:.8px; y:.8px; rx:10px; ry:10px; width:calc(100% - 1.6px); height:calc(100% - 1.6px); fill:none; stroke:#fff; stroke-width:1.6; stroke-dasharray:1; stroke-dashoffset:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.beat-st-helier-approach .sq-tris { display:inline-block; width:34px; height:9px; margin-right:12px; vertical-align:-1px; fill:#fff; }
+.beat-st-helier-approach .sq-tris polygon { opacity:0; }
+/* 29 Oct 2026, Simon: the three triangles pulse REALLY slowly (4.5 s a breath, each a little behind the one before) instead of flashing */
+@keyframes sqBreathe { 0%, 100% { opacity:1; } 50% { opacity:.25; } }
+.beat-st-helier-approach .sq-head { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#8399a4; margin-bottom:6px; }
+.beat-st-helier-approach .sq-row { position:relative; display:grid; grid-template-columns:18px 1fr auto; align-items:center; column-gap:10px; padding:7px 0 9px; border-top:1px solid rgba(255,255,255,.07); opacity:.42; transition:opacity .35s; }
+.beat-st-helier-approach .sq-row[data-state="active"], .beat-st-helier-approach .sq-row[data-state="done"] { opacity:1; }
+.beat-st-helier-approach .sq-row span { font-size:13px; font-weight:600; letter-spacing:.01em; line-height:1.15; }
+.beat-st-helier-approach .sq-row small { display:block; margin-top:1px; font-size:9.5px; font-weight:400; letter-spacing:.05em; color:#8399a4; }
+.beat-st-helier-approach .sq-row b { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+.beat-st-helier-approach .sq-tick { position:relative; width:16px; height:16px; border-radius:50%; border:1.5px solid rgba(255,255,255,.3); box-sizing:border-box; transition:background .3s, border-color .3s; }
+.beat-st-helier-approach .sq-row[data-state="active"] .sq-tick { border-color:#4fd1b5; }
+.beat-st-helier-approach .sq-row[data-state="done"] .sq-tick { background:#4fd1b5; border-color:#4fd1b5; }
+.beat-st-helier-approach .sq-row[data-state="done"] .sq-tick::after { content:""; position:absolute; left:4.5px; top:2px; width:4px; height:7px; border:solid #08141a; border-width:0 2px 2px 0; transform:rotate(45deg); }
+.beat-st-helier-approach .sq-row em { position:absolute; left:28px; right:0; bottom:3px; height:2px; background:rgba(255,255,255,.1); border-radius:1px; overflow:hidden; }
+.beat-st-helier-approach .sq-row em u { display:block; height:100%; background:#4fd1b5; transform:scaleX(0); transform-origin:0 50%; text-decoration:none; }
+.beat-st-helier-approach .sq-list.sq-pinned { left:0; top:0; right:auto; transform-origin:0 0; will-change:transform, opacity; }
+.beat-st-helier-approach .sq-lead { position:absolute; inset:0; width:100%; height:100%; z-index:7; pointer-events:none; overflow:visible; opacity:0; }
+/* the call-out, in the manner of the Lalabe film's captions: a thin white line that draws itself on, a crosshair that pings, a row of chevrons that flicker in, then the card wipes open and its title types out (28 Oct 2026, Simon) */
+.beat-st-helier-approach .sq-lead .sq-ln { stroke:#fff; stroke-width:1.6; stroke-linejoin:miter; stroke-dasharray:1; stroke-dashoffset:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.beat-st-helier-approach .sq-lead .sq-xh path { stroke:#fff; stroke-width:1.3; opacity:0; filter:drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+.beat-st-helier-approach .sq-lead .sq-pt { fill:#4fd1b5; stroke:#08141a; stroke-width:1.2; opacity:0; }
+.beat-st-helier-approach .sq-lead .sq-ring { stroke:#fff; stroke-width:1.2; opacity:0; transform-box:fill-box; transform-origin:center; }
+.beat-st-helier-approach .sq-lead.sq-on .sq-ln { animation:sqDraw .9s .12s cubic-bezier(.3,.7,.2,1) forwards; }
+.beat-st-helier-approach .sq-lead.sq-on .sq-xh path { animation:sqFade .35s 0s ease-out forwards; }
+.beat-st-helier-approach .sq-lead.sq-on .sq-pt { animation:sqFade .25s 0s ease-out forwards; }
+.beat-st-helier-approach .sq-lead.sq-on .sq-ring { animation:sqPing 1.6s .05s ease-out 2 forwards; }
+@keyframes sqDraw { to { stroke-dashoffset:0; } }
+@keyframes sqFade { from { opacity:0; } to { opacity:1; } }
+@keyframes sqFlick { 0% { opacity:0; } 14% { opacity:1; } 28% { opacity:.2; } 42% { opacity:1; } 56% { opacity:.4; } 100% { opacity:1; } }
+@keyframes sqPing { 0% { opacity:.9; transform:scale(.5); } 100% { opacity:0; transform:scale(2.6); } }
+.beat-st-helier-approach .sq-list.sq-on .sq-frame rect { animation:sqDraw 1.1s .85s cubic-bezier(.3,.7,.2,1) forwards, sqFrameOut .6s 2.5s ease-out forwards; }
+@keyframes sqFrameOut { to { opacity:0; } }
+.beat-st-helier-approach .sq-list.sq-on .sq-tris polygon { animation:sqFade .5s calc(1.3s + var(--j, 0) * .1s) ease-out forwards, sqBreathe 4.5s ease-in-out calc(2.1s + var(--j, 0) * .6s) infinite; }   /* the three triangles fade in, then pulse slowly (29 Oct 2026, Simon: not flashing) */
+.beat-st-helier-approach .sq-list.sq-on::before { animation:sqFillDown .8s 1.5s cubic-bezier(.4,.1,.2,1) backwards; }   /* the glass fills from the top down */
+@keyframes sqFillDown { from { clip-path:inset(0 0 100% 0); } to { clip-path:inset(0 0 0 0); } }
+.beat-st-helier-approach .sq-head span { display:inline-block; overflow:hidden; white-space:nowrap; vertical-align:bottom; }
+.beat-st-helier-approach .sq-list.sq-on .sq-head span { animation:sqType .8s 2.0s steps(19) backwards; }
+@keyframes sqType { from { max-width:0; } to { max-width:20em; } }
+.beat-st-helier-approach .sq-list.sq-on .sq-now { animation:sqFade .5s 2.3s ease-out backwards; }
+.beat-st-helier-approach .sq-list.sq-on .sq-row { animation:sqRow .45s calc(2.4s + var(--i, 0) * .09s) cubic-bezier(.2,.8,.2,1) backwards; }
+@keyframes sqRow { from { opacity:0; transform:translateX(-10px); } }
+@media (prefers-reduced-motion: reduce) { .beat-st-helier-approach .sq-frame rect { stroke-dashoffset:0; opacity:0; animation:none !important; } .beat-st-helier-approach .sq-tris polygon { opacity:1; animation:none !important; } .beat-st-helier-approach .sq-lead .sq-ln { stroke-dashoffset:0; animation:none !important; } .beat-st-helier-approach .sq-lead .sq-xh path, .beat-st-helier-approach .sq-lead .sq-pt { opacity:1; animation:none !important; } .beat-st-helier-approach .sq-list.sq-on, .beat-st-helier-approach .sq-list.sq-on * { animation:none !important; } }
+/* the 'now' line on the card (what is happening this moment) and the tags that follow the main actors (27 Oct 2026, Simon: make it clearer what is going on) */
+.beat-st-helier-approach .sq-now { min-height:34px; margin:2px 0 8px; padding:7px 10px 7px 12px; font-size:12.5px; font-weight:600; line-height:1.25; letter-spacing:.01em; color:#fff; background:rgba(79,209,181,.14); border-left:3px solid #4fd1b5; border-radius:0 6px 6px 0; }
+.beat-st-helier-approach .sq-tags { position:absolute; inset:0; z-index:4; pointer-events:none; overflow:hidden; }
+.beat-st-helier-approach .sq-tag { position:absolute; left:0; top:0; margin:-30px 0 0 14px; padding:3px 8px 4px; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; color:#fff; background:rgba(10,18,22,.86); border:1px solid rgba(255,255,255,.22); border-radius:6px; box-shadow:0 4px 14px rgba(0,0,0,.35); transition:opacity .3s; will-change:transform; }
+.beat-st-helier-approach .sq-tag::before { content:""; position:absolute; left:-9px; bottom:-8px; width:10px; height:10px; border-left:1.5px solid rgba(255,255,255,.5); border-bottom:1.5px solid rgba(255,255,255,.5); }
+@media (max-width:520px) {   /* phone: a compact card in the bottom-right corner, clear of the plotter on the left */
+  .beat-st-helier-approach .sq-list { right:10px; top:112px; width:164px; padding:8px 10px 3px; border-radius:8px; }
+  .beat-st-helier-approach .sq-head { font-size:8px; margin-bottom:3px; }
+  .beat-st-helier-approach .sq-now { min-height:30px; font-size:10.5px; padding:5px 7px 5px 9px; margin-bottom:5px; }
+  .beat-st-helier-approach .sq-tag { font-size:8.5px; padding:2px 6px 3px; margin:-24px 0 0 10px; }
+  .beat-st-helier-approach .sq-row { grid-template-columns:14px 1fr; column-gap:7px; padding:5px 0 8px; }
+  .beat-st-helier-approach .sq-row span { font-size:11px; }
+  .beat-st-helier-approach .sq-row small { display:none; }
+  .beat-st-helier-approach .sq-row b { grid-column:2; grid-row:2; text-align:left; font-size:10.5px; font-weight:600; color:#b9cad1; white-space:normal; }
+  .beat-st-helier-approach .sq-tick { width:13px; height:13px; grid-row:1 / span 2; }
+  .beat-st-helier-approach .sq-row[data-state="done"] .sq-tick::after { left:3.5px; top:1.5px; width:3px; height:6px; }
+  .beat-st-helier-approach .sq-row em { left:21px; }
+}
+
+/* The berthing game (30 Oct 2026, berth-game-ui.js): the ghost berth on the water, the lines bar, the red flash on a collision. The rest is Hold the Line's (.sg-*). */
+.beat-st-helier-approach .berth-ghost { fill:rgba(143,214,196,.10); stroke:rgba(190,240,228,.8); stroke-width:1.6; stroke-dasharray:7 6; stroke-linejoin:round; opacity:0; pointer-events:none; transition:opacity .4s; filter:drop-shadow(0 0 4px rgba(125,255,232,.5)); }
+.beat-st-helier-approach .sg-lines { position:static; box-sizing:border-box; width:100%; padding:10px 12px 12px; background:rgba(8,16,22,.78); border:1px solid rgba(255,255,255,.18); border-radius:10px; text-align:center; display:none; pointer-events:auto; backdrop-filter:blur(6px); }
+.beat-st-helier-approach .sg-lines.on { display:block; } .beat-st-helier-approach .sg:not(.playing) .sg-lines { display:none; }
+.beat-st-helier-approach .sg-lines .cap { margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#f2b64a; }
+.beat-st-helier-approach .sg-lines .track { position:relative; margin:0 auto; width:48px; height:150px; border-radius:8px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.28); cursor:pointer; touch-action:none; }
+.beat-st-helier-approach .sg-lines .zone { position:absolute; left:0; right:0; background:rgba(95,224,162,.45); border-top:2px solid #5fe0a2; border-bottom:2px solid #5fe0a2; }
+.beat-st-helier-approach .sg-lines .mk { position:absolute; left:-5px; right:-5px; top:50%; height:4px; margin-top:-2px; background:#fff; border-radius:2px; box-shadow:0 0 8px rgba(255,255,255,.85); }
+.beat-st-helier-approach .sg-lines.frozen .mk { background:#ff8a7a; box-shadow:0 0 8px rgba(255,138,122,.9); }
+.beat-st-helier-approach .sg-lines .hint { margin:9px 0 8px; font-size:12px; line-height:1.35; color:#dfeef2; } .beat-st-helier-approach .sg-lines .hint i { font-style:normal; font-size:10.5px; opacity:.65; }
+.beat-st-helier-approach .sg-lines .sg-small { position:static; width:100%; }
+.beat-st-helier-approach .sg-berth.hit::after { content:""; position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 140px 36px rgba(255,70,50,.5); animation:bgHit 2.4s ease-out forwards; }
+@keyframes bgHit { 0% { opacity:0; } 12% { opacity:1; } 100% { opacity:.35; } }
+.beat-st-helier-approach .sg-rcol { position:absolute; right:24px; bottom:214px; width:178px; display:flex; flex-direction:column; align-items:stretch; gap:8px; pointer-events:none; }
+.beat-st-helier-approach .sg-rcol > * { pointer-events:auto; } .beat-st-helier-approach .sg:not(.playing) .sg-rcol { display:none; }
+.beat-st-helier-approach .sg-rcol .sg-wind { position:static; right:auto; bottom:auto; width:100%; } .beat-st-helier-approach .sg-rcol .sg-pause { position:relative; z-index:3; width:100%; padding:8px 12px; letter-spacing:.14em; text-transform:uppercase; }
+/* the collision warning (Simon, 30 Oct 2026): red glowing edges up to five seconds before an impact that would be a collision, unless it is averted: --warn runs 0.12 to 1 as the impact nears */
+.beat-st-helier-approach .sg-berth.warning:not(.hit)::before { content:""; position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 calc(50px + 110px * var(--warn, .3)) calc(8px + 32px * var(--warn, .3)) rgba(255,64,44,calc(.28 + .5 * var(--warn, .3))); animation:bgWarn calc(1.3s - .85s * var(--warn, .3)) ease-in-out infinite alternate; }
+@keyframes bgWarn { from { opacity:.45; } to { opacity:1; } }
+/* Pause (Simon, 30 Oct 2026): the rest of the screen greys and fades behind a card with a Resume button; the Pause button above the wind dial stays on top and resumes too */
+.beat-st-helier-approach .sg-pausewrap { position:absolute; inset:0; z-index:2; display:none; align-items:center; justify-content:center; background:rgba(8,16,20,.5); -webkit-backdrop-filter:grayscale(.9) brightness(.75); backdrop-filter:grayscale(.9) brightness(.75); pointer-events:auto; }
+.beat-st-helier-approach .sg-berth.paused .sg-pausewrap { display:flex; }
+/* the closing line over the open sea at the end of the journey (31 Oct 2026, Simon; finale.js) */
+.beat-st-helier-approach .sfin-line { position:absolute; left:50%; bottom:15vh; z-index:7; width:min(94vw, 84rem); text-wrap:balance; text-align:center; pointer-events:none; opacity:0; }
+.beat-st-helier-approach .sfin-line span { font:300 clamp(30px, 4.6vw, 72px)/1.1 'Jost', system-ui, sans-serif; letter-spacing:-.01em; color:#fff; text-shadow:0 2px 28px rgba(2,24,32,.65), 0 0 2px rgba(2,24,32,.5); }
+/* the finale plays by itself; a click pauses it (1 Nov 2026) */
+.sfin-hit { position:absolute; inset:0; z-index:5; pointer-events:none; cursor:pointer; }
+.sfin-hit.on { pointer-events:auto; }
+.sfin-play { position:absolute; left:50%; top:50%; z-index:7; width:92px; height:92px; margin:-46px 0 0 -46px; border-radius:50%; border:2px solid rgba(255,255,255,.9); background:rgba(4,7,14,.5); cursor:pointer; padding:0; opacity:0; pointer-events:none; transform:scale(.9); transition:opacity .25s ease, transform .25s ease; }
+.sfin-play.on { opacity:1; pointer-events:auto; transform:scale(1); }
+.sfin-play i { position:absolute; left:50%; top:50%; width:0; height:0; margin:-17px 0 0 -10px; border-style:solid; border-width:17px 0 17px 30px; border-color:transparent transparent transparent #fff; }
+.sfin-play:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+/* 1 Nov 2026, Simon: the card closes slowly when the way out begins: it collapses up from the bottom (2.2 s) to the title and the 'All services complete' line, which holds and blinks twice, then the rest fades away. Scrolling back clears the class and the card is back. */
+@keyframes sqRowsOut { from { max-height:var(--rows-h, 220px); } to { max-height:0; } }
+@keyframes sqBlink { 0%, 100% { opacity:1; } 45% { opacity:.12; } }
+@keyframes sqOutFade { to { opacity:0; } }
+.beat-st-helier-approach .sq-list.sq-out { animation:sqOutFade .9s 3.8s ease-in forwards; }
+.beat-st-helier-approach .sq-list.sq-out .sq-rows { overflow:hidden; animation:sqRowsOut 2.2s cubic-bezier(.45,.05,.3,1) forwards; }   /* the rows shrink up from the bottom; the card's own glass (rounded, bordered) follows its height, so the bottom corners stay round */
+.beat-st-helier-approach .sq-list.sq-out .sq-now { animation:sqFade .5s 2.3s ease-out backwards, sqBlink .7s .1s ease-in-out 3 both; }   /* 1 Nov 2026, Simon: the message flashes WHILE the rows collapse (3 flashes over the 2.2 s), then holds still for 1.6 s, then the card fades */   /* (the first is the message's own fade-in from the card's opening, listed again so it is the SAME animation: switching this class on and off then only adds or removes the blink; it used to swap the fade-in for the blink and back, restarting the fade-in (message gone for 2.3 s) every time) */
+.beat-st-helier-approach .sq-lead.sq-out { animation:sqOutFade .9s 3.8s ease-in forwards; }
+@media (prefers-reduced-motion: reduce) { .beat-st-helier-approach .sq-list.sq-out, .beat-st-helier-approach .sq-lead.sq-out { animation:none !important; opacity:0 !important; } }

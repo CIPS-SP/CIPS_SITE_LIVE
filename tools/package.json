@@ -1,0 +1,10 @@
+{
+  "name": "cips-site-live-tools",
+  "private": true,
+  "description": "Editing helpers for the CIPS live site (never published). tailwind: compile the page classes. check: serve site/ on its own and confirm it is self-contained.",
+  "scripts": {
+    "tailwind": "tailwindcss -c tailwind.config.js -i tailwind.input.css -o ../site/css/tailwind.css --minify",
+    "check": "node check.mjs"
+  },
+  "devDependencies": { "tailwindcss": "3.4.17" }
+}

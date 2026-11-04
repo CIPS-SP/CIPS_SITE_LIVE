@@ -1,0 +1,30 @@
+/* nav-plotter.css — extracted from the real plotter's own look (_beats/seaway-wake/game.css, .plotter-box etc.),
+   trimmed to just this panel (drops the VHF/joystick/comms rules that live alongside it there). Class names kept
+   the same on purpose — this is the same instrument, just mountable in any beat. */
+.plotter-box{position:absolute;left:5vw;bottom:5vh;z-index:6;width:250px;border-radius:12px;
+  background:#1d2226;box-shadow:0 12px 34px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.08);
+  overflow:hidden;touch-action:none;cursor:grab;font-family:'Jost',system-ui,sans-serif}
+.plotter-top{position:relative;display:flex;justify-content:space-between;padding:6px 10px 5px;
+  font:600 9px/1 'Jost',system-ui,sans-serif;letter-spacing:.18em;color:#9fb3bf}
+.plotter-top .pfollow,.plotter-top .pfull{position:absolute;top:2px;appearance:none;border:0;
+  background:rgba(255,255,255,.1);color:#eaf4f5;border-radius:6px;width:20px;height:16px;font:600 11px/1 system-ui;cursor:pointer}
+.plotter-top .pfollow{right:8px}.plotter-top .pfull{right:32px;font-size:12px}
+.plotter-top .pfollow:hover,.plotter-top .pfull:hover{background:rgba(255,255,255,.22)}
+.plotter-box canvas.plotter{display:block;width:250px;height:250px}
+.plotter-box .pz{position:absolute;right:8px;top:32px;display:flex;flex-direction:column;gap:4px}
+.plotter-box .pz button{appearance:none;border:0;width:22px;height:22px;border-radius:6px;
+  background:rgba(20,26,30,.82);color:#eaf4f5;font:600 15px/1 system-ui;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.plotter-box .pz button:hover{background:rgba(40,50,56,.95)}
+.plotter-data{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#14181b}
+.plotter-data div{padding:6px 4px 6px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
+.plotter-data b{display:block;font:600 15px/1 'Jost',system-ui,sans-serif;color:#eaf4f5;letter-spacing:.02em;white-space:nowrap}
+.plotter-data span{display:block;font-size:8px;letter-spacing:.14em;color:#8a9ba6;margin-top:3px;text-transform:uppercase}
+.plotter-compact{transform:scale(.72);transform-origin:left bottom}
+.plotter-box.plotter-full{position:fixed;left:16px;right:16px;top:56px;bottom:max(16px,env(safe-area-inset-bottom));
+  width:auto;display:flex;flex-direction:column;z-index:9999;transform:none}
+.plotter-box.plotter-full canvas.plotter{width:100%;height:auto;flex:1;min-height:0}
+.plotter-box.plotter-full .plotter-top{font-size:11px;padding:9px 14px 8px}
+.plotter-box.plotter-full .plotter-top .pfollow,.plotter-box.plotter-full .plotter-top .pfull{top:5px;width:24px;height:20px;font-size:13px}
+.plotter-box.plotter-full .plotter-top .pfull{right:36px;font-size:14px}
+.plotter-box.plotter-full .plotter-data b{font-size:19px}.plotter-box.plotter-full .plotter-data span{font-size:9px}.plotter-box.plotter-full .plotter-data div{padding:9px 6px}
+@media (max-width:820px){.plotter-box{left:3vw;bottom:3vh;transform:scale(.72);transform-origin:left bottom}}
