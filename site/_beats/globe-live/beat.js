@@ -505,9 +505,11 @@ export async function mount(stage, o, ctx){
   /* the night aerial ON the sphere: the Channel region as a Web-Mercator tile mosaic (the same imagery + Black Marble lights
      recipe channel-night uses), draped on a sphere patch whose UVs are Mercator, so the picture the globe holds at its last
      frame is the picture the night map opens on — the crossfade between them has nothing to hide. */
+  /* go-live (4 Nov 2026, Simon): the map tiles are baked into assets/tiles (Esri World Imagery z7 over the Channel and z9 over the islands, NASA VIIRS Black Marble z7/z8, exactly the tiles the mosaic below asks for) so the page asks no outside server for them. */
+  const TILE_BASE = new URL('assets/tiles/', import.meta.url).href;
   const NIGHT = { z: 7, lonMin: -8.5, lonMax: 5.5, latMin: 46.8, latMax: 53.2, tint: 0.74,
-    imagery: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    lights: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_Black_Marble/default/2016-01-01/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png' };
+    imagery: TILE_BASE + 'esri/{z}/{y}/{x}.jpg',
+    lights: TILE_BASE + 'nasa/{z}/{y}/{x}.png' };
   const patches = [];   // { mesh, mat, in:[p0,p1] } — the tile pyramid on the sphere: z7 (Channel) → z9 (islands region) → the HD plate
   function mercUV() { const D2R = Math.PI / 180; return { tx: (lon, n) => (lon + 180) / 360 * n, ty: (lat, n) => (1 - Math.log(Math.tan(lat * D2R) + 1 / Math.cos(lat * D2R)) / Math.PI) / 2 * n }; }
   function patchGeometry(lonA, lonB, latA, latB, uvOf, radius, W = 96, H = 64) {

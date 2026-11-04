@@ -29,6 +29,7 @@ tools/    editing helpers, never published: the Tailwind compiler, the self-cont
 ## Rules that keep it self-contained
 
 - **No outside addresses**: no CDN scripts, web fonts, map tiles, images, APIs or analytics. Everything the page loads sits in `site/`. (Links people click, such as WhatsApp or LinkedIn, are fine.) The one allowed exception is the CIPS review drop box, set in `site/review/config.js`.
+- **Map tiles are baked in** (`site/_beats/globe-live/assets/tiles`: Esri World Imagery and NASA Black Marble, the 94 tiles the globe's night map uses; `tools/bake-tiles.py` shows how they were made). Credits are in the page footer; font licences in `site/fonts/OFL.txt`.
 - **Nothing is shared with other folders**: no `../` paths out of `site/`, no submodules, no copies pointing back at the old working repo.
 - **No unnecessary files**: nothing in `site/` that the pages do not use. No backups, notes, tools, or old versions.
 - **Files stay under 24 MiB** (Cloudflare Pages allows 25 MiB per file).
