@@ -21,7 +21,9 @@ Public website of Channel Island Port Services (cips.agency). Read `README.md` f
 - Reviews: the captain's review page is `site/review/`. Its answers go to the review drop box (Cloudflare Worker, code and README in `CIPS-TAG/CIPS/review-drop-box`), and the CIPS Desk (a separate project on Render) collects them. Design: `CIPS-TAG/CIPS/DOCS/SPEC-reviews.md`.
 - Hosting plan: Cloudflare Pages (output directory `site`, no build command), `dev` previews at `dev.<project>.pages.dev`, `main` goes to cips.agency. Never move nameservers or touch email DNS records.
 
+## The visitor's vessel (done 4 Nov 2026)
+`site/js/vessel.js` holds where the visitor is sailing from (Mediterranean = Monaco, Northern Europe = Rotterdam, Caribbean = St Maarten; Mediterranean default) and an optional vessel name (Kinship default), kept for the session, announced on `window` as a `cips:vessel` event. The globe's chooser panel (`site/js/globe-enhancements.js`, `arrangeDeparture`) sets it; the globe (`_beats/globe-live/beat.js`, `syncVesselFields`) replans the demo vessel's route and card title from it; the chart scene's tag, the enquiry form's vessel field and both mini-games (`_beats/seaway-wake/game.js`, `YACHT`) read it. "Observe the Channel Islands" and the ship list are gone (hidden, not deleted: the picker code still exists behind them).
+
 ## Open items (4 Nov 2026)
 - GitHub repo under CIPS_SP and the Cloudflare account/project (Simon to create).
-- Replace the "Find your ship" panel and the globe card wording that says every vessel is live (decision pending: "Tell us your vessel" or a plain button).
 - Deploy the review drop box and set `site/review/config.js`.

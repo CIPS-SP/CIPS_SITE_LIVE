@@ -75,5 +75,5 @@ export function currentVtsMessage({S,calls,cfg,pilot,lastMessage},format) {
 
 // Compact sender repetition only; the complete validated instruction stays in the detail dialog.
 export function compactInstruction(text) {
- return String(text).replace(/^Kinship,\s*(?:Pilots?|VTS)\.\s*/i,'Kinship: ').replace(/Please reduce speed to/i,'Reduce to').replace(/\bknots\b/gi,'kts');
+ return String(text).replace(/^([^,.]+),\s*(?:Pilots?|VTS)\.\s*/i,'$1: ').replace(/Please reduce speed to/i,'Reduce to').replace(/\bknots\b/gi,'kts');
 }

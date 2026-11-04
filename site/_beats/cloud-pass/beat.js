@@ -55,6 +55,9 @@ export async function mount(stage, o, ctx) {
   const aisEl = stage.querySelector('.ais');
   const aisTriEl = stage.querySelector('.ais-tri');
   if (aisTriEl) aisTriEl.style.transform = `rotate(${AIS_HEADING.toFixed(1)}deg)`;
+  // 4 Nov 2026, Simon: the tag carries the visitor's vessel name (js/vessel.js), Kinship unless they gave one
+  const aisTag = stage.querySelector('.ais-tag'), setTag = v => { if (aisTag && v && v.title && aisTag.firstChild) aisTag.firstChild.textContent = v.title; };
+  setTag(window.CIPS_VESSEL); window.addEventListener('cips:vessel', e => setTag(e.detail));
   if (titleEl) { if (o.title) { titleEl.querySelector('.beat-eyebrow').textContent = o.title.eyebrow; titleEl.querySelector('.beat-title').textContent = o.title.text; } else titleEl.remove(); }
   if (o.chart && chartEl) buildChannelChart(chartEl, { flights: true, tss: true, towns: true, yards: o.yards }).then(c => { chart = c; chart.offsetX = o.chartOffsetX; }).catch(e => console.warn('[cloud-pass] chart failed', e));
   const t0 = performance.now();

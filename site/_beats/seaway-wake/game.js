@@ -548,6 +548,9 @@ const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2,
    line; and CIPS — Simon — for the pilot, the water taxi, the crew change, fuel, and the stores (with the Captain's Hamper). */
 const CM = { log: $('[data-comms="log"]'), ch: $('[data-comms="ch"]'), menu: $('[data-comms="menu"]'), stores: $('[data-comms="stores"]'), storesHead: $('[data-comms="storeshead"]'), vtsBtn: $('[data-act="vts"]'), vtsLabel: $('[data-comms="vtslabel"]') };
 const YACHT = { name: 'Kinship', len: 70, draught: 3.8, pob: 12, from: 'St Malo' };
+// 4 Nov 2026, Simon: the visitor's vessel name and departure (js/vessel.js, set on the home page; this game runs in an overlay frame of it) carry through: the pilot, the Coastguard and VTS use the name
+try { const v = (window.parent !== window && window.parent.CIPS_VESSEL) || JSON.parse(sessionStorage.getItem('cips.vessel') || 'null'); if (v && v.name) { YACHT.name = v.name; if (v.dep && v.dep.place) YACHT.from = v.dep.place; } } catch (_) {}
+document.querySelectorAll('[data-vessel]').forEach(el => { el.textContent = YACHT.name; });
 const commsFilter=createCommsFilter();
 let voiceStatus='Sound is off. VHF text is always available.';
 const radioVoice=createRadioVoice({config:CFG.comms,getTime:()=>S.t,

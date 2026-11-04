@@ -270,6 +270,7 @@ export async function mount(stage, o, ctx){
   // below: real vh math off the CURRENT progress instead of an absolute DOM position (GLOBE_LIVE_VH, defined further
   // down but already assigned by the time this ever actually runs, since it's only ever called from a later click).
   function jumpToObserve() {
+    return;   // 4 Nov 2026, Simon: "Observe the Channel Islands" is gone with the live traffic it was for (the words in the strip no longer jump there)
     if (voyageMonitorArmed) return;   // already there — nothing to do
     resetVoyageExample(); resetVoyageRoute();
     stage.classList.remove('voyage-gate'); voyageCta.hidden = true;
@@ -637,9 +638,24 @@ export async function mount(stage, o, ctx){
       kin = { mesh, mat, pts, ar };
       // planVoyageRoute() (defined further down, needs kin.pts for its tail) is a plain function declaration,
       // hoisted within this same scope — safe to call here even though its definition appears later in the file.
-      try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); } catch (e) { console.warn('[globe-live] Kinship-from-Monaco route unavailable, falling back to her own track', e); }
+      syncVesselFields();   // the visitor's departure and vessel name (js/vessel.js), if they have already chosen
+      try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); } catch (e) { console.warn('[globe-live] route from the departure unavailable, falling back to her own track', e); }
     } catch (e) { console.warn('[globe-live] Kinship sprite unavailable', e); }
   }
+  // 4 Nov 2026, Simon: the visitor chooses where they are sailing from (js/vessel.js: Mediterranean = Monaco, Northern Europe = Rotterdam, Caribbean = St Maarten)
+  // and may name the vessel (Kinship if not). The demo vessel's start, its route (the same lane planner the real-ship routes use) and the title on
+  // its card follow that choice; with no choice it is exactly Kinship from Monaco as before.
+  let vesselDep = null;
+  function syncVesselFields() {
+    const v = window.CIPS_VESSEL; if (!v || !v.dep) return false;
+    KIN_ORIGIN.lat = v.dep.lat; KIN_ORIGIN.lng = v.dep.lng; KIN_ORIGIN.name = v.dep.place; KIN_CALLOUT.content.title = v.title;
+    const changed = vesselDep !== v.departure; vesselDep = v.departure; return changed;
+  }
+  window.addEventListener('cips:vessel', e => {
+    const changed = syncVesselFields();
+    if (changed && kin) { try { kinRoute = planVoyageRoute(KIN_ORIGIN.lat, KIN_ORIGIN.lng); console.log('[globe-live] departure', KIN_ORIGIN.name, Math.round(kinRoute.total), 'nm'); } catch (err) { console.warn('[globe-live] route from', KIN_ORIGIN.name, 'unavailable', err); } }
+    if (e.detail && e.detail.focus) live?.focusOn?.(KIN_ORIGIN.lng, KIN_ORIGIN.lat);   // choosing a departure turns the globe to it
+  });
   // 25 Sep 2026, Simon: "try something else" — a nautical convention instead of an abstract heading offset. The
   // card sits off her AFT QUARTER (150° from the bow — the classic "always visible, never in the way" spot,
   // between dead astern and abeam), one fixed distance out, port or starboard; if her own quarter position is

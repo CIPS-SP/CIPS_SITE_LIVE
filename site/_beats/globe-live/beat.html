@@ -10,7 +10,7 @@
   <div class="globeCopy">
     <p class="eyebrow text-[12px]">The Atlantic Gateway&nbsp;C.I.</p>
     <h1>Your ship.<br><span class="l2">Our islands.</span></h1>
-    <p class="gsub">Every vessel on the feed is on this globe. Find yours, and we will show you the way in — past the busiest lanes in the world to a port that is expecting you.</p>
+    <p class="gsub">The Channel Islands sit at the Atlantic Gateway. Tell us where you’re sailing from and we’ll show you the journey.</p>
     <!-- Voyage Planner Phase 2 (16 Sep 2026): the CTA is what unlocks scrolling into the fly-in — see the scroll gate
          in beat.js. Before it's resolved the globe is still fully drag/orbit-able, just not scrollable past this point.
          Clicking it opens the ship finder (.lpanel) directly — no intermediate choice screen (17 Sep 2026, Simon: the
@@ -33,9 +33,9 @@
   <div class="lpanel" data-live="panel">
     <!-- Voyage Planner (16 Sep 2026): closes the picker and takes the captain back to the opening CTA, gate re-engaged. -->
     <button type="button" class="lclose" data-live="panelClose" aria-label="Close and start over">&times;</button>
-    <div class="lhead"><b>Find your ship</b><span class="lstatus wait" data-live="status">connecting…</span><button class="lexpand" data-live="expand" type="button" aria-expanded="false" title="Ships in the area">Ships nearby <i>&#9662;</i></button></div>
+    <div class="lhead"><b>Where are you sailing from?</b><span class="lstatus wait" data-live="status">connecting…</span><button class="lexpand" data-live="expand" type="button" aria-expanded="false" title="Ships in the area">Ships nearby <i>&#9662;</i></button></div>
     <input class="lsearch" data-live="search" type="search" placeholder="Vessel name or MMSI" autocomplete="off" spellcheck="false" />
-    <button type="button" class="lexample" data-g="voyageExample">Bring in a demo vessel</button>
+    <button type="button" class="lexample" data-g="voyageExample">Start the journey</button>
     <!-- 17 Sep 2026, Simon: a second, neutral way in — same scroll-unlock mechanism as "Bring in a demo vessel"
          (below, beat.js), just without picking any particular ship as the story — and Kinship's own scripted
          marker/callout are suppressed for real (voyageMonitorMode, placeKinship()) so it's genuinely vessel-free,
@@ -56,7 +56,7 @@
          above "Change ship": shown (beat.js tick()) from the moment the demo vessel is armed until the first real scroll, and again if they scroll back
          to the top. The live route's own pulsing "Scroll to see your route" button stays in its card (no longer hidden by the compact toggle). -->
     <span class="lcue" data-g="voyageCue" hidden aria-live="polite" title="Scroll to continue your journey"><span>Scroll to continue</span><i aria-hidden="true">&darr;</i></span>   <!-- moved into .lhead (beside the "Your voyage" title) by beat.js -->
-    <button type="button" class="lchange" data-g="voyageChange">Change ship</button>
+    <button type="button" class="lchange" data-g="voyageChange">Change departure</button>
     <!-- Voyage Planner Phase 3, 2nd pass (17 Sep 2026): selecting a ship now automatically centres/marks her (beat.js
          faceQuat + live.js's pulsing chevron) — no "Show her" step needed. "Follow this ship" (was "Take me in") is
          the one committing action left on the card: hides the finder (stage.following, see beat.css) and opens her
@@ -70,7 +70,7 @@
        rather than keeping the whole panel up throughout (which would undercut that reveal): this small pill fades in
        exactly as the finder fades out, and reopens it (forced fully visible from then on) on click. See
        voyagePanelForced in beat.js. -->
-  <button type="button" class="lreopen" data-g="voyageReopenPanel" aria-label="Change ship" style="opacity:0;pointer-events:none">Change ship</button>
+  <button type="button" class="lreopen" data-g="voyageReopenPanel" aria-label="Change departure" style="opacity:0;pointer-events:none">Change departure</button>
   <!-- 17 Sep 2026, Simon: a second option, stacked under "Change ship"/"Choose a ship to enter the port" —
        "Observe the Channel Islands" needed a way to carry on toward the port without picking a vessel first. Only
        shown while voyageMonitorMode is active (beat.js tick()); jumps straight to seaway-wake's own p=0 (relabelled

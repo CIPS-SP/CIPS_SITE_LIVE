@@ -98,10 +98,10 @@ export function installGlobeEnhancements(root = '#beats') {
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
   if (voyageButton) { voyageButton.textContent = 'Play the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
   const pickerTitle = stage.querySelector('[data-live="panel"] .lhead b');
-  if (pickerTitle) pickerTitle.textContent = 'Choose your ship';
+  if (pickerTitle) pickerTitle.textContent = 'Where are you sailing from?';
 
   installShipPicker(stage);
-  arrangeChooser(stage, S);
+  arrangeDeparture(stage, S);
   addSkipLink(stage, R);
   extendNudges(stage, S);
   installVoyagePrompt(stage, {readyLabel: 'Scroll to see your route (simulated)', dismissOnScroll: false});   // keep Simon's pulsing prompts up
@@ -119,36 +119,53 @@ export function installGlobeEnhancements(root = '#beats') {
   const hint = stage.querySelector('[data-g="hint"]');
   if (hint) hint.textContent = 'Swipe to rotate · scroll to move on';
   const invitation = stage.querySelector('.gsub');
-  if (invitation) invitation.textContent = 'Every vessel on the AIS feed is on this globe. Find yours, and we\u2019ll show you the way here \u2013 past the busiest shipping lanes in the world to a port you\u2019ll want to call home.';
+  if (invitation) invitation.textContent = 'The Channel Islands sit at the Atlantic Gateway. Tell us where you\u2019re sailing from and we\u2019ll show you the journey.';
   const globeCanvas = stage.querySelector('canvas');
   if (globeCanvas && matchMedia('(pointer:coarse)').matches) globeCanvas.style.touchAction = 'pan-y';
 }
 
-// --- change 2 (21 Sep 2026): ships first in the chooser, then the two alternatives ---
-function arrangeChooser(stage, S) {
+// --- departure chooser (4 Nov 2026, Simon): replaces the ship finder. Three departure points, an optional vessel name (Kinship if left blank), then "Start the journey".
+// The choice lives in js/vessel.js (window.CIPS_VESSEL); the globe (beat.js) follows it: the route from that start and the vessel's card title. The chart tag, the enquiry
+// form and the mini-games read it too. "Observe the Channel Islands" and the ship list went with the live traffic they were for.
+function arrangeDeparture(stage, S) {
   const panel = stage.querySelector('[data-live="panel"]');
-  const search = stage.querySelector('[data-live="search"]');
-  const results = stage.querySelector('[data-live="results"]');
-  const demo = stage.querySelector('[data-g="voyageExample"]');
-  if (!panel || !search || !results || !demo || panel.querySelector('.choose-hint')) return;
-  const hint = document.createElement('p');
-  hint.className = 'choose-hint';
-  hint.textContent = 'Click a ship to choose it, or search by name';
-  panel.insertBefore(hint, search);
-  panel.insertBefore(results, demo);          // the ships sit directly under the search box
-  const or = document.createElement('div');
-  or.className = 'choose-or';
-  or.innerHTML = '<span>or</span>';
-  panel.insertBefore(or, demo);
+  const start = stage.querySelector('[data-g="voyageExample"]');
+  const V = window.CIPS_VESSEL;
+  if (!panel || !start || !V || panel.querySelector('.depart')) return;
+  const group = document.createElement('div');
+  group.className = 'depart'; group.setAttribute('role', 'group'); group.setAttribute('aria-label', 'Where are you sailing from?');
+  for (const d of Object.values(V.departures)) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'depart-opt'; b.dataset.dep = d.key; b.textContent = d.label;
+    b.setAttribute('aria-pressed', d.key === V.departure ? 'true' : 'false');
+    b.addEventListener('click', () => {
+      V.set({ departure: d.key }, { focus: true });
+      for (const o of group.querySelectorAll('.depart-opt')) o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+    });
+    group.appendChild(b);
+  }
+  const nameBox = document.createElement('label');
+  nameBox.className = 'depart-name';
+  nameBox.innerHTML = '<span>Your vessel\u2019s name <em>(optional)</em></span><input type="text" maxlength="40" placeholder="Kinship" autocomplete="off" spellcheck="false">';
+  const input = nameBox.querySelector('input');
+  if (V.custom) input.value = V.name;
+  input.addEventListener('input', () => V.set({ name: input.value }));
+  start.before(group);
+  start.before(nameBox);
   const style = document.createElement('style');
   style.textContent = `
-    ${S} [data-live="panel"] .choose-hint{margin:10px 0 8px;font-size:12px;line-height:1.4;color:#FF8A1E;letter-spacing:.02em}
-    ${S} [data-live="expand"]{display:none!important}
-    ${S}:not(.globe-ship-selected) [data-live="results"]{display:block!important;max-height:min(260px,32vh);overflow-y:auto;margin:8px 0 4px;border:1px solid rgba(255,255,255,.12);border-radius:8px}
-    ${S} [data-live="results"] li{cursor:pointer}
-    ${S} [data-live="panel"] .choose-or{display:flex;align-items:center;gap:10px;margin:12px 0 8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-    ${S} [data-live="panel"] .choose-or::before,${S} [data-live="panel"] .choose-or::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.15)}
-    ${S}.globe-ship-selected [data-live="panel"] .choose-hint,${S}.globe-ship-selected [data-live="panel"] .choose-or{display:none}
+    ${S} [data-live="panel"] [data-live="search"],${S} [data-live="panel"] [data-live="results"],${S} [data-live="panel"] [data-live="expand"],${S} [data-live="panel"] [data-live="status"],
+    ${S} [data-live="panel"] [data-g="voyageMonitor"],${S} [data-live="panel"] [data-live="card"],${S} [data-live="panel"] .lactions{display:none!important}
+    ${S} .depart{display:grid;gap:8px;margin:14px 0 4px}
+    ${S} .depart-opt{position:relative;padding:12px 14px;border:1px solid rgba(255,255,255,.28);border-radius:0;background:rgba(6,10,18,.55);color:#fff;text-align:left;cursor:pointer;font:600 12px/1.2 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;min-height:44px}
+    ${S} .depart-opt:hover{border-color:#fff}
+    ${S} .depart-opt[aria-pressed="true"]{border-color:#FF8A1E;color:#FF8A1E;background:rgba(255,138,30,.10)}
+    ${S} .depart-name{display:block;margin:14px 0;color:rgba(255,255,255,.72);font:500 11px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.08em}
+    ${S} .depart-name em{font-style:normal;opacity:.7}
+    ${S} .depart-name input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:11px 12px;border:1px solid rgba(255,255,255,.28);border-radius:0;background:rgba(6,10,18,.6);color:#fff;font:500 14px 'Jost',system-ui,sans-serif;letter-spacing:.04em}
+    ${S} .depart-name input:focus{outline:0;border-color:#FF8A1E}
+    ${S} .depart-name input::placeholder{color:rgba(255,255,255,.45)}
+    ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name{display:none!important}
     @media(max-width:820px){
       ${S}:not(.globe-intro):not(.following) [data-live="panel"]{top:calc(env(safe-area-inset-top) + 160px)!important;max-height:calc(100vh - 190px);max-height:calc(100dvh - 190px)}
     }
@@ -202,7 +219,7 @@ function extendNudges(stage, S) {
     if (busy || !panel.classList.contains('gate-pulse')) return;   // his voyagePulse() just fired on the panel
     busy = true; setTimeout(() => { busy = false; }, 2800);         // same 2.8 s spacing as his
     if (stage.classList.contains('globe-ship-selected')) restart(stage.querySelector('.lvoyage .ltake') || stage.querySelector('[data-live="follow"]'));
-    else { restart(stage.querySelector('[data-live="results"]')); restart(panel.querySelector('.choose-hint')); }
+    else restart(stage.querySelector('[data-g="voyageExample"]'));
   }).observe(panel, {attributes: true, attributeFilter: ['class']});
 
   // A swipe up on a phone is a scroll attempt too: hand it to his wheel listeners while scrolling is held
@@ -220,8 +237,7 @@ function extendNudges(stage, S) {
 
   const style = document.createElement('style');
   style.textContent = `
-    ${S} [data-live="results"].gate-pulse{animation:voyagePanelGatePulse 1.4s ease-in-out 2}
-    ${S} [data-live="panel"] .choose-hint.gate-pulse{animation:chooseHintPulse 1.4s ease-in-out 2}
+    ${S} [data-g="voyageExample"].gate-pulse{animation:voyageCtaPulse 1.4s ease-in-out 2}
     ${S} [data-live="follow"].gate-pulse{animation:voyageCtaPulse 1.4s ease-in-out 2}
     @keyframes chooseHintPulse{0%,100%{text-shadow:none;color:#FF8A1E}50%{text-shadow:0 0 12px rgba(255,138,30,.85);color:#ffb070}}
   `;
