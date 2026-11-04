@@ -17,7 +17,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(here, '../site');
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(n);
-const only = flag('--desktop') || flag('--phone') || flag('--pages');
+const only = flag('--desktop') || flag('--phone') || flag('--pages') || flag('--doors');
 const want = (n) => !only || flag(n);
 const CHROME = (() => { const i = args.indexOf('--chrome'); if (i >= 0) return args[i + 1]; for (const p of ['C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', '/usr/bin/google-chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']) if (existsSync(p)) return p; throw new Error('Chrome not found: pass --chrome <path>'); })();
 
@@ -40,7 +40,7 @@ const chrome = spawn(CHROME, ['--headless=new', '--remote-debugging-port=' + DBG
 async function connect() { for (let i = 0; i < 60; i++) { try { return (await (await fetch('http://127.0.0.1:' + DBG + '/json/new?about:blank', { method: 'PUT' })).json()).webSocketDebuggerUrl; } catch (e) { await sleep(500); } } throw new Error('Chrome did not start'); }
 
 const requested = new Set(), problems = { missing: new Map(), outside: new Map(), errors: [] };
-async function run(label, page, mobile, scroll) {
+async function run(label, page, mobile, scroll, after) {
   const c = new WebSocket(await connect()); await new Promise((r) => (c.onopen = r));
   let id = 0; const pend = new Map(); const reqs = new Map();
   c.onmessage = (e) => { const m = JSON.parse(e.data);
@@ -71,6 +71,7 @@ async function run(label, page, mobile, scroll) {
     console.log(`  ${label}: scrolled ${steps} steps, page height ${h}`);
     await sleep(4000);
   } else console.log('  ' + label + ': loaded');
+  if (after) { await after(send); console.log('  ' + label + ': done'); }
   c.close();
 }
 
@@ -79,6 +80,14 @@ try {
   if (want('--desktop')) await run('home desktop', 'index.html', false, true);
   if (want('--phone')) await run('home phone', 'index.html', true, true);
   if (want('--pages')) for (const p of PAGES) await run(p, p, false, false);
+  // the doors that open on a click: the seaway game (its modules, pictures and sounds load in an overlay)
+  if (want('--doors')) await run('door: Play the arrival', 'index.html?goto=seaway-wake:0.04', false, false, async (send) => {
+    await sleep(12000);
+    await send('Runtime.evaluate', { expression: "(()=>{const b=document.querySelector('[data-play]'); if(b){ b.hidden=false; b.click(); return 'clicked'; } return 'no button'; })()" });
+    await sleep(18000);
+    const r = await send('Runtime.evaluate', { expression: "(()=>{const f=document.querySelector('.splay-overlay iframe'); return f ? 'overlay open, game frame ' + (f.contentDocument ? f.contentDocument.title : '?') : 'no overlay'; })()", returnByValue: true });
+    console.log('  game: ' + r.result.result.value);
+  });
 } finally { chrome.kill(); server.close(); }
 
 // ---- report ----

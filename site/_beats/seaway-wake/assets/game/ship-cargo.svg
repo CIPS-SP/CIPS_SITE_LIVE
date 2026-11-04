@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 240" width="64" height="240">
+  <!-- a small cargo ship / coaster in plan, bow up: dark hull, buff deck, three hatches forward, the bridge and funnel aft. Original drawing (HLC lab). -->
+  <defs><linearGradient id="hull" x1="0" x2="1"><stop offset="0" stop-color="#1e3a55"/><stop offset=".5" stop-color="#2b5078"/><stop offset="1" stop-color="#1a3149"/></linearGradient></defs>
+  <path d="M32 4 C44 30 54 58 54 96 L54 214 C54 226 46 234 32 236 C18 234 10 226 10 214 L10 96 C10 58 20 30 32 4 Z" fill="url(#hull)"/>
+  <path d="M32 14 C42 38 49 62 49 98 L49 210 C49 220 42 228 32 229 C22 228 15 220 15 210 L15 98 C15 62 22 38 32 14 Z" fill="#c9b98f"/>
+  <rect x="20" y="64" width="24" height="34" rx="2" fill="#7c2f2a" stroke="#4a1a17" stroke-width="1"/>
+  <rect x="20" y="104" width="24" height="34" rx="2" fill="#7c2f2a" stroke="#4a1a17" stroke-width="1"/>
+  <rect x="20" y="144" width="24" height="34" rx="2" fill="#7c2f2a" stroke="#4a1a17" stroke-width="1"/>
+  <rect x="17" y="186" width="30" height="30" rx="3" fill="#eef1f2" stroke="#8a949a" stroke-width="1"/>
+  <rect x="22" y="190" width="20" height="8" rx="1" fill="#2a3b48"/>
+  <circle cx="32" cy="212" r="4.5" fill="#d8b64a" stroke="#6b5a20" stroke-width="1"/>
+  <circle cx="32" cy="28" r="2.2" fill="#eef1f2"/>
+  <path d="M26 44 L38 44" stroke="#8a7a52" stroke-width="1.5"/>
+</svg>

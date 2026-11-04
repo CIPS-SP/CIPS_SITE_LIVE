@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 120 120" width="120" height="120">
+  <!-- plan view of a narrow-body airliner (A320 family proportions: 37.6 m long, 34.1 m span), nose up, plain white so the airline name can be painted on. Original drawing, same flat-vector style as the ship sprites. -->
+  <defs>
+    <linearGradient id="fus" x1="0" x2="1"><stop offset="0" stop-color="#a6b6c4"/><stop offset=".2" stop-color="#e6edf3"/><stop offset=".5" stop-color="#fbfdff"/><stop offset=".8" stop-color="#e6edf3"/><stop offset="1" stop-color="#a6b6c4"/></linearGradient>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafcfd"/><stop offset=".55" stop-color="#e5ebf0"/><stop offset="1" stop-color="#c8d2db"/></linearGradient>
+    <linearGradient id="nac" x1="0" x2="1"><stop offset="0" stop-color="#b3bec7"/><stop offset=".35" stop-color="#f4f6f8"/><stop offset=".65" stop-color="#ffffff"/><stop offset="1" stop-color="#b3bec7"/></linearGradient>
+    <g id="half" stroke-linejoin="round">
+      <!-- engine first, so the wing covers it: the nacelle hangs under the wing on its pylon and only the intake and fan cowl show ahead of the leading edge (A320: centreline 5.75 m out) -->
+      <rect x="73.5" y="40.6" width="7" height="14" rx="3.3" fill="url(#nac)" stroke="#8f9ba5" stroke-width=".6"/>
+      <path d="M73.9 44.2 A3.1 3.1 0 0 1 80.1 44.2" fill="none" stroke="#7d8993" stroke-width=".55"/><ellipse cx="77" cy="42.4" rx="2.6" ry="1.1" fill="#ffffff" opacity=".85"/>
+      <!-- main wing: 27 degrees of leading-edge sweep, root chord about 6.4 m, tip chord about 1.4 m, the trailing edge kinking back outboard of the engine; sharklet at the tip -->
+      <path d="M60 38.7 L110.5 64.5 L110.9 68.9 L80 61.9 L60 60.4 Z" fill="url(#wing)" stroke="#8f9ba5" stroke-width=".7"/>
+      <path d="M110.2 65 C111.6 62 112.2 60 112.4 58.6 L112.8 67.8 L110.9 68.9 Z" fill="#dfe5e9" stroke="#8f9ba5" stroke-width=".6"/>
+      <path d="M67 44.6 L109.6 65.9" stroke="#c0cad1" stroke-width="1.1" fill="none"/>
+      <path d="M68 55.6 L80 56.5 L80 61.9 L68 61 Z M81 57.2 L98 61 L98 65.8 L81 62 Z" fill="#eef1f3" stroke="#aab5bd" stroke-width=".5"/>
+      <path d="M99.4 62.3 L109.6 65.1 L109.9 68.5 L99.4 66 Z" fill="#e2e7ea" stroke="#aab5bd" stroke-width=".5"/>
+      <path d="M70 50 L96 56.6 M72 53 L80 54.4 M84 56.8 L106 61.6" stroke="#bcc6cd" stroke-width=".4" fill="none"/>
+      <g fill="#f7f9fa" stroke="#9aa6af" stroke-width=".4"><ellipse cx="73" cy="62.4" rx=".9" ry="2.4" transform="rotate(-8 73 62.4)"/><ellipse cx="89" cy="65.2" rx=".9" ry="2.4" transform="rotate(-8 89 65.2)"/><ellipse cx="103" cy="68.6" rx=".8" ry="2" transform="rotate(-8 103 68.6)"/></g>
+      <!-- tailplane (12.45 m span, 29 degrees of sweep) and elevator -->
+      <path d="M62 92.4 L78.4 101 L78.7 105.9 L62 104.9 Z" fill="url(#wing)" stroke="#8f9ba5" stroke-width=".7"/>
+      <path d="M62.4 99.8 L78.2 103.8" stroke="#b4bec6" stroke-width=".45" fill="none"/>
+    </g>
+  </defs>
+  <use xlink:href="#half"/><use xlink:href="#half" transform="translate(120,0) scale(-1,1)"/>
+  <!-- fuselage over the wing roots, a pale fairing where wing meets body, the fin along the spine -->
+  <path d="M60 4 C63.2 4.6 65.4 9 65.8 17 L65.8 84 C65.8 98 63 108 61.4 115 L58.6 115 C57 108 54.2 98 54.2 84 L54.2 17 C54.6 9 56.8 4.6 60 4 Z" fill="url(#fus)" stroke="#8f9ba5" stroke-width=".7" stroke-linejoin="round"/>
+  <path d="M60 4 C61.7 4.3 63.1 5.8 63.7 8.4 L56.3 8.4 C56.9 5.8 58.3 4.3 60 4 Z" fill="#cdd4da"/>
+  <!-- cockpit windscreen from above: a thin chevron band of six panes just behind the nose cone -->
+  <path d="M56.9 12.3 L58.6 10.9 L60 10.5 L61.4 10.9 L63.1 12.3 L62.7 13.7 L61.2 12.6 L60 12.3 L58.8 12.6 L57.3 13.7 Z" fill="#24303a"/>
+  <path d="M58.6 10.9 L58.8 12.6 M60 10.5 L60 12.3 M61.4 10.9 L61.2 12.6" stroke="#6b7a86" stroke-width=".3" fill="none"/>
+  <ellipse cx="60" cy="51" rx="8" ry="14.5" fill="#ffffff" opacity=".45"/>
+  <path d="M60 17 L60 88" stroke="#d3dadf" stroke-width=".4" fill="none"/>
+  <rect x="59.1" y="88" width="1.8" height="25" rx=".9" fill="#e6eaed" stroke="#aab5bd" stroke-width=".4"/>
+  <path d="M59.2 104.6 L60.8 104.6" stroke="#aab5bd" stroke-width=".4"/>
+  <!-- navigation lights (red port, green starboard) with a soft halo, and white anti-collision strobes that blink -->
+  <circle cx="9.4" cy="64.6" r="2.4" fill="#ff3b30" opacity=".22"/><circle cx="9.4" cy="64.6" r=".85" fill="#ff4a40"/>
+  <circle cx="110.6" cy="64.6" r="2.4" fill="#2ee86b" opacity=".22"/><circle cx="110.6" cy="64.6" r=".85" fill="#35f070"/>
+  <g fill="#ffffff" opacity="0">
+    <circle cx="9.8" cy="68.2" r="1.5"><animate attributeName="opacity" values="0;1;0;0;1;0;0;0;0;0" dur="1.7s" repeatCount="indefinite"/></circle>
+    <circle cx="110.2" cy="68.2" r="1.5"><animate attributeName="opacity" values="0;1;0;0;1;0;0;0;0;0" dur="1.7s" begin=".35s" repeatCount="indefinite"/></circle>
+    <circle cx="60" cy="114.3" r="1.4"><animate attributeName="opacity" values="0;0;0;1;0;0;0;0;0;0" dur="1.7s" repeatCount="indefinite"/></circle>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 180" width="60" height="180">
+  <!-- an all-weather lifeboat in plan, bow up: dark blue hull, orange wheelhouse and decks, the mark on the wheelhouse roof. Original drawing (HLC lab). -->
+  <path d="M30 3 C 44 22, 54 52, 54 96 L 54 164 C 54 172, 48 177, 40 177 L 20 177 C 12 177, 6 172, 6 164 L 6 96 C 6 52, 16 22, 30 3 Z" fill="#153a6b"/>
+  <path d="M30 12 C 42 30, 49 56, 49 96 L 49 160 C 49 167, 45 171, 39 171 L 21 171 C 15 171, 11 167, 11 160 L 11 96 C 11 56, 18 30, 30 12 Z" fill="#f28c1d"/>
+  <rect x="17" y="60" width="26" height="62" rx="9" fill="#ff9f2e" stroke="#c96f0f" stroke-width="1.4"/>
+  <rect x="20" y="64" width="20" height="9" rx="3" fill="#26343f"/>
+  <g fill="#153a6b"><circle cx="21" cy="150" r="3"/><circle cx="39" cy="150" r="3"/></g>
+  <rect x="22" y="24" width="16" height="6" rx="3" fill="#c96f0f"/>
+</svg>

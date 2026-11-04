@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 60" width="24" height="60">
+  <!-- a sea kayak in plan, bow up: yellow hull, the paddler, the paddle across. Original drawing (HLC lab). -->
+  <path d="M12 2 C 17 14, 19 26, 19 34 C 19 44, 16 54, 12 58 C 8 54, 5 44, 5 34 C 5 26, 7 14, 12 2 Z" fill="#f2c318"/>
+  <line x1="-2" y1="28" x2="26" y2="36" stroke="#3a3a3a" stroke-width="1.6"/>
+  <circle cx="12" cy="32" r="3.4" fill="#c8302e"/>
+</svg>

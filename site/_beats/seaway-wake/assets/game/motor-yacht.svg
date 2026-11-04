@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 120" width="40" height="120">
+  <!-- a motor yacht in plan, bow up: white hull, teak decks, flybridge amidships, tender aft. Original drawing (HLC lab). -->
+  <path d="M20 3 C29 22 34 44 34 70 L34 104 C34 112 28 117 20 118 C12 117 6 112 6 104 L6 70 C6 44 11 22 20 3 Z" fill="#f4f6f7" stroke="#aab4ba" stroke-width="1"/>
+  <path d="M20 12 C27 28 31 48 31 70 L31 102 C31 108 26 112 20 113 C14 112 9 108 9 102 L9 70 C9 48 13 28 20 12 Z" fill="#d9c39a"/>
+  <path d="M20 40 C26 46 29 56 29 68 L29 88 C29 92 25 95 20 95 C15 95 11 92 11 88 L11 68 C11 56 14 46 20 40 Z" fill="#f7f9fa" stroke="#b7c0c5" stroke-width="1"/>
+  <rect x="13" y="58" width="14" height="22" rx="4" fill="#3b5566"/>
+  <rect x="12" y="98" width="16" height="9" rx="4" fill="#6d7d86"/>
+  <path d="M15 22 L25 22" stroke="#9aa6ac" stroke-width="1"/>
+</svg>

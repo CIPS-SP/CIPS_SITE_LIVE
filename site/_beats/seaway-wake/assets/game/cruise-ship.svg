@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 520" width="120" height="520">
+  <!-- a small cruise ship in plan, bow up, at anchor: white hull and superstructure, sun decks, a pool aft, the funnel. Original drawing (HLC lab). -->
+  <path d="M60 4 C 90 50, 108 120, 108 240 L 108 490 C 108 504, 98 512, 84 512 L 36 512 C 22 512, 12 504, 12 490 L 12 240 C 12 120, 30 50, 60 4 Z" fill="#2f3f55"/>
+  <path d="M60 14 C 86 58, 102 124, 102 240 L 102 488 C 102 498, 95 504, 84 504 L 36 504 C 25 504, 18 498, 18 488 L 18 240 C 18 124, 34 58, 60 14 Z" fill="#f7f8f6"/>
+  <rect x="26" y="90" width="68" height="360" rx="20" fill="#eef0ec" stroke="#cfd4cd" stroke-width="1.5"/>
+  <rect x="32" y="100" width="56" height="26" rx="9" fill="#26343f"/>
+  <g fill="#d8dcd5"><rect x="38" y="150" width="44" height="7" rx="3"/><rect x="38" y="170" width="44" height="7" rx="3"/><rect x="38" y="190" width="44" height="7" rx="3"/><rect x="38" y="210" width="44" height="7" rx="3"/></g>
+  <rect x="44" y="270" width="32" height="46" rx="8" fill="#c8302e"/>
+  <rect x="40" y="360" width="40" height="52" rx="10" fill="#4fb8e6"/>
+  <g fill="#f2b64a"><circle cx="34" cy="440" r="3"/><circle cx="46" cy="440" r="3"/><circle cx="74" cy="440" r="3"/><circle cx="86" cy="440" r="3"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 190" width="70" height="190">
+  <!-- a fishing trawler in plan, bow up: dark green hull, buff deck, the wheelhouse forward, the gantry and the net drum aft. Original drawing (HLC lab). -->
+  <path d="M35 3 C 52 24, 64 58, 64 110 L 64 172 C 64 181, 57 186, 48 186 L 22 186 C 13 186, 6 181, 6 172 L 6 110 C 6 58, 18 24, 35 3 Z" fill="#1f4d3a"/>
+  <path d="M35 12 C 49 32, 58 62, 58 110 L 58 170 C 58 177, 53 181, 47 181 L 23 181 C 17 181, 12 177, 12 170 L 12 110 C 12 62, 21 32, 35 12 Z" fill="#c9b280"/>
+  <rect x="20" y="46" width="30" height="40" rx="7" fill="#f0eee6" stroke="#8d8a7a" stroke-width="1.2"/><rect x="23" y="50" width="24" height="9" rx="3" fill="#26343f"/>
+  <rect x="14" y="120" width="42" height="5" rx="2" fill="#5a5a5a"/><rect x="14" y="150" width="42" height="5" rx="2" fill="#5a5a5a"/>
+  <circle cx="35" cy="138" r="9" fill="#3d3d3d"/><circle cx="35" cy="138" r="5" fill="#7c6f4c"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="80">
+  <!-- a shoal of surface fish: a dark rippling patch with the flash of many small backs. Original drawing (HLC lab). -->
+  <ellipse cx="60" cy="40" rx="56" ry="34" fill="#0c3a44" opacity=".35"/>
+  <ellipse cx="60" cy="40" rx="40" ry="24" fill="#0a2f38" opacity=".35"/>
+  <g fill="#cfe9f0" opacity=".85">
+    <ellipse cx="30" cy="34" rx="3" ry="1.1" transform="rotate(-20 30 34)"/><ellipse cx="44" cy="26" rx="3" ry="1.1" transform="rotate(10 44 26)"/><ellipse cx="58" cy="22" rx="3" ry="1.1" transform="rotate(-8 58 22)"/>
+    <ellipse cx="74" cy="28" rx="3" ry="1.1" transform="rotate(15 74 28)"/><ellipse cx="88" cy="38" rx="3" ry="1.1" transform="rotate(-12 88 38)"/><ellipse cx="80" cy="52" rx="3" ry="1.1" transform="rotate(20 80 52)"/>
+    <ellipse cx="62" cy="58" rx="3" ry="1.1" transform="rotate(-15 62 58)"/><ellipse cx="44" cy="54" rx="3" ry="1.1" transform="rotate(8 44 54)"/><ellipse cx="34" cy="46" rx="3" ry="1.1" transform="rotate(-25 34 46)"/>
+    <ellipse cx="52" cy="40" rx="3" ry="1.1" transform="rotate(5 52 40)"/><ellipse cx="68" cy="42" rx="3" ry="1.1" transform="rotate(-18 68 42)"/>
+  </g>
+</svg>

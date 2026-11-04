@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Corbière from above: a rocky islet, the white tower with its red lantern, a wash of surf round the rocks. Original drawing. -->
+  <path d="M60 8 C 80 6, 104 22, 108 44 C 112 66, 100 90, 80 104 C 62 116, 30 110, 18 92 C 6 74, 8 44, 22 26 C 32 14, 46 9, 60 8 Z" fill="rgba(255,255,255,.28)"/>
+  <path d="M60 18 C 76 16, 94 28, 98 46 C 102 64, 92 84, 76 96 C 60 106, 34 100, 26 84 C 16 68, 20 46, 32 32 C 40 23, 50 19, 60 18 Z" fill="#6d6459"/>
+  <path d="M58 26 C 70 24, 84 34, 86 48 C 88 62, 80 78, 68 86 C 56 92, 40 88, 34 74 C 28 62, 32 44, 42 34 C 47 29, 52 27, 58 26 Z" fill="#8a7f70"/>
+  <g fill="#5a5148" opacity=".6"><ellipse cx="44" cy="70" rx="7" ry="4"/><ellipse cx="74" cy="42" rx="6" ry="3.5"/><ellipse cx="70" cy="80" rx="5" ry="3"/></g>
+  <circle cx="60" cy="56" r="13" fill="#cfd6d8"/><circle cx="60" cy="56" r="11" fill="#f6f7f5"/>
+  <circle cx="60" cy="56" r="5.5" fill="#d32f2f"/><circle cx="60" cy="56" r="2.2" fill="#ffe082"/>
+  <rect x="58.5" y="70" width="3" height="18" fill="#cfd6d8"/>
+</svg>

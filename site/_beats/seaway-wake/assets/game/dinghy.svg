@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 60" width="44" height="60">
+  <!-- a racing dinghy in plan, bow up: white hull, the sail eased out to port, the helm aft. The club's mark goes on the sail. Original drawing (HLC lab). -->
+  <path d="M22 6 C 28 16, 31 30, 31 42 L 31 54 C 31 57, 29 58, 26 58 L 18 58 C 15 58, 13 57, 13 54 L 13 42 C 13 30, 16 16, 22 6 Z" fill="#f7f8f6" stroke="#9aa19d" stroke-width="1"/>
+  <path class="sail" d="M22 22 L 22 50 L 2 40 Z" fill="#ffffff" stroke="#b9bfc4" stroke-width="1" opacity=".95"/>
+  <circle cx="22" cy="50" r="2" fill="#26343f"/>
+</svg>
