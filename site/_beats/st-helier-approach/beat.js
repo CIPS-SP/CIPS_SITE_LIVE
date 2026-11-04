@@ -539,6 +539,7 @@ export async function mount(stage, o, ctx) {
   // ---- plotter: measured against THIS path (so cross-track error stays meaningful past the last charted point) ----
   let plotZoom = 0;
   let curSpeed = 12;   // noirmont's figure at the start; follows o.speed
+  let exitFix = null;   // chapter 5: where the plotter says the yacht is while the "Leaving St Helier" film plays ({ pos, hdg, kn }), null the rest of the time
   const tilt = o.tilt !== false ? mountTiltShift(stage) : null;   // the miniature look: top and bottom of the frame softly blurred (see _shared/tilt-shift.js)
 // The plotter's grey dashed lines here are the real transits, not Howard's old pilotage tail: GEO.pilotage past East Rock (index 5) was an unverified straight line to the harbour that contradicts the leading lights (23 Oct 2026, Simon),
   // so it is cut at East Rock, and the Small Road lead and the Pier Head lead are drawn dashed instead, from out at sea (tailNm) to the rear light.
@@ -547,7 +548,32 @@ export async function mount(stage, o, ctx) {
   // The planned track keeps its tail (23 Oct 2026, Simon: "our solid line drops away from behind us"): the plotter's route starts back at the old Noirmont route, so the line she has come along stays drawn behind her as she zooms in.
   const plotRoute = [ROUTE[0], ROUTE[1], ROUTE[2], ...NODES], plotNames = ['Western Passage', 'East Rock', ...PLOT_NAMES];   // (the beat now starts on the leg after ROUTE[2], East Rock gate)
   const plotGEO = Object.assign({}, GEO, { names: plotNames, pilotage: GEO.pilotage.slice(0, 6), leadLines });
-  const plotter = o.nav !== false ? mountNavPlotter(stage, { GEO: plotGEO, route: plotRoute, shipLatLng: () => curPos, headingDeg: () => curHdg, speedKts: () => curSpeed, zoomTarget: () => plotZoom, hiChart: [{ src: ctx.base + 'assets/chart-mid.webp', meta: ctx.base + 'assets/chart-mid.json', from: 0.25, span: 0.10 }, { src: ctx.base + 'assets/chart-hi.webp', meta: ctx.base + 'assets/chart-hi.json', from: 0.8, span: 0.4 }]   /* the wide z16 chart over the whole approach from a quarter of the main chart's scale, the sharp z18 harbour chart over it for the closest zooms (23 Oct 2026, Simon: the sharp chart showed as a rectangle) */, compact: coarse, assetsBase: seaway, markNames: NAVAID_UNNAMED }) : null;
+  // ---- chapter 5, the way out (4 Nov 2026, Simon: "make sure the plotter updates and tracks relative to the vessel positions on the video clips of the yacht leaving the harbour and small roads") ----
+  // The film (videos/journey/journey-6-departure.mp4, 15.4 s) is scrubbed by the scroll over pz 2.20 to 2.62 (videoMoments, above) and leaves the berth, goes up the channel, out between the pier heads and
+  // along the Small Roads to open water. While it plays, the plotter's ship goes the same way: back along the arrival path, then on back along the arrival route (EXIT), at the film's own time.
+  // FILM_KEYS: [seconds into the film, nm along EXIT, knots], read off the film's frames (0 to 3.5 s the berth and the basin, 4.5 to 7.5 s the aerials of the harbour and the pier heads, 9 to 12 s overhead on the water in the
+  // Small Roads, 13.5 s on far out). Tune them here if the ship on the plotter ever runs ahead of, or behind, the yacht in the picture.
+  const EXIT = (() => {
+    const pts = DENSE.pts.slice().reverse().concat([ROUTE[2], ROUTE[1], ROUTE[0]]), cum = [0];
+    for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + nmBetween(pts[i - 1], pts[i]));
+    const total = cum[cum.length - 1];
+    const dOf = ll => { let best = 0, bd = Infinity; pts.forEach((q, i) => { const d = nmBetween(q, ll); if (d < bd) { bd = d; best = i; } }); return cum[best]; };
+    const pos = d => { d = Math.max(0, Math.min(total, d)); let lo = 0, hi = cum.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] <= d) lo = m; else hi = m; }
+      const t = cum[hi] > cum[lo] ? (d - cum[lo]) / (cum[hi] - cum[lo]) : 0; return [lerp(pts[lo][0], pts[hi][0], t), lerp(pts[lo][1], pts[hi][1], t)]; };
+    const hdg = d => { const a = pos(d - 0.012), b = pos(d + 0.012), cosLat = Math.cos(a[0] * Math.PI / 180); return ((Math.atan2((b[1] - a[1]) * cosLat, b[0] - a[0]) * 180 / Math.PI) + 360) % 360; };
+    return { pos, hdg, dOf, total, dStart: DENSE.total };
+  })();
+  const FILM_S = 15.35, FILM_PZ = [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
+  const FILM_KEYS = (() => { const dK = EXIT.dOf(K_TURN), dGap = EXIT.dOf(GAP_MID), dX = EXIT.dOf(X_TURN), dS = EXIT.dStart;
+    return [[0, 0, 0.3], [1.5, 0.03, 1.5], [3.5, 0.5 * dK, 3.5], [4.5, 0.85 * dK, 4.5], [6.0, dK, 5], [7.5, dGap, 5], [9.0, dX, 6.5], [12.0, dS, 10.5], [13.5, dS + 0.5, 12], [15.4, Math.min(EXIT.total, dS + 1.4), 13]]; })();
+  function exitAt(pz, hdg0) {   // the plotter's ship at this point of the scroll: null until the film starts
+    if (pz <= FILM_PZ[0]) return null;
+    const tf = clamp01((pz - FILM_PZ[0]) / (FILM_PZ[1] - FILM_PZ[0])) * FILM_S;
+    let i = 0; while (i < FILM_KEYS.length - 2 && tf > FILM_KEYS[i + 1][0]) i++;
+    const a = FILM_KEYS[i], b = FILM_KEYS[i + 1], k = clamp01((tf - a[0]) / (b[0] - a[0])), d = lerp(a[1], b[1], k), out = EXIT.hdg(d);
+    return { pos: EXIT.pos(d), hdg: hdg0 + (((out - hdg0 + 540) % 360) - 180) * smooth(0, 3, tf), kn: lerp(a[2], b[2], k) };   // she starts on the berth's heading and swings onto the way out over the first three seconds
+  }
+  const plotter = o.nav !== false ? mountNavPlotter(stage, { GEO: plotGEO, route: plotRoute, shipLatLng: () => exitFix ? exitFix.pos : curPos, headingDeg: () => exitFix ? exitFix.hdg : curHdg, speedKts: () => exitFix ? exitFix.kn : curSpeed, zoomTarget: () => plotZoom, hiChart: [{ src: ctx.base + 'assets/chart-mid.webp', meta: ctx.base + 'assets/chart-mid.json', from: 0.25, span: 0.10 }, { src: ctx.base + 'assets/chart-hi.webp', meta: ctx.base + 'assets/chart-hi.json', from: 0.8, span: 0.4 }]   /* the wide z16 chart over the whole approach from a quarter of the main chart's scale, the sharp z18 harbour chart over it for the closest zooms (23 Oct 2026, Simon: the sharp chart showed as a rectangle) */, compact: coarse, assetsBase: seaway, markNames: NAVAID_UNNAMED }) : null;
   const vm = (o.video !== false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage, { moments: o.videoMoments.map(m => Object.assign({ src: ctx.base + '../../videos/journey/' + m.file + '.mp4', poster: ctx.base + '../../videos/journey/' + m.file + '.jpg' }, m)), plotter, reduced: ctx.reduced }) : null;
   let cardClosed = false;
   const finHost = ctx && ctx.layer ? ctx.layer.parentElement : null, fin = (o.finaleTail > 0 && finHost) ? createFinale({ stage, host: finHost, reduced: ctx.reduced, tail: o.finaleTail }) : null;   // the closing line and the shrink into the home page (finale.js); only in the pinned page, not in a stand-alone demo
@@ -727,6 +753,7 @@ export async function mount(stage, o, ctx) {
     let hdg = bgs ? hdgPath : hdgPath + hdgYaw * smooth(o.berthYaw[0], o.berthYaw[1], p);
     curHdg = hdg; curSpeed = bgs ? bgs.groundKn() : gm ? gm.u : scoreAt(p, o.speed.map(s => ({ p: s.p, scale: s.k })));
     // chapter 5, the way out (31 Oct 2026, Simon): the yacht swings off the berth and goes back down the channel the way she came (the arrival path in reverse, out to just beyond the entrance) while the camera lifts and follows her
+    exitFix = (r > 0 && !gm && !bgs && o.exitSync !== false) ? exitAt(pz, curHdg) : null;   // (the plotter only: the picture behind it is the film)
     let finDisp = null;   // her displacement from the berth, metres north and east: the sea moves past by the same amount
     if (false && r > 0 && !gm && !bgs) {   // 31 Oct 2026, Simon: no yacht coming off the berth, just zoom out and cut straight to the film (switched off, not deleted)
       const mv = smooth(0.05, 0.30, r), u2 = lerp(1, Math.max(0, U_X - 0.04), mv), bp = posAtU(1);
@@ -742,7 +769,7 @@ export async function mount(stage, o, ctx) {
     const fx = FX0;   // (chapter framing moves come later)
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), visW = 2 * camH * tanH * camera.aspect, visHw = 2 * camH * tanH; let off = (0.5 - fx) * visW;
     /* the end frame (10 Oct, Simon: show both vessels from above, plotter out of the way): over the last stretch the camera drifts from Kinship to the middle of the two berths and a touch east and north, so all three yachts (the two berths and the NNQ yacht across the channel) show, clear of the plotter */
-    const wq = smooth(0.0, 0.3, q), FOCUS = quay ? [lerp(PAIR_MID[0], QF[0], wq), lerp(PAIR_MID[1], QF[1], wq)] : PAIR_MID;   // chapter 4: the camera settles on the quay abeam Kinship
+    const wq = smooth(0.0, 0.17, q), FOCUS = quay ? [lerp(PAIR_MID[0], QF[0], wq), lerp(PAIR_MID[1], QF[1], wq)] : PAIR_MID;   // chapter 4: the camera settles on the quay abeam Kinship
     const FOCUSF = (false && r > 0) ? [lerp(FOCUS[0], curPos[0], smooth(0.0, 0.10, r)), lerp(FOCUS[1], curPos[1], smooth(0.0, 0.10, r))] : FOCUS;   // chapter 5: the camera leaves the quay and follows the yacht out
     const endK = smooth(0.80, 1.0, p), unitM2 = M_PER_UNIT / geoK, panN = endK * (((FOCUSF[0] - curPos[0]) * 111320) / unitM2 + 0.05 * visHw), panE = endK * (((FOCUSF[1] - curPos[1]) * 111320 * Math.cos(curPos[0] * Math.PI / 180)) / unitM2 - 0.05 * visW);
     off += panE;

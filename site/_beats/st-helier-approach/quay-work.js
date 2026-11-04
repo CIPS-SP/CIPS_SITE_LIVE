@@ -601,7 +601,7 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     if (!now) now = T < TL.pump[0] ? 'Bunker connection in progress' : T < TL.pump[1] ? (T >= TL.g0 && T < TL.gEnd ? 'Garbage runs in progress' : 'Fuelling in progress') : 'Fuelling complete';
     else if (T >= TL.g0 && T < TL.gEnd && best < TL.g0) now = 'Garbage runs in progress';
     if (now !== nowText) { nowEl.textContent = now; nowText = now; }
-    putTag('D', w3pos || [0, 0], w3pos && T < TL.wdEnd ? 0.95 : 0, 'Washdown');   // (29 Oct 2026, Simon: the call-out is on him from the moment he steps off the yacht until he goes back aboard)
+    putTag('D', w3pos || [0, 0], w3pos && T < TL.wdEnd ? 0.95 * (1 - seg(TL.wdS1[0] + 3.5, TL.wdS1[0] + 4.1, T)) : 0, 'Washdown');   // (29 Oct 2026, Simon: the call-out is on him from the moment he steps off the yacht ...; 4 Nov 2026, Simon: ... until a second after he starts spraying (the spray is full at wdS1[0] + 3.3), when it fades away)
     putTag('P', wp1 ? wp1.en : [0, 0], wp1 && carry >= 1 ? 0.95 : 0, 'Provisions');   // (31 Oct 2026, Simon: his name card shows on both runs down to the yacht, the first load and the second)
     putTag('W', wd != null && !w2 ? W.path.pos(wd) : [0, 0], wd != null && !w2 && T < TL.water[0] + 4 ? 0.95 : 0, 'Fresh water');
     putTag('G', wg ? wg.en : [0, 0], wg && bagOn && gTrip === 1 ? 0.95 : 0, 'Garbage');

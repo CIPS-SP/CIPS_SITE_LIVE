@@ -29,3 +29,7 @@ The picker carries a **preview of the journey card** (title, "N nm from <place>"
 ## Open items (4 Nov 2026)
 - GitHub repo `CIPS-SP/CIPS_SITE_LIVE` exists (private, empty, created by Simon 4 Nov 2026); `origin` is set locally. Push `dev` and `main` only when Simon says push. Still needed: the Cloudflare account/project.
 - Deploy the review drop box and set `site/review/config.js`.
+
+## The quay and the finale (4 Nov 2026)
+- Quay: the Washdown call-out fades about a second after the spray starts (`quay-work.js`, `putTag('D', ...)`); the camera's pan onto the quay finishes by q = 0.17 (`beat.js`, `wq`) so the brow's landward end is in frame when tanker A's second driver reaches it.
+- Finale: while the "Leaving St Helier" film is scrubbed by the scroll (pz 2.20 to 2.62) the plotter's ship follows the yacht in the film along the way out (berth, channel, pier heads, Small Roads, then back along the arrival route): `FILM_KEYS` in `site/_beats/st-helier-approach/beat.js` (film seconds, nm along the way out, knots), read off the film's frames. Tune there if the ship on the plotter runs ahead of or behind the yacht in the picture; `exitSync:false` switches it off.
