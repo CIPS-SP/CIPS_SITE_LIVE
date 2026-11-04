@@ -11,6 +11,9 @@ The public CIPS website (cips.agency): **only what the live site needs, self-con
 
 A change is made on `dev`, checked at the preview address, and only then released to `main` (on Simon's say-so). Nothing reaches the public by accident.
 
+## Looking at it on your PC
+Double-click **`Open CIPS Site LIVE (Windows).bat`** in this folder. A black window opens (the small local web server: leave it open while you look) and your browser opens the site at `http://localhost:8080`. It shows whatever branch is checked out here, changes nothing, and never caches, so you always see the current files. It needs Node.js (the LTS version from nodejs.org). The same thing from a terminal: `node tools/serve.mjs` (`--port 8090` for another port, `--no-open` to skip opening the browser).
+
 ## The folders
 
 ```
