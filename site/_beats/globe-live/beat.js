@@ -558,6 +558,8 @@ export async function mount(stage, o, ctx){
   // kin.pts / KIN_TRACK / the endScreen/endBearing/endBlend numbers above are all untouched: planVoyageRoute()
   // always merges its tail onto kin.pts.slice(VOYAGE_ROUTE_MERGE_INDEX), so her ending is identical to today.
   const KIN_ORIGIN = { lat: 43.7384, lng: 7.4246 };   // Monaco
+  let kinWasPing = false, kinGrowFrom = null;   // the ping that shows while the picker is open, and when it began growing into the full chevron
+  const kinPingWave = () => KIN_AIS.pulseFloor + (1 - KIN_AIS.pulseFloor) * (0.5 + 0.5 * Math.cos(performance.now() / 1000 * Math.PI * 2 / 1.5));   // a steady 1.5 s rhythm, in time (the scrolling pulse below runs on distance)
   let kinFaceLL = null, kinFocusMix = 0;   // 4 Nov 2026: where the demo vessel is right now (set every frame in placeKinship) and how firmly the globe is following her (tick)
   let kinRoute = null;   // { pts, cum, total, tailStart } from planVoyageRoute() — set once buildKinship()'s curve (kin.pts) exists, since planVoyageRoute() depends on it for its tail
   // 23 Sep 2026, Simon: widening KIN.show (above) to make her visible early accidentally also dragged the chevron-
@@ -735,6 +737,21 @@ export async function mount(stage, o, ctx){
     shown.y = Math.max(margin, Math.min(Hs - ch - margin, shown.y));
     return shown;
   }
+  const kinPanelEl = stage.querySelector('[data-live="panel"]');
+  function placeKinPing() {   // a small bright ping where the vessel will start (the first point of her route), same marker as the real one at the start of the journey
+    const pts = kinRoute.pts, a = pts[0].clone().normalize();
+    let b = pts[1]; for (let k = 1; k < pts.length && k < 40; k++) { b = pts[k]; if (b.distanceTo(pts[0]) > 1e-5) break; }
+    const f = b.clone().sub(a); f.sub(a.clone().multiplyScalar(f.dot(a))).normalize();
+    const lift = CFG.radius * KIN.lift, world = globe.localToWorld(a.clone().multiplyScalar(lift)), sp = worldToStagePx(world);
+    const spAhead = worldToStagePx(globe.localToWorld(a.clone().addScaledVector(f, 0.02).normalize().multiplyScalar(lift)));
+    const ang = Math.atan2(spAhead.y - sp.y, spAhead.x - sp.x) * 180 / Math.PI;
+    let vis = smooth(0.08, 0.30, world.clone().normalize().dot(camera.position.clone().normalize()));   // not through the back of the globe while it is still turning to her
+    { const pr = kinPanelEl && kinPanelEl.getBoundingClientRect(), vx = sp.x + kinStageR.left, vy = sp.y + kinStageR.top; if (pr && vx > pr.left - 14 && vx < pr.right + 14 && vy > pr.top - 14 && vy < pr.bottom + 14) vis = 0; }   // on a narrow screen the picker covers the middle of the globe: no ping on top of its text
+    const flash = Math.min(1, kinPingWave() * 1.25), t2 = `translate(${sp.x.toFixed(1)},${sp.y.toFixed(1)}) rotate(${ang.toFixed(1)})`;
+    kinAisFlash.setAttribute('transform', t2 + ` scale(${(PING_PX / 14 * (1 + flash * 0.65)).toFixed(3)})`); kinAisFlash.style.opacity = (Math.min(1, flash * 1.3) * vis).toFixed(3);
+    kinAisGlow.setAttribute('transform', `translate(${sp.x.toFixed(1)},${sp.y.toFixed(1)}) scale(${(PING_GLOW * (1 + flash * 4.2)).toFixed(2)})`); kinAisGlow.style.opacity = (flash * vis).toFixed(3);
+  }
+  const PING_PX = 5, PING_GLOW = 0.5;   // the preview ping's size (px, glow scale); the full marker starts at KIN_AIS.px[0] = 10 and glow scale 1
   function placeKinship(p, depth) {
     if (!kin) return;
     // 17 Sep 2026, Simon: "Observe the Channel Islands" needed to be genuinely vessel-free, not just unnamed —
@@ -750,6 +767,9 @@ export async function mount(stage, o, ctx){
       kin.mat.opacity = 0; kinFaceLL = null;
       if (kinAisCore) { kinAisCore.style.opacity = '0'; kinAisFlash.style.opacity = '0'; kinAisGlow.style.opacity = '0'; }
       if (kinCalloutCard) { kinCalloutCard.style.opacity = '0'; kinCalloutLine.style.opacity = '0'; }
+      // 4 Nov 2026, Simon: the vessel starts pinging at the departure the moment the picker is open (Monaco is chosen by default), small but bright;
+      // "Start the journey" grows it into the full chevron (below, kinGrow). Picker open = not behind the opening CTA, not folded into the voyage card, at the top of the scroll.
+      if (kinRoute && kinAisFlash && !voyageMonitorMode && !voyageRouteMode && p < 0.01 && !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode')) { placeKinPing(); kinWasPing = true; kinGrowFrom = null; }
       return;
     }
     // her position: arc-length-sampled along the Monaco route when it's built (so a much longer, chokepoint-heavy
@@ -788,7 +808,9 @@ export async function mount(stage, o, ctx){
     // now much wider visibility window) — see the comment above KIN_SPRITE_SCHEDULE.
     const uK = smooth(KIN_SPRITE_SCHEDULE[0], KIN_SPRITE_SCHEDULE[1], p);
     const ais = KIN_AIS, cf = ais.crossfade, planFade = smooth(cf[0], cf[1], uK), aisFade = 1 - planFade;
-    const aisPx = lerp(ais.px[0], ais.px[1], smooth(0, 1, uK));
+    let kinGrow = 1;   // 0 = the small ping, 1 = the full marker: eases up over 0.8 s once "Start the journey" has been pressed
+    if (kinWasPing) { if (kinGrowFrom == null) kinGrowFrom = performance.now(); kinGrow = smooth(0, 1, (performance.now() - kinGrowFrom) / 800); if (kinGrow >= 1) kinWasPing = false; }
+    const aisPx = lerp(ais.px[0], ais.px[1], smooth(0, 1, uK)) * lerp(PING_PX / ais.px[0], 1, kinGrow);
     // the plan-view sprite starts at exactly the AIS marker's size at the moment it takes over — no pop — then keeps growing
     const pxAtHandoff = lerp(ais.px[0], ais.px[1], smooth(0, 1, cf[0]));
     const px = lerp(pxAtHandoff, KIN.px[1], smooth(cf[0], 1, uK));
@@ -800,7 +822,8 @@ export async function mount(stage, o, ctx){
     // until the crossfade; never dims to nothing between beats, just breathes between pulseFloor and full brightness
     const wave = ais.pulseFloor + (1 - ais.pulseFloor) * (0.5 + 0.5 * Math.cos(u / ais.pulsePeriod * Math.PI * 2));
     const burst = 1 + 0.8 * Math.exp(-u / ais.pulseDur * 3);
-    const flash = Math.min(1, wave * burst);
+    const restPing = 1 - smooth(0, 0.02, p);   // while she is still at the start, ping on the clock (as the preview does) rather than waiting for a scroll to drive the pulse
+    const flash = Math.min(1, wave * burst) * (1 - restPing) + Math.min(1, kinPingWave() * 1.25) * restPing;
     // kin.mesh.position is LOCAL to `globe` (mesh.parent), which itself spins/flies-in/settles under its own
     // quaternion — the sprite renders in the right place because three.js applies that automatically when drawing
     // it, but a manual projection needs the actual WORLD position, not the pre-rotation local one (bug, 15 Sep: this
@@ -831,10 +854,10 @@ export async function mount(stage, o, ctx){
 
     if (kinAisCore) {
       const t2 = `translate(${sp.x.toFixed(1)},${sp.y.toFixed(1)}) rotate(${ang.toFixed(1)})`;
-      kinAisCore.setAttribute('transform', t2 + ` scale(${(aisPx / 14).toFixed(3)})`); kinAisCore.style.opacity = aisFade.toFixed(3);
+      kinAisCore.setAttribute('transform', t2 + ` scale(${(aisPx / 14).toFixed(3)})`); kinAisCore.style.opacity = (aisFade * kinGrow).toFixed(3);
       // the flash itself swells a little at each peak (not just brightens) so the pulse reads clearly, not just a flicker
       kinAisFlash.setAttribute('transform', t2 + ` scale(${(aisPx / 14 * (1 + flash * 0.65)).toFixed(3)})`); kinAisFlash.style.opacity = (Math.min(1, flash * 1.3) * aisFade).toFixed(3);
-      kinAisGlow.setAttribute('transform', `translate(${sp.x.toFixed(1)},${sp.y.toFixed(1)}) scale(${(1 + flash * 4.2).toFixed(2)})`); kinAisGlow.style.opacity = (flash * aisFade).toFixed(3);
+      kinAisGlow.setAttribute('transform', `translate(${sp.x.toFixed(1)},${sp.y.toFixed(1)}) scale(${(lerp(PING_GLOW, 1, kinGrow) * (1 + flash * 4.2)).toFixed(2)})`); kinAisGlow.style.opacity = (flash * aisFade).toFixed(3);
     }
 
     // CALLOUT — trails behind her along her live projected heading (23 Sep 2026: same technique Phase 4's routed-

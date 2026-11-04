@@ -173,6 +173,15 @@ function arrangeDeparture(stage, S) {
   renderPreview();
   // opening the picker turns the globe to the departure already chosen (the Mediterranean unless they were here before)
   stage.querySelector('[data-g="voyageCtaBtn"]')?.addEventListener('click', () => V.set({}, { focus: true }));
+  // 4 Nov 2026, Simon: no separate "Start the journey" press: the button reads "Scroll to start the journey" and the first scroll gesture (wheel, swipe, arrow / page keys)
+  // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
+  const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0;
+  window.addEventListener('wheel', e => { if (e.deltaY > 0 && pickerOpen()) start.click(); }, { capture: true, passive: true });
+  window.addEventListener('keydown', e => {
+    if (!['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey) return;
+    const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName))) return;   // typing a name, or pressing a focused button, is not a scroll
+    if (pickerOpen()) start.click();
+  });
   start.before(group);
   start.before(nameBox);
   start.before(preview);
