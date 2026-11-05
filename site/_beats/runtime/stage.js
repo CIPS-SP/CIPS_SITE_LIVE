@@ -36,6 +36,12 @@ export async function run(list, opts = {}) {
   const vh = () => innerHeight;
   const toPx = v => { if (typeof v === 'number') return v; const m = String(v).match(/^([\d.]+)(vh|px)?$/); return m ? (m[2] === 'px' ? +m[1] : +m[1] / 100 * vh()) : vh(); };
   const groups = {};   // name → { section, stage, members:[] }
+  // 5 Nov 2026, Simon ("still getting this empty dark blue page on loading"): the globe was built, but the next scenes were mounted straight after it, and their set-up (models, big chart
+  // images going up to the graphics card) kept the browser busy for seconds, so the finished globe could not reach the screen: the loading screen went and the page stayed dark.
+  // Now the globe is shown first: after mounting it the runtime waits for `cips:globe-ready` (or `cips:globe-failed`, or 12 s) and a few frames, and between later scenes it lets a frame through.
+  const globeShown = new Promise(res => { addEventListener('cips:globe-ready', res, { once: true }); addEventListener('cips:globe-failed', res, { once: true }); setTimeout(res, 12000); });
+  const frames = n => new Promise(res => { const f = () => (--n <= 0 ? res() : requestAnimationFrame(f)); requestAnimationFrame(f); });
+  const breathe = () => Promise.race([frames(2), new Promise(res => setTimeout(res, 120))]).then(() => new Promise(res => setTimeout(res, 0)));   // (a hidden tab has no frames: never wait on them alone)
 
   for (let i = 0; i < list.length; i++) {
     const item = typeof list[i] === 'string' ? { beat: list[i] } : list[i];
@@ -97,6 +103,8 @@ export async function run(list, opts = {}) {
       if (ctrl && typeof ctrl.exit === 'function') Object.assign(handoff, ctrl.exit() || {});
     } catch (e) { console.error(`[beats] ${name}: mount failed`, e); (layer || section).classList.add('beat-failed'); }
     beats.push({ name, item, section, stage, layer, ctrl, visible: false, lastP: -1, group: item.group || null });
+    if (name === 'globe-live') { await globeShown; await Promise.race([frames(6), new Promise(res => setTimeout(res, 400))]); }
+    else if (i < list.length - 1) await breathe();
   }
   // size the pinned groups: height = sum of member tracks; compute each member's slice
   function layoutGroups() {
