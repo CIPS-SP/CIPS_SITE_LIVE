@@ -19,9 +19,17 @@
  */
 const CSS_URL = new URL('./video-moment.css', import.meta.url).href;
 let wideSetting = false;   // the Expand choice carries from one moment (and one beat) to the next
+// 5 Nov 2026, Simon: the ON SCENE box flashed up while the page was loading. It was added before its own stylesheet had arrived, so it showed unstyled for a moment.
+// Each box now stays hidden until the stylesheet has loaded (or failed).
+let cssReady = null;
+function loadCss() {
+  if (cssReady) return cssReady;
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = CSS_URL; l.dataset.videoMomentCss = '1';
+  cssReady = new Promise(res => { l.onload = res; l.onerror = res; }); document.head.appendChild(l); return cssReady;
+}
 
 export function mountVideoMoment(stage, { moments = [], plotter = null, reduced = false } = {}) {
-  if (!document.querySelector('link[data-video-moment-css]')) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = CSS_URL; l.dataset.videoMomentCss = '1'; document.head.appendChild(l); }
+  const css = loadCss();
   const conn = navigator.connection || {}, still = !!(reduced || conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '') || conn.effectiveType === '3g');
 
   const root = document.createElement('div'); root.className = 'vm-box' + (wideSetting ? ' wide' : '') + (still ? ' still' : ''); root.setAttribute('role', 'region'); root.setAttribute('aria-label', 'Footage from the scene');
@@ -31,6 +39,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // in the group's stage, above every layer, and stays seen for as long as it plays; the runtime still only calls update() while this beat is live, so the watchdog below ends it once the visitor is well past.
   const layerEl = stage.parentElement, host = layerEl && layerEl.classList.contains('beat-layer') ? layerEl.parentElement : stage;
   if (host !== stage) root.style.zIndex = '200';
+  root.style.visibility = 'hidden'; css.then(() => { root.style.visibility = ''; });   // (see loadCss)
   host.appendChild(root);
   const frame = root.querySelector('.vm-frame'), titleEl = root.querySelector('.vm-title'), bar = root.querySelector('.vm-bar i'), bigBtn = root.querySelector('.vm-big'), playBtn = root.querySelector('.vm-play');
 
@@ -49,6 +58,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     const box = document.createElement('div'); box.className = 'vm-full'; box.setAttribute('aria-hidden', 'true');
     const v = document.createElement('video'); v.className = 'vm-fv'; v.muted = true; v.defaultMuted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'none'; v.disablePictureInPicture = true;
     if (m.poster) v.poster = m.poster;
+    box.style.visibility = 'hidden'; css.then(() => { box.style.visibility = ''; });   // (see loadCss)
     box.appendChild(v); stage.appendChild(box);
     return Object.assign({ lead: 0.1, loaded: false, bad: false, on: false, started: false }, m, { box, v });
   });

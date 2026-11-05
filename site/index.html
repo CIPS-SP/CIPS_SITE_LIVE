@@ -22,6 +22,20 @@
   <link rel="stylesheet" href="home/qr-home.css">
   <link rel="stylesheet" href="home/qr-chrome.css">
   <script>window.CIPS_LIVE_DATA = false; /* go-live build: simulated ships and flights only */</script>
+  <script>
+    /* 5 Nov 2026, Simon: coming back to a tab left open, the page sometimes opened far down (often the bottom) with scrolling locked.
+       The browser was putting the page back where it had been, and the globe then locked scrolling wherever that was. The journey always starts at the globe:
+       (1) the browser never restores this page's scroll position (a ?goto= link still jumps, by its own code);
+       (2) safety net: the only scroll lock that is not a mini-game is the globe's "choose your voyage" lock, which belongs at the very top. If the page is ever
+           locked anywhere else with no mini-game open, it is put back at the top, where that lock makes sense. */
+    try { history.scrollRestoration = 'manual'; } catch (e) { /* older browsers */ }
+    (function () {
+      var fix = function () { var b = document.body; if (!b || b.style.overflow !== 'hidden' || document.querySelector('.splay-overlay') || scrollY <= 2) return; scrollTo({ top: 0, behavior: 'instant' }); };
+      addEventListener('pageshow', function () { setTimeout(fix, 300); });
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(fix, 300); });
+      setInterval(fix, 1000);
+    })();
+  </script>
   <script src="js/vessel.js"></script>
   <script type="importmap">{ "imports": {
   "three": "./_beats/_vendor/three-0.165.0/three.module.js",
@@ -29,7 +43,12 @@
   "three152": "./_beats/_vendor/three-0.152.2/three.module.js",
   "three152/addons/": "./_beats/_vendor/three-0.152.2/addons/",
   "topojson-client": "./_beats/_vendor/topojson-client-3.1.0/index.js"
+}, "scopes": {
+  "./_beats/_vendor/three-0.152.2/": { "three": "./_beats/_vendor/three-0.152.2/three.module.js" }
 }}</script>
+  <!-- 5 Nov 2026 (load speed): the globe's add-ons (OrbitControls, CSS2DRenderer) ask for plain "three"; without the scope above that meant the newer 1.3 MB copy too, which the globe then waited for. Now they use the globe's own copy; the newer one loads later, with the sea scenes that need it. -->
+  <link rel="modulepreload" href="./_beats/_vendor/three-0.152.2/three.module.js">
+  <link rel="preload" href="./_beats/_vendor/world-atlas-2/land-110m.json" as="fetch" crossorigin>
 
   <style>
     html, body { -webkit-font-smoothing: antialiased; }
@@ -192,7 +211,28 @@
     @media (max-width:640px){ #arrival.film-sec .cinema-caption { bottom:26%; } .film-stage{ height:82vh; } }
 
     /* ===================== GLOBE OPENING ACT ===================== */
-    #openingAct { position:relative; z-index:1; background:#04070e; }
+    /* 5 Nov 2026, Simon: "Building the matrix" replaced by a loading screen. It is part of the page itself, so it is there from the first moment (the globe's own
+       message only arrived once its scene had loaded), fades in only after 0.35 s (a quick load never shows it), and fades out when the globe is drawn (cips:globe-ready). */
+    #globeLoader { position:absolute; top:0; left:0; right:0; height:100vh; height:100svh; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+      background:radial-gradient(ellipse at 50% 46%, #0b1a2c 0%, #06101d 45%, #04070e 100%); color:#9fc3d6; pointer-events:none;
+      opacity:0; animation:glIn .5s ease .35s forwards; transition:opacity .6s ease; }
+    #globeLoader.gone { opacity:0 !important; animation:none; }
+    #globeLoader svg { width:104px; height:104px; overflow:visible; }
+    #globeLoader .dot { fill:none; stroke:#4fb0e4; stroke-width:2.2; stroke-linecap:round; stroke-dasharray:0 6.2; }
+    #globeLoader .rim { fill:none; stroke:#45d3bb; stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0 5.4; }
+    #globeLoader .mer { transform-box:fill-box; transform-origin:center; animation:glTurn 3.6s linear infinite; }
+    #globeLoader .mer.m2 { animation-delay:-1.2s; } #globeLoader .mer.m3 { animation-delay:-2.4s; }
+    #globeLoader .glow { fill:#45d3bb; opacity:.9; animation:glPing 1.8s ease-out infinite; transform-box:fill-box; transform-origin:center; }
+    #globeLoader .lbl { font:500 11.5px 'JetBrains Mono', ui-monospace, monospace; letter-spacing:.24em; text-transform:uppercase; color:#b9d3e0; }
+    #globeLoader .bar { position:relative; width:150px; height:1px; background:rgba(159,195,214,.18); overflow:hidden; margin-top:-8px; }
+    #globeLoader .bar i { position:absolute; top:0; bottom:0; width:40%; background:linear-gradient(90deg, transparent, #45d3bb, transparent); animation:glBar 1.6s ease-in-out infinite; }
+    @keyframes glIn { to { opacity:1; } }
+    @keyframes glTurn { 0% { transform:scaleX(1); } 50% { transform:scaleX(-1); } 100% { transform:scaleX(1); } }
+    @keyframes glPing { 0% { transform:scale(.6); opacity:.95; } 100% { transform:scale(2.6); opacity:0; } }
+    @keyframes glBar { 0% { left:-40%; } 100% { left:100%; } }
+    @media (prefers-reduced-motion:reduce) { #globeLoader .mer, #globeLoader .glow, #globeLoader .bar i { animation:none; } }
+    .beat-globe-live [data-g="status"] { display:none !important; }   /* the old "Building the matrix" line: the loader above does its job */
+    #openingAct { position:relative; z-index:1; background:#04070e; min-height:600vh; }   /* 5 Nov 2026 (load speed): holds the home page well below the first screen while the journey is still being built, so its lazy-loading photos wait instead of competing with the globe (the journey's real height takes over once it is laid out) */
     /* 31 Oct 2026, Simon: the journey ends by shrinking its whole frame into the hero picture (st-helier-approach/finale.js sets has-finale on <html>). For that the home page starts one window height early, so the hero rises up
        beneath the shrinking frame during the last window of the scroll; the dark moves from the opening act's own background onto the pinned stage (so what the shrinking frame leaves behind is the page); and the wave goes. */
     html.has-finale .qr { margin-top:-100vh; margin-top:-100svh; }
@@ -499,7 +539,7 @@
   <main id="top">
 
     <!-- ================= OPENING ACT — built from the shared beat library (_beats/) ================= -->
-    <div id="openingAct"><div id="beats"></div></div>
+    <div id="openingAct"><div id="globeLoader" role="status" aria-live="polite"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="rim" cx="50" cy="50" r="44"/><ellipse class="dot" cx="50" cy="50" rx="44" ry="15"/><ellipse class="dot" cx="50" cy="30" rx="37" ry="9" opacity=".6"/><ellipse class="dot" cx="50" cy="70" rx="37" ry="9" opacity=".6"/><ellipse class="dot mer" cx="50" cy="50" rx="30" ry="44"/><ellipse class="dot mer m2" cx="50" cy="50" rx="30" ry="44"/><ellipse class="dot mer m3" cx="50" cy="50" rx="30" ry="44"/><circle class="glow" cx="47" cy="38" r="3"/></svg><div class="lbl">Loading the globe</div><div class="bar"><i></i></div></div><div id="beats"></div></div>
     <!-- "Back to the globe": a pill offered from the main site (scroll up, or just after "Skip to CIPS") that returns to the START of the globe journey -->
     <button id="skipToCips" type="button">Skip to CIPS <span class="arr" aria-hidden="true">↓</span></button>
     <button id="backToGlobe" type="button" aria-label="Go back to the globe and play the CIPS journey"><span class="arr" aria-hidden="true">↑</span><span>Back to the globe &mdash; <b>play the CIPS journey</b></span></button>
@@ -526,7 +566,7 @@
           <div class="panel">
             <div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">the approach · chart plotter · live</span></div>
             <div class="mont" style="aspect-ratio:auto">
-              <img src="images/home/journey-corbiere.jpg" alt="The approach to La Corbière with the CIPS chart plotter" style="position:static;opacity:1;animation:none;display:block;width:100%;height:auto">
+              <img src="images/home/journey-corbiere.jpg" fetchpriority="low" alt="The approach to La Corbière with the CIPS chart plotter" style="position:static;opacity:1;animation:none;display:block;width:100%;height:auto">
               <button type="button" class="play" id="homeReplay" style="cursor:pointer">▶ REPLAY THE JOURNEY</button>
             </div>
           </div>
@@ -542,10 +582,10 @@
 
       <div class="sec" id="desks"><div class="deskhead"><div><div class="eyebrow">Sectors</div><h2>Choose an <span class="grad">Agency Desk.</span></h2><p class="sub">Four specialist desks, one agency.</p></div><img class="roundel" src="images/home/roundel.png" alt="CIPS, cips.agency, established 1986: Shipping, Yachting, Offshore, Cruise" width="480" height="480"></div>
         <div class="desks tall">
-          <a href="sectors/shipping.html"><div class="im"><img src="images/home/sector-shipping.jpg" alt="Two tankers alongside, from above" style="object-position:40% 50%"></div><div class="b"><h3>SHIPPING <span>→</span></h3><p>Commercial vessel agency, bunkering and fast-track customs clearance.</p></div></a>
-          <a href="sectors/yachting.html"><div class="im"><img src="images/home/sector-yachting.jpg" alt="Savannah passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
-          <a href="sectors/offshore.html"><div class="im"><img src="images/home/sector-offshore.jpg" alt="An offshore wind turbine" style="object-position:50% 20%"></div><div class="b"><h3>OFFSHORE <span>→</span></h3><p>Reliable logistics, provisioning and clearances for offshore operations.</p></div></a>
-          <a href="sectors/cruise.html"><div class="im"><img src="images/home/sector-cruise.jpg" alt="Vista, bow-on" style="object-position:38% 50%"></div><div class="b"><h3>CRUISE <span>→</span></h3><p>Ground handling, shore experiences and port formalities for cruise calls.</p></div></a>
+          <a href="sectors/shipping.html"><div class="im"><img loading="lazy" src="images/home/sector-shipping.jpg" alt="Two tankers alongside, from above" style="object-position:40% 50%"></div><div class="b"><h3>SHIPPING <span>→</span></h3><p>Commercial vessel agency, bunkering and fast-track customs clearance.</p></div></a>
+          <a href="sectors/yachting.html"><div class="im"><img loading="lazy" src="images/home/sector-yachting.jpg" alt="Savannah passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
+          <a href="sectors/offshore.html"><div class="im"><img loading="lazy" src="images/home/sector-offshore.jpg" alt="An offshore wind turbine" style="object-position:50% 20%"></div><div class="b"><h3>OFFSHORE <span>→</span></h3><p>Reliable logistics, provisioning and clearances for offshore operations.</p></div></a>
+          <a href="sectors/cruise.html"><div class="im"><img loading="lazy" src="images/home/sector-cruise.jpg" alt="Vista, bow-on" style="object-position:38% 50%"></div><div class="b"><h3>CRUISE <span>→</span></h3><p>Ground handling, shore experiences and port formalities for cruise calls.</p></div></a>
         </div>
       </div>
 
@@ -575,7 +615,7 @@
 
       <div class="sec gwhead" id="gateway"><div class="eyebrow">The Channel Islands</div><h2>Your <span class="grad">Atlantic Gateway.</span></h2></div>
 
-      <div class="filmband" id="gwband"><img src="images/home/atlantic-gateway.jpg" alt="Kinship with the CIPS roundel over the sea"><video playsinline preload="none" controls controlslist="nodownload" tabindex="-1" aria-label="The Atlantic Gateway film"></video><span class="gwp" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z" fill="currentColor"/></svg></span><div class="fb"><button class="pl gwwatch" type="button"><i aria-hidden="true">&#9654;</i>Watch the film <span></span></button></div><button class="gwe" type="button" aria-label="Expand the film"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 2h4v4M6 14H2v-4M14 2 9.5 6.5M2 14l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Expand</button><button class="gwx" type="button" aria-label="Close the film">&times;</button></div>
+      <div class="filmband" id="gwband"><img loading="lazy" src="images/home/atlantic-gateway.jpg" alt="Kinship with the CIPS roundel over the sea"><video playsinline preload="none" controls controlslist="nodownload" tabindex="-1" aria-label="The Atlantic Gateway film"></video><span class="gwp" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z" fill="currentColor"/></svg></span><div class="fb"><button class="pl gwwatch" type="button"><i aria-hidden="true">&#9654;</i>Watch the film <span></span></button></div><button class="gwe" type="button" aria-label="Expand the film"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 2h4v4M6 14H2v-4M14 2 9.5 6.5M2 14l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Expand</button><button class="gwx" type="button" aria-label="Close the film">&times;</button></div>
 
       <div class="pstrip" aria-label="CIPS at work">
         <img src="images/home/strip-1.jpg" alt="Tankers side by side, bunkering" loading="lazy">
@@ -588,7 +628,7 @@
         <ul class="dlpoints"><li>Arrival times, berth and live status for each call</li><li>Our updates, crew travel, documents and accounts in one place</li><li>Private to you: your vessels only, on any device</li><li>Set up by arrangement, with the 24/7 duty agent behind it</li></ul>
         <div class="ctas"><a class="btn pri" href="#contact" data-service="CIPS Desk LIVE">Talk to us about CIPS Desk LIVE →</a><a class="btn" href="desk-live.html">Find out more</a></div></div>
         <div class="dlcar" id="dlcar"><div class="panel"><div class="bar"><b></b><b></b><b></b><span class="dlttl" style="margin-left:8px">cips desk live · ship operators</span></div>
-          <button type="button" class="dlslides" data-lb-open aria-label="Enlarge the CIPS Desk LIVE concept screen"><img class="on" src="images/desk/desk-live-shipping.webp" data-lb data-cap="Ship operators" alt="Concept screen for a ship operator: a tanker alongside and discharging, with the call timeline, crew travel and supplier invoices" width="2000" height="944"><img src="images/desk/desk-live-yachting.webp" data-lb data-cap="Yachts" alt="Concept screen for a yacht captain: a motor yacht at anchor with guests ashore, cars, lunch and bunkering" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-cruise.webp" data-lb data-cap="Cruise lines" alt="Concept screen for a cruise line: a ship tendering at anchor with guests ashore and coach tours" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-offshore.webp" data-lb data-cap="Offshore" alt="Concept screen for an offshore operator: a service operation vessel on the worksite, crew transfer by CTV, provisions and supplier invoices" width="2000" height="944" loading="lazy"></button></div>
+          <button type="button" class="dlslides" data-lb-open aria-label="Enlarge the CIPS Desk LIVE concept screen"><img class="on" loading="lazy" src="images/desk/desk-live-shipping.webp" data-lb data-cap="Ship operators" alt="Concept screen for a ship operator: a tanker alongside and discharging, with the call timeline, crew travel and supplier invoices" width="2000" height="944"><img src="images/desk/desk-live-yachting.webp" data-lb data-cap="Yachts" alt="Concept screen for a yacht captain: a motor yacht at anchor with guests ashore, cars, lunch and bunkering" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-cruise.webp" data-lb data-cap="Cruise lines" alt="Concept screen for a cruise line: a ship tendering at anchor with guests ashore and coach tours" width="2000" height="944" loading="lazy"><img src="images/desk/desk-live-offshore.webp" data-lb data-cap="Offshore" alt="Concept screen for an offshore operator: a service operation vessel on the worksite, crew transfer by CTV, provisions and supplier invoices" width="2000" height="944" loading="lazy"></button></div>
           <div class="dltabs" role="group" aria-label="Example views"><button type="button" aria-selected="true">Ship operators</button><button type="button" aria-selected="false">Yachts</button><button type="button" aria-selected="false">Cruise lines</button><button type="button" aria-selected="false">Offshore</button></div>
           <p class="dlnote">Concept screens: every name, vessel and figure is made up.</p></div></div></div>
 
@@ -604,7 +644,7 @@
 
       <div class="assoc" aria-label="Associates and memberships"><div class="eyebrow">Associates and memberships</div><div class="mq"><ul class="track"><li><img src="images/logos/ics.png" alt="Institute of Chartered Shipbrokers, company member"></li><li><img src="images/logos/british-superyacht.png" alt="British Superyacht, Leading the Industry"></li><li><img src="images/logos/superyacht-ready.png" alt="Superyacht Ready"></li><li><img src="images/logos/captains-recommended-2026.png" alt="Captain's Recommended Service 2026, Superyacht Services Guide"></li><li><img src="images/logos/atlantic-gateway.png" alt="The Atlantic Gateway, Channel Islands"></li><li><img src="images/logos/water-taxi-ci.png" alt="Water Taxi CI"></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li></ul></div></div>
 
-      <div class="banner" style="margin:0"><img src="images/home/corbiere.jpg" alt="La Corbière lighthouse at sunset" style="object-position:50% 24%"><span class="t">La Corbière, Jersey</span></div>
+      <div class="banner" style="margin:0"><img loading="lazy" src="images/home/corbiere.jpg" alt="La Corbière lighthouse at sunset" style="object-position:50% 24%"><span class="t">La Corbière, Jersey</span></div>
 
       <section class="sec grid-bg" id="contact">
         <div class="split" style="align-items:flex-start">
@@ -907,6 +947,15 @@
   
   <!-- ===== OPENING ACT — beat list (order = array). Library: ../_beats (synced copy in ./_beats). See TECH-REFERENCE-hero-animation.md ===== -->
   <script src="js/scroll-momentum.js" defer></script>
+  <script>
+    /* the loading screen goes once the globe is drawn; if the globe cannot load it says so */
+    (function () {
+      var el = document.getElementById('globeLoader'); if (!el) return;
+      var done = function () { el.classList.add('gone'); setTimeout(function () { el.remove(); }, 700); };
+      addEventListener('cips:globe-ready', done, { once: true });
+      addEventListener('cips:globe-failed', function () { var l = el.querySelector('.lbl'); if (l) l.textContent = 'The globe could not load. Please refresh the page'; var bar = el.querySelector('.bar'); if (bar) bar.remove(); }, { once: true });
+    })();
+  </script>
   <script type="module">
     import { run } from './_beats/runtime/stage.js';
     /* 25 Sep 2026, Simon: "I see the old globe (without the Skip to CIPS button) for a second, then it switches" —
@@ -937,7 +986,7 @@
       { beat:'cloud-pass',     track:'260vh', group:'opening', over:true, reveal:0.64, fadePrev:[0.50,0.70], options:{ chart:false, chartHold:0.06, chartIn:2.0, dawn:[0.12,0.72] } },   /* into the cloud at night, out in daylight */   /* chartIn 2.0 = the dark sky backdrop barely arrives before the whiteout; the clouds do the covering, so the night map is not dimmed early */  /* clouds only — close over the night map, break through to the sea */
       { beat:'seaway-wake',    track:'2405vh', group:'opening', overlap:'80vh', options:{ heading:'east', arrivalSpeed:22, copyIn:[0.60,0.70], islands:false, yaw:0, hudIn:[0.031,0.045] } },   /* 3 Oct 2026, Simon: "incorporate cloud pass into the start of seaway... currently its a bit glitchy loading/switching between the two" — overlap:'80vh' starts this beat's slice 80vh before cloud-pass ends (cloud-pass's reveal point is 94vh from its end, so seaway is live well before then): the ship is already sailing (the due-east preamble) while the clouds break through, instead of sitting frozen on its first frame and then popping into motion; the plotter + play door wait (hudIn, raw progress 0.031-0.045 = the 80vh overlap plus a short fade) so they don't pop in on top of the clouds. The runtime shortens the group by the overlap. Seaway also now compiles its shaders at mount and uploads its coast textures at load, so nothing stalls the frame it is revealed. 3 Oct 2026, Simon: "speed up the scroll speed in seaway (so it matches that in noirmont) but make sure it stays smooth not jerky" — 4320vh -> 2607vh, but NOT a straight cut: the beat now remaps scroll progress through a smooth constant-ground-speed curve (CRUISE_VH_PER_NM=260 in seaway-wake/beat.js, easing back to the old pilot-transfer pace between its 50-60% points), so the pilot transfer + exit keep their old scroll length and only the open-water cruise speeds up. 2607 is that curve's computed total (ctrl.paceVh) — if CRUISE_VH_PER_NM or the route changes, recompute and update this. 2 Oct 2026 (later), Simon: "scroll rate on seaway is too slow, lets speed that up by 25%" — 5400vh -> 4320vh (5400/1.25), a straight track-length cut so every phase's relative timing stays exactly as tuned. 2 Oct 2026, Simon: "the leg as we exit the pilot zone goes way too fast... at least x3" — was 1800vh. Pushing pilot.home[0] earlier (the only lever that widens the exit phase's own p-share directly) badly compresses the alongside/boarding-transfer phase instead — even an aggressive shift only reaches ~1.6x, and alongside was deliberately widened for "slow down time" earlier. A straight 3x track-length increase instead: guarantees the exit phase gets at least 3x more vh without touching any of the other already-tuned phase boundaries or their own relative timing. 30 Sep 2026: was 900vh (600vh before that); 29 Sep 2026: yaw moved to noirmont-transit's own ending — this beat now hands off mid-crossing, not straight to berth-arrival */
       { beat:'noirmont-transit', track:'900vh', group:'opening' },   /* 23 Oct 2026, Simon: the handover to st-helier-approach moved back to East Rock on the 022 heading (endAt 0.8 -> 0.5625, see _shared/st-helier-route.js): 1600vh * 0.5625 = 900vh keeps the scroll speed. */   /* 3 Oct 2026, Simon: "lets end noirmont beat at the point where it is currently p80%, thats where we will transition into the next beat, as the zoom in starts" — 1600vh -> 1280vh (1600*0.8): the beat now stops at its old 80% point (option endAt:0.8), same scroll speed, no yaw/zoom-in; the next beat takes the zoom-in. 1 Oct 2026, Simon: "the route goes way too fast" — was 260vh, no more than a by-feel number from before seaway-wake's own pacing got slowed down repeatedly; 1600vh paces this beat's real ~4.4 M route (GEO.pilotage.slice(3)) at roughly the same vh-per-mile seaway-wake's own cruise legs now run at (~1800vh / ~3 M, excluding its pilot-transfer hold), not reasoned from scratch — a starting point to tune further, not a final number. 29 Sep 2026: Chapter 1 scene 1 — pilot already aboard, past Noirmont Point into St Aubin's Bay, picks up the leading line; ends with the yaw/turn that used to be seaway-wake's own, matching berth-arrival's opening frame */
-      { beat:'st-helier-approach', track:'21250vh', group:'opening', keepPrev:0.0018 },   /* 31 Oct 2026 (the finale): chapter 5, the way out, added: the yacht casts off and the camera lifts, the Savannah departure full screen, the closing line, and the whole frame shrinking into the home page's hero panel (finale.js): 1500vh more, track 18850vh -> 20350vh (keepPrev 0.0019 = about 39vh); home-port and statement-breather are no longer in the run (their job is the closing line). 31 Oct 2026 (latest): every speed in the quay halved, story 1565 s -> 2842 s, quay track 9300vh -> 16850vh at the same pace (keepPrev 0.0021 = about 39vh). 31 Oct 2026 (later): quay re-timed, story 1702 s -> 1565 s, track 12100vh -> 11300vh at the same pace (quay 9300vh). 31 Oct 2026: track 9750vh -> 12100vh (the quay slowed for people and the van, see quayTail in the beat: chapters 1-3 stay 2000vh); keepPrev 0.0032 (about 39vh, was 0.004 of 9750vh). 30 Oct 2026: keepPrev (about 39vh): the runtime keeps the beat before drawn for the first 3% of a beat by default, which on this 9750vh beat was about 290vh of scrolling with noirmont-transit's sea and plates drawn underneath the harbour and never seen (the Small Roads ran at 16-27 fps there); the next scene is now warmed up before the changeover, so the short overlap is enough. */   /* 4 Oct 2026, Simon: Small Roads, entrance and berth rebuilt in the new style as ONE scene with three chapters (picks up exactly where noirmont-transit stops). Replaces berth-arrival; bunkers-road and provisions-quay are not needed any more (the quay at work is chapter 4 of this scene). 30 Oct 2026: all three are archived in CIPS/archive/beats. */
+      { beat:'st-helier-approach', track:'17539vh', group:'opening', keepPrev:0.0022 },   /* 5 Nov 2026, Simon: the quay shortened to one provisions run (story 2842 s -> 2216 s): track 21250vh -> 17539vh (quay 16850vh -> 13139vh at the same pace; chapters 1-3 2000vh and the finale 2400vh unchanged); keepPrev 0.0022 = about 39vh. */   /* 31 Oct 2026 (the finale): chapter 5, the way out, added: the yacht casts off and the camera lifts, the Savannah departure full screen, the closing line, and the whole frame shrinking into the home page's hero panel (finale.js): 1500vh more, track 18850vh -> 20350vh (keepPrev 0.0019 = about 39vh); home-port and statement-breather are no longer in the run (their job is the closing line). 31 Oct 2026 (latest): every speed in the quay halved, story 1565 s -> 2842 s, quay track 9300vh -> 16850vh at the same pace (keepPrev 0.0021 = about 39vh). 31 Oct 2026 (later): quay re-timed, story 1702 s -> 1565 s, track 12100vh -> 11300vh at the same pace (quay 9300vh). 31 Oct 2026: track 9750vh -> 12100vh (the quay slowed for people and the van, see quayTail in the beat: chapters 1-3 stay 2000vh); keepPrev 0.0032 (about 39vh, was 0.004 of 9750vh). 30 Oct 2026: keepPrev (about 39vh): the runtime keeps the beat before drawn for the first 3% of a beat by default, which on this 9750vh beat was about 290vh of scrolling with noirmont-transit's sea and plates drawn underneath the harbour and never seen (the Small Roads ran at 16-27 fps there); the next scene is now warmed up before the changeover, so the short overlap is enough. */   /* 4 Oct 2026, Simon: Small Roads, entrance and berth rebuilt in the new style as ONE scene with three chapters (picks up exactly where noirmont-transit stops). Replaces berth-arrival; bunkers-road and provisions-quay are not needed any more (the quay at work is chapter 4 of this scene). 30 Oct 2026: all three are archived in CIPS/archive/beats. */
     ], { root:'#beats', base:'./_beats/' });
     /* 21 Sep 2026 (Howard): the globe enhancements first made on the Monaco page, applied here (js/globe-enhancements.js)
        — the import/install itself now starts above, concurrently with run(); this just makes sure it's genuinely

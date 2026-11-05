@@ -305,10 +305,10 @@ export const TL = (() => {
   // the yacht's crew: the water man connects fresh water, then starts the garbage runs
   t.w1Go = t.p1Arr + 2.5; t.w1Ped = t.w1Go + W.toPed.len / WALK.W1; t.w1End = t.w1Ped + 1.0 + W.hose.len / (WALK.W1 * 0.9); t.w1Home = t.w1End + 2.0 + W.back.len / WALK.W1;
   t.water = [t.w1End + 2.0, 0];   // (it ends, and the second crew member takes the hose off, once the washdown is over: see below)
-  // 29 Oct 2026, Simon: the provisions man makes two runs. He goes up to the van as the FIRST garbage man comes down (he was staying aboard for two runs; there is not time for a second round trip if he waits), loads again, brings the
-  // second load down, and goes up for good as the LAST garbage man comes down; the van leaves after that.
-  t.p1Back = Math.max(t.p1Arr + 4, t.gStart[0] + t.gT + 1.6); t.p1Van = t.p1Back + P.walkP.len / WALK.P1; t.p1Down2 = t.p1Van + 6; t.p1Arr2 = t.p1Down2 + P.walkP.len / WALK.P1;
-  t.p1Up2 = Math.max(t.p1Arr2 + 3, t.gStart[TRIPS - 1] + t.gT + 1.6); t.p1Home = t.p1Up2 + P.walkP.len / WALK.P1;
+  // 5 Nov 2026, Simon: "shorten quay - reduce to one provision run". The provisions man takes the hamper and cases down once, goes back up to the van (as the first garbage man comes down, as before) and drives away.
+  // Everything chained after the van (tanker B leaving, fuelling complete, tanker A leaving) comes forward with it. (29 Oct 2026 to 5 Nov 2026 he made two runs.)
+  t.p1Back = Math.max(t.p1Arr + 4, t.gStart[0] + t.gT + 1.6); t.p1Home = t.p1Back + P.walkP.len / WALK.P1;
+  t.p1Top = t.p1Back + (P.walkP.len - Math.min(P_BROW[0], P_BROW[1])) / WALK.P1;   // when, on his way back, he reaches the top of the brow (its quay end)
   t.vOut = [t.p1Home + 1.5, 0]; t.vOut[1] = t.vOut[0] + P.outV.len / VOUT;           // the van leaves
   t.b1Ret = [t.vOut[0] + 3, 0]; t.b1Ret[1] = t.b1Ret[0] + P.walkB.len / WALK.B1;     // B's driver takes hose B away ...
   t.bOut = [t.b1Ret[1] + 1.5, 0]; t.bOut[1] = t.bOut[0] + P.outB.len / VOUT;         // ... and tanker B leaves
@@ -318,7 +318,7 @@ export const TL = (() => {
   t.a1Home = t.hoseAback[1] + 0.5 + A1.dBrow / WALK.A1;
   t.aOut = [t.a1Home + 2.5, 0]; t.aOut[1] = t.aOut[0] + P.outA.len / VOUT;           // tanker A leaves
   // the washdown: one crew member comes out while the water is running
-  t.wd0 = t.p1Arr2 + 1; t.wdPed = t.wd0 + WD.out3.len / WALK.W1; t.wdConn = [t.wdPed, t.wdPed + 6];                                  // out with the coil to the pedestal; sets it down, connects, takes the nozzle   // 1 Nov 2026, Simon: the washdown man first appears when the second provisions man gets aboard (was 12 s after the fresh water connected, about 480 s earlier)
+  t.wd0 = t.p1Top; t.wdPed = t.wd0 + WD.out3.len / WALK.W1; t.wdConn = [t.wdPed, t.wdPed + 6];                                  // out with the coil to the pedestal; sets it down, connects, takes the nozzle   // 5 Nov 2026, Simon: the washdown man appears as the provisions man reaches the top of the brow on his way back to the van (1 Nov to 5 Nov: when the second load got aboard)
   t.wdS1 = [t.wdConn[1], t.wdConn[1] + WD_DMAX / VS]; t.wdS2 = [t.wdS1[1] + 2.5, t.wdS1[1] + 2.5 + (WD_DMAX - WD_DEND) / VS];      // the sweep south, then back north
   t.wdCoil = [t.wdS2[1] + 0.5, t.wdS2[1] + 11]; t.wdEnd = t.wdCoil[1] + 2 + WD.back.len / WALK.W1;                                   // coils it all up, disconnects, picks it up and goes aboard
   // 1 Nov 2026, Simon: the fresh water takes longer: it completes just after the washdown has finished (5 s after the washdown man is back aboard), and then the second crew member takes the hose off
@@ -489,9 +489,7 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     let wp1 = null, pOp = 0, carry = 0;
     if (T >= TL.vIn[1] + 0.3 && T < TL.p1Home + 0.8) {
       if (T < TL.p1Back) { wp1 = onWalk(P.walkP, T, TL.p1Go, WALK.P1, false); pOp = fadeIn(T, TL.vIn[1] + 0.3) * (T > TL.p1Arr ? fadeOut(T, TL.p1Arr + 2.0) : 1); carry = T < TL.p1Arr - 0.4 ? 1 : 0; }   // run 1: the hamper and cases down to the yacht, then aboard
-      else if (T < TL.p1Down2) { wp1 = onWalk(P.walkP, T, TL.p1Back, WALK.P1, true); pOp = fadeIn(T, TL.p1Back + 0.2); }                                                                   // back up to the van, and a moment at it
-      else if (T < TL.p1Up2) { wp1 = onWalk(P.walkP, T, TL.p1Down2, WALK.P1, false); pOp = T > TL.p1Arr2 ? fadeOut(T, TL.p1Arr2 + 2.0) : 1; carry = T < TL.p1Arr2 - 0.4 ? 2 : 0; }          // run 2: more cases down to the yacht
-      else { wp1 = onWalk(P.walkP, T, TL.p1Up2, WALK.P1, true); pOp = fadeIn(T, TL.p1Up2 + 0.2) * fadeOut(T, TL.p1Home + 0.8); }                                                                // and up to the van for good
+      else { wp1 = onWalk(P.walkP, T, TL.p1Back, WALK.P1, true); pOp = fadeIn(T, TL.p1Back + 0.2) * fadeOut(T, TL.p1Home + 0.8); }                                                                   // back up to the van, and a moment at it
     }
     if (wp1) putEN(pP1.sp, wp1.en, (pP1.hdg = wp1.moving ? wp1.hdg : pP1.hdg), pOp); else pP1.sp.group.visible = false;
     const hs = h => (h * Math.PI) / 180, fwd = (en, h, f, s) => [en[0] + Math.sin(hs(h)) * f + Math.cos(hs(h)) * s, en[1] + Math.cos(hs(h)) * f - Math.sin(hs(h)) * s];
@@ -581,9 +579,9 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     hosePos(hoseObjs.D, hoseD || WD.line, hoseD ? hoseD.len : 0, HW.fuel * 0.78, sw * 0.9, hoseD ? hv : 0, tSec, couplings[3], 0x9ab5a4);
 
     // ---- the checklist, the 'now' line and the tags ----
-    const fuelDone = T >= TL.pump[1], provDone = T >= TL.p1Up2 + 0.4, waterDone = T >= TL.water[1], wasteDone = drops >= TRIPS;
+    const fuelDone = T >= TL.pump[1], provDone = T >= TL.p1Back + 0.4, waterDone = T >= TL.water[1], wasteDone = drops >= TRIPS;
     setRow('fuel', fuelDone ? 'done' : T >= TL.pump[0] ? 'active' : 'idle', fuelDone ? fmt(FUEL_L) + ' L' : T >= TL.pump[0] ? fmt(FUEL_L * pumpK) + ' L' : '-', fuelDone ? 1 : pumpK);
-    setRow('prov', provDone ? 'done' : T >= TL.vIn[1] ? 'active' : 'idle', provDone ? 'hamper + ' + 2 * CASES + ' cases' : T >= TL.p1Arr + 0.6 ? 'hamper + ' + CASES + ' cases' : T >= TL.vIn[1] ? 'on the way' : '-', provDone ? 1 : T < TL.p1Arr ? 0.5 * seg(TL.p1Go, TL.p1Arr, T) : T < TL.p1Down2 ? 0.5 : 0.5 + 0.5 * seg(TL.p1Down2, TL.p1Up2, T));   // (two runs: the bar is half full after the first and completes when he steps off the yacht after the second)
+    setRow('prov', provDone ? 'done' : T >= TL.vIn[1] ? 'active' : 'idle', provDone ? 'hamper + ' + CASES + ' cases' : T >= TL.p1Arr + 0.6 ? 'hamper + ' + CASES + ' cases' : T >= TL.vIn[1] ? 'on the way' : '-', provDone ? 1 : T < TL.p1Arr ? 0.95 * seg(TL.p1Go, TL.p1Arr, T) : 0.95);   // (one run, 5 Nov 2026: the bar fills as he carries it down and completes when he steps off the yacht)
     setRow('water', waterDone ? 'done' : T >= TL.w1Go ? 'active' : 'idle', waterDone ? fmt(WATER_L) + ' L' : T >= TL.water[0] ? fmt(WATER_L * waterK) + ' L' : T >= TL.w1Go ? 'Connecting' : '-', waterDone ? 1 : waterK);
     setRow('waste', wasteDone ? 'done' : T >= TL.g0 ? 'active' : 'idle', T >= TL.g0 ? (drops * TRIP_M3).toFixed(1) + ' m³' : '-', wasteDone ? 1 : drops / TRIPS + (bagOn ? 0.5 / TRIPS : 0));
     { const washDone = T >= TL.wdS2[1], mins = Math.round(40 * clamp01((T - TL.wdS1[0]) / (TL.wdS2[1] - TL.wdS1[0])));
@@ -592,7 +590,7 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     const STEPS = [
       [0, TL.a1Go, 'Bunkers arriving'], [TL.a1Go, TL.pump[0], 'Bunker connection in progress'], [TL.pump[0], TL.bFwd[1], 'Connected: fuelling starts'],
       [TL.bFwd[1], TL.flowB + 4, 'No.2 tanker arrived: connecting to master'],
-      [TL.vFwd[0] + 4, TL.p1Go, 'Provision van arrives'], [TL.p1Go, TL.p1Arr + 3, 'Provisions on their way to the yacht'], [TL.p1Down2, TL.p1Arr2 + 3, 'Provisions: second load on its way to the yacht'],
+      [TL.vFwd[0] + 4, TL.p1Go, 'Provision van arrives'], [TL.p1Go, TL.p1Arr + 3, 'Provisions on their way to the yacht'],
       [TL.w1Go, TL.water[0], 'Connecting fresh water'], [TL.water[0], TL.water[0] + 6, 'Fresh water connected'],
       [TL.wd0, TL.wdS1[0], 'Connecting washdown hose'], [TL.wdS1[0], TL.wdS2[1], 'Crew washing down'], [TL.g0, TL.gEnd, 'Garbage runs in progress'],
             [TL.bOut[1], TL.hoseAback[1], 'Fuelling complete: disconnecting'], [TL.aOut[0], TL.aOut[1], 'Bunkers departing'], [TL.aOut[1], TL.end + 99, 'All services complete: vessel turned around, ready to rest or depart'],
@@ -602,7 +600,7 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     else if (T >= TL.g0 && T < TL.gEnd && best < TL.g0) now = 'Garbage runs in progress';
     if (now !== nowText) { nowEl.textContent = now; nowText = now; }
     putTag('D', w3pos || [0, 0], w3pos && T < TL.wdEnd ? 0.95 * (1 - seg(TL.wdS1[0] + 3.5, TL.wdS1[0] + 4.1, T)) : 0, 'Washdown');   // (29 Oct 2026, Simon: the call-out is on him from the moment he steps off the yacht ...; 4 Nov 2026, Simon: ... until a second after he starts spraying (the spray is full at wdS1[0] + 3.3), when it fades away)
-    putTag('P', wp1 ? wp1.en : [0, 0], wp1 && carry >= 1 ? 0.95 : 0, 'Provisions');   // (31 Oct 2026, Simon: his name card shows on both runs down to the yacht, the first load and the second)
+    putTag('P', wp1 ? wp1.en : [0, 0], wp1 && carry >= 1 ? 0.95 : 0, 'Provisions');   // (his name card shows while he carries the load down to the yacht)
     putTag('W', wd != null && !w2 ? W.path.pos(wd) : [0, 0], wd != null && !w2 && T < TL.water[0] + 4 ? 0.95 : 0, 'Fresh water');
     putTag('G', wg ? wg.en : [0, 0], wg && bagOn && gTrip === 1 ? 0.95 : 0, 'Garbage');
     const closing = outK < 0.995; if (closing !== cardOut) { cardOut = closing; if (closing) card.style.setProperty('--rows-h', rowsEl.offsetHeight + 'px'); card.classList.toggle('sq-out', closing); lead.classList.toggle('sq-out', closing); }

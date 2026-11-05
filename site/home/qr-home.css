@@ -19,7 +19,7 @@
 .qr .lead{font-size:20px;color:var(--ink2);max-width:30em}
 .qr .sub{color:var(--ink2);max-width:36em;font-size:19px;margin:0 0 44px}
 .qr .ctas{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
-.qr .sec{padding:84px 32px;border-bottom:1px solid var(--line)}
+.qr .sec{padding:64px 32px;border-bottom:1px solid var(--line)}   /* 5 Nov 2026, Simon: sections a little closer together (was 84px top and bottom) */
 .qr .eyebrow{font:500 12px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
 .qr .panel{background:var(--panel);color:#e6edf3;border:1px solid #1f2a35;box-shadow:0 30px 60px -20px rgba(12,17,22,.35)}
 .qr .panel .bar{display:flex;gap:7px;align-items:center;padding:10px 14px;border-bottom:1px solid #1f2a35;font:400 11px 'JetBrains Mono';color:#7d8b98}
@@ -234,7 +234,7 @@
 .qr .pstrip{gap:12px;padding:44px 32px 44px}
 .qr .pstrip img{border-right:0}
 @media(max-width:900px){.qr .pstrip{padding:32px 16px 32px}}
-.qr .gwhead{padding:84px 32px 40px;border-bottom:0}
+.qr .gwhead{padding:64px 32px 32px;border-bottom:0}
 .qr .gwhead h2{margin:0}
 .qr .filmband::after{display:none}
 /* 1 Nov 2026, Simon: the Atlantic Gateway band is the still with a play button; pressing it opens the band out to the film's shape and plays the film in place (home/gateway-film.js) */
@@ -274,7 +274,7 @@
 @media(max-width:900px){.qr .filmband{height:460px}}   /* the taller 540 px band is for wide screens; phones keep 460 */
 @media(max-width:900px){.qr .filmband .fb{left:16px;bottom:28px}}
 @media(prefers-reduced-motion:reduce){.qr .filmband,.qr .filmband>video{transition:none}}
-.qr .assoc{padding:44px 0 48px;border-bottom:1px solid var(--line)}
+.qr .assoc{padding:36px 0 40px;border-bottom:1px solid var(--line)}
 .qr .assoc .eyebrow{padding:0 32px;margin-bottom:26px}
 .qr .assoc .mq{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .qr .assoc .track{display:flex;align-items:center;gap:96px;width:max-content;margin:0;padding:0 48px;list-style:none;animation:mq 70s linear infinite}

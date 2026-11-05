@@ -24,6 +24,9 @@
  *   plotter.destroy();
  */
 const DEG = Math.PI / 180;
+// 5 Nov 2026, Simon: where the chart image ends (open sea west of it, seen just after the clouds) the plotter showed a darker blue band with a line down it. The empty area is now
+// painted the chart's own sea colour (measured from the plate: about #ebf5fa; was #d6e9f3), so the join does not show.
+const SEA = '#ebf5fa';
 const NM_PER_DEG_LAT = 60;
 const MERC = lat => Math.log(Math.tan(lat * DEG) + 1 / Math.cos(lat * DEG));   // for the raster's Web Mercator plate (same as game.js's own MERC)
 
@@ -237,7 +240,7 @@ export function mountNavPlotter(stage, { GEO, route = GEO.route, shipLatLng, hea
     const K = view.pxPerNm, C = view.centre, cosLat = Math.cos(C[0] * DEG);
     const X = g => PW / 2 + (g[1] - C[1]) * 60 * cosLat * K, Y = g => PH / 2 - (g[0] - C[0]) * 60 * K;
     const c = pc; c.setTransform(PX * PS, 0, 0, PX * PS, 0, 0); c.clearRect(0, 0, PW, PH);
-    c.fillStyle = '#d6e9f3'; c.fillRect(0, 0, PW, PH);
+    c.fillStyle = SEA; c.fillRect(0, 0, PW, PH);
     const rasterOn = rReady(chart);
     if (rasterOn) {   // the real chart: Mercator plate → this equirectangular window (locally the same shape; the difference over 5 M is under a pixel)
       const b = chart.meta.bounds, iw = chart.meta.w || chart.img.naturalWidth, ih = chart.meta.h || chart.img.naturalHeight; const mN = MERC(b.north), mS = MERC(b.south);
@@ -319,7 +322,7 @@ export function mountNavPlotter(stage, { GEO, route = GEO.route, shipLatLng, hea
   // a call to draw() itself, which reads the caller's shipLatLng()/headingDeg() getters; those can depend on
   // state (e.g. a scroll progress variable) that only exists once the host's own mount() has fully finished,
   // and this constructor runs synchronously inside that same mount().
-  pc.setTransform(PX * PS, 0, 0, PX * PS, 0, 0); pc.fillStyle = '#d6e9f3'; pc.fillRect(0, 0, PW, PH);
+  pc.setTransform(PX * PS, 0, 0, PX * PS, 0, 0); pc.fillStyle = SEA; pc.fillRect(0, 0, PW, PH);
 
   function destroy() { removeEventListener('keydown', escHandler); root.remove(); }
   for (const evn of ['pointerdown', 'pointermove', 'wheel', 'click', 'keydown']) root.addEventListener(evn, () => { poke = true; }, { passive: true });   // a touch redraws at once

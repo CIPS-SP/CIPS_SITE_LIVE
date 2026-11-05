@@ -1336,13 +1336,39 @@ export async function mount(stage, o, ctx){
       return { uRings, bb, ref };
     });
   
-    function isLand(lon, lat) {
+    // 5 Nov 2026 (load speed, Simon: the globe sat on a blank screen too long): the same even-odd ray cast as pointInRing, done once per
+    // latitude row instead of once per dot. For a row, every ring's crossings of that latitude are worked out once (the same formula and the
+    // same rule for which edges count, so the answers are identical), sorted, and a dot is inside a ring when an odd number of crossings lie
+    // to its east. Was about 1.5 s on a fast PC (the "Building the matrix" wait); now a few tens of ms. Same dots, same places.
+    const rowCache = new Map();
+    function rowCrossings(lat) {
+      let row = rowCache.get(lat); if (row) return row;
+      row = [];
       for (const p of polys) {
+        const b = p.bb; if (lat < b.minLat || lat > b.maxLat) continue;
+        const rings = p.uRings.map(ring => {
+          const xs = [];
+          for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+            const denom = yj - yi; if (denom === 0) continue;
+            if ((yi > lat) !== (yj > lat)) xs.push((xj - xi) * (lat - yi) / denom + xi);
+          }
+          return Float64Array.from(xs).sort();
+        });
+        row.push({ p, rings });
+      }
+      rowCache.set(lat, row); return row;
+    }
+    const eastOf = (xs, x) => { let lo = 0, hi = xs.length; while (lo < hi) { const m = (lo + hi) >> 1; if (xs[m] > x) hi = m; else lo = m + 1; } return xs.length - lo; };   // how many crossings lie strictly east of x
+    function isLand(lon, lat) {
+      for (const { p, rings } of rowCrossings(lat)) {
         let L = lon; const d = L - p.ref;         // bring test point into the polygon's frame
         if (d > 180) L -= 360; else if (d < -180) L += 360;
         const b = p.bb;
-        if (L < b.minLon || L > b.maxLon || lat < b.minLat || lat > b.maxLat) continue;
-        if (pointInPolygon(L, lat, p.uRings)) return true;
+        if (L < b.minLon || L > b.maxLon) continue;
+        if (!(eastOf(rings[0], L) & 1)) continue;                                   // outside the outer ring
+        let hole = false; for (let k = 1; k < rings.length && !hole; k++) hole = !!(eastOf(rings[k], L) & 1);
+        if (!hole) return true;
       }
       return false;
     }
@@ -1422,7 +1448,7 @@ export async function mount(stage, o, ctx){
       pts.push(u.multiplyScalar(h));
     }
     const curve = new THREE.CatmullRomCurve3(pts);
-    const TUB = 90, RAD = 6;
+    const TUB = 240, RAD = 8;   // 5 Nov 2026, Simon: arcs looked blocky close up (was 90 x 6); finer cut so the tube stays round and smooth as the camera closes in
     // custom tube: store centreline + unit radial offset, so a uniform can set thickness live
     const frames = curve.computeFrenetFrames(TUB, false);
     const pos = [], off = [], prog = [], idx = [];
@@ -2143,7 +2169,7 @@ export async function mount(stage, o, ctx){
         else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => polygons.push(poly));
       }
     } catch (e) {
-      statusEl.textContent = 'Could not load land data (needs internet)';
+      statusEl.textContent = 'Could not load land data (needs internet)'; dispatchEvent(new Event('cips:globe-failed'));   // (index.html's loading screen says so)
       console.error(e); return;
     }
   
@@ -2171,6 +2197,7 @@ export async function mount(stage, o, ctx){
     // showed two maps back-to-back in the same transition.
   
     statusEl.style.display = 'none';
+    requestAnimationFrame(() => requestAnimationFrame(() => dispatchEvent(new Event('cips:globe-ready'))));   // 5 Nov 2026: index.html's loading screen fades once the first frames of the globe are on screen
     hintEl.style.transition = 'opacity 1s'; hintEl.style.opacity = 1;
     console.log('dots:', { fill: fill.length, edge: edge.length });
   }
@@ -2263,7 +2290,11 @@ export async function mount(stage, o, ctx){
     // (Howard's lab, 15 Sep — guards against the picker's "Show her" zoom and the deep zoom)
     const expectDepth = lerp(FAR_Z - CFG.radius, NEAR_Z - CFG.radius, smooth(REORIENT_END, 0.62, p));
     const zoomK = Math.min(1, (camera.position.z - CFG.radius) / expectDepth);
-    ARC_TH.value = lerp(CFG.arcThickness, CFG.arcThicknessNear, smooth(REORIENT_END, 0.65, p)) * zoomK; // arcs thin as we approach
+    // 5 Nov 2026, Simon: "make the comet arcs thinner and more refined, they are too chunky as the zoom increases". The thickness was a size in the world, so it swelled on
+    // screen as the camera closed in. Now it is scaled with the camera's height above the globe: the same fine thread on screen at any zoom, easing to about half as the
+    // camera arrives (ARC_NEAR_K). The world view (the start) is unchanged.
+    const ARC_NEAR_K = 0.5, camDepth = Math.max(1e-6, camera.position.z - CFG.radius);
+    ARC_TH.value = CFG.arcThickness * Math.min(1, camDepth / (FAR_Z - CFG.radius)) * lerp(1, ARC_NEAR_K, smooth(REORIENT_END, 0.65, p)); // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
   
     // world globe stays visible until the very end of this beat's own track — cloud-pass crossfades in over it
     // (fadePrev), so fading the globe out early here just left a blank gap before the next beat's imagery arrived.
