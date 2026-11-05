@@ -215,8 +215,10 @@
        message only arrived once its scene had loaded), fades in only after 0.35 s (a quick load never shows it), and fades out when the globe is drawn (cips:globe-ready). */
     #globeLoader { position:absolute; top:0; left:0; right:0; height:100vh; height:100svh; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
       background:radial-gradient(ellipse at 50% 46%, #0b1a2c 0%, #06101d 45%, #04070e 100%); color:#9fc3d6; pointer-events:none;
-      opacity:0; animation:glIn .5s ease .35s forwards; transition:opacity .6s ease; }
-    #globeLoader.gone { opacity:0 !important; animation:none; }
+      transition:opacity .6s ease; }
+    /* (5 Nov 2026, later: the dark background covers the page from the first moment, so a globe drawn underneath early is never seen and then covered again; only the icon and words wait 0.35 s) */
+    #globeLoader > * { opacity:0; animation:glIn .5s ease .35s forwards; }
+    #globeLoader.gone { opacity:0 !important; }
     #globeLoader svg { width:104px; height:104px; overflow:visible; }
     #globeLoader .dot { fill:none; stroke:#4fb0e4; stroke-width:2.2; stroke-linecap:round; stroke-dasharray:0 6.2; }
     #globeLoader .rim { fill:none; stroke:#45d3bb; stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0 5.4; }

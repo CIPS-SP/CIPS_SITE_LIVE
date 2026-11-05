@@ -69,6 +69,9 @@ export async function run(list, opts = {}) {
       }
       layer = document.createElement('div'); layer.className = 'beat beat-' + name + ' beat-layer'; layer.dataset.beat = name;
       layer.style.zIndex = String(10 + i + (item.over ? 50 : 0));
+      // 5 Nov 2026, Simon (the page went dark again a moment after the globe appeared): a later layer starts hidden. Its visibility is set by frame(), which only starts once every scene
+      // is mounted, so until then each new layer (the sea, with its dark background) lay on top of the globe for the seconds the rest took to build.
+      if (g.members.length) layer.style.visibility = 'hidden';
       const inner = document.createElement('div'); inner.className = 'beat-stage'; inner.tabIndex = -1; lockStageScroll(inner); layer.appendChild(inner);
       g.stage.appendChild(layer);
       g.members.push({ item, layer });
