@@ -197,4 +197,64 @@ await t('health, unknown paths, wrong methods, preflight', async () => {
   assert.equal(pre.status, 204); assert.equal(pre.headers.get('Access-Control-Allow-Origin'), ORIGIN);
 });
 
+console.log('short links (5 Nov 2026)');
+const { normCode, codeFromRef, slugFor, makeCode } = await import('../src/code.js');
+const makeLink = async (e, over = {}, auth = desk) => send(e, req('POST', '/api/links', { body: { b: BOOKING, ship: 'M/Y Kinship', port: 'St Helier, Jersey', arr: '12 Aug 2026', dep: '14 Aug 2026', svc: ['AGENCY', 'BUNKERS'], ...over }, headers: auth }));
+await t('codes: 8 characters, no I L O U; typed variants read back; vessel names become tidy slugs', async () => {
+  for (let i = 0; i < 200; i++) assert.match(makeCode(), /^[0-9A-HJKMNP-TV-Z]{8}$/);
+  assert.equal(normCode('7kq4m2xd'), '7KQ4M2XD'); assert.equal(normCode('7KQ4M2XO'), '7KQ4M2X0'); assert.equal(normCode('IL234567'), '11234567');
+  assert.equal(normCode('7KQ4M2X'), ''); assert.equal(normCode('7KQ4M2XU'), ''); assert.equal(normCode('<script>'), '');
+  assert.equal(codeFromRef('kinship-7KQ4M2XD'), '7KQ4M2XD'); assert.equal(codeFromRef('lady-m-7kq4m2xd'), '7KQ4M2XD'); assert.equal(codeFromRef('7KQ4M2XD'), '7KQ4M2XD');
+  assert.equal(slugFor('M/Y Kinship'), 'kinship'); assert.equal(slugFor('S/Y Étoile du Nord'), 'etoile-du-nord'); assert.equal(slugFor('MY Lady M'), 'lady-m'); assert.equal(slugFor(''), '');
+});
+await t('the Desk makes a short link: code, vessel-code reference, full link, default 60-day expiry', async () => {
+  const e = { ...env(), REVIEW_PAGE: 'https://site.example/review/' };
+  const r = await makeLink(e); assert.equal(r.status, 200);
+  const j = await r.json();
+  assert.match(j.code, /^[0-9A-HJKMNP-TV-Z]{8}$/); assert.equal(j.ref, 'kinship-' + j.code);
+  assert.equal(j.link, 'https://site.example/review/?kinship-' + j.code); assert.equal(j.exp, '2027-01-09');
+});
+await t('only the Desk can make or switch off links; bad details are refused', async () => {
+  const e = env();
+  assert.equal((await makeLink(e, {}, {})).status, 401);
+  assert.equal((await makeLink(e, {}, { Authorization: 'Bearer wrong' })).status, 401);
+  assert.equal((await makeLink(e, { b: 'notabooking' })).status, 400);
+  assert.equal((await makeLink(e, { exp: '2026-11-01' })).status, 400);
+  assert.equal((await send(e, req('DELETE', '/api/links/7KQ4M2XD'))).status, 401);
+});
+await t('the page can look a code up: details without the booking id, any case, O/0 and I/1 forgiven', async () => {
+  const e = env(); const { code } = await (await makeLink(e)).json();
+  const r = await send(e, req('GET', '/api/link/' + code.toLowerCase(), { headers: { Origin: ORIGIN } }));
+  assert.equal(r.status, 200); assert.equal(r.headers.get('Access-Control-Allow-Origin'), ORIGIN);
+  const d = await r.json();
+  assert.deepEqual(Object.keys(d).sort(), ['arr', 'dep', 'exp', 'port', 'ship', 'svc']); assert.equal(d.ship, 'M/Y Kinship');
+  assert.equal(JSON.stringify(d).includes(BOOKING), false);
+});
+await t('unknown codes: not found, and after 30 misses an hour the address must wait', async () => {
+  const e = env(); const ip = { 'CF-Connecting-IP': '203.0.113.9' };
+  assert.equal((await send(e, req('GET', '/api/link/7KQ4M2XD', { headers: ip }))).status, 404);
+  assert.equal((await send(e, req('GET', '/api/link/rubbish!', { headers: ip }))).status, 404);
+  for (let i = 0; i < 30; i++) await send(e, req('GET', '/api/link/22222222', { headers: ip }));
+  assert.equal((await send(e, req('GET', '/api/link/33333333', { headers: ip }))).status, 429);
+  assert.equal((await send(e, req('GET', '/api/link/33333333', { headers: { 'CF-Connecting-IP': '198.51.100.7' } }))).status, 404);
+});
+await t('an answer sent with a code is stored with the booking from the box; a wrong code is refused', async () => {
+  const e = env(); const { code } = await (await makeLink(e)).json();
+  const ans = { role: 'Captain', overall: 5, appoint: 'Yes', didWell: 'Very good.', imp: {} };
+  assert.equal((await send(e, req('POST', '/api/review', { body: { c: code, ...ans }, headers: { Origin: ORIGIN } }))).status, 200);
+  assert.equal((await send(e, req('POST', '/api/review', { body: { c: 'ZZZZZZZZ', ...ans }, headers: { Origin: ORIGIN } }))).status, 403);
+  const items = (await (await send(e, req('GET', '/api/collect', { headers: desk }))).json()).items;
+  assert.equal(items.length, 1); assert.equal(items[0].booking, BOOKING); assert.equal(items[0].c, undefined);
+});
+await t('a link expires at the end of its day (the page is told "expired"), and the Desk can switch one off', async () => {
+  const e = env(); const { code } = await (await makeLink(e, { exp: '2026-11-10' })).json();
+  assert.equal((await send(e, req('GET', '/api/link/' + code), Date.parse('2026-11-10T23:59:00Z'))).status, 200);
+  const late = await send(e, req('GET', '/api/link/' + code), Date.parse('2026-11-11T00:00:01Z'));
+  assert.equal(late.status, 410); assert.equal((await late.json()).reason, 'expired');
+  const { code: c2 } = await (await makeLink(e)).json();
+  assert.equal((await send(e, req('DELETE', '/api/links/' + c2, { headers: desk }))).status, 200);
+  assert.equal((await send(e, req('GET', '/api/link/' + c2))).status, 404);
+  assert.equal((await send(e, req('POST', '/api/review', { body: { c: c2, overall: 5 }, headers: { Origin: ORIGIN } }))).status, 403);
+});
+
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

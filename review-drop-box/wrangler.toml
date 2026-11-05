@@ -10,6 +10,10 @@ send_metrics = false
 # 5 Nov 2026: the live site on Cloudflare Pages (cipslive.pages.dev) and, ready for go-live, cips.agency with and without www.
 ALLOWED_ORIGINS = "https://cipslive.pages.dev,https://cips.agency,https://www.cips.agency"
 
+# The review page, for the full link the box hands back when the Desk makes a short link (…/review/?kinship-7KQ4M2XD).
+# Change to https://cips.agency/review/ when the site moves there.
+REVIEW_PAGE = "https://cipslive.pages.dev/review/"
+
 [[kv_namespaces]]
 binding = "BOX"
 id = "2c88883b101e4edfaac53006ad8c7465"   # KV namespace "BOX", created 5 Nov 2026 on Simon@cips.agency's Account

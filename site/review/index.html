@@ -270,9 +270,18 @@
 
   var API = String(window.REVIEW_API || '').replace(/\/$/, '');
   var LINK_RAW = (new URLSearchParams(location.search).get('p') || '').trim();
-  // The link is signed by the CIPS Desk. This page only reads it to show the ship and the services;
+  // 5 Nov 2026, Simon: short links. A link is now  /review/?kinship-7KQ4M2XD : the vessel's name (for the eye only) and an
+  // 8-character code. The drop box holds the booking's details under that code; this page asks it for them (never the booking id)
+  // and sends the code back with the answers. The long signed links (?p=...) below still work.
+  var CODE = LINK_RAW ? '' : (function(){
+    var s = location.search.replace(/^\?/, '').split('&')[0];
+    try { s = decodeURIComponent(s); } catch (e) {}
+    s = s.replace(/\s+/g, ''); s = s.slice(s.lastIndexOf('-') + 1).toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1');
+    return /^[0-9A-HJKMNP-TV-Z]{8}$/.test(s) ? s : '';
+  })();
+  // The long link is signed by the CIPS Desk. This page only reads it to show the ship and the services;
   // the drop box checks the signature again when the answer is sent, so editing the link gets nowhere.
-  var LINK = (function(){
+  var LINK = CODE ? null : (function(){
     try {
       var part = LINK_RAW.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');
       var bin = atob(part + '='.repeat((4 - part.length % 4) % 4));
@@ -336,7 +345,19 @@
     var exp=document.getElementById('exp'); if (exp) exp.textContent='';
   }
 
-  if (LINK && !LINK.expired) { fill(LINK); } else { showLoadError(LINK && LINK.expired ? 'expired' : 'bad'); }
+  if (CODE) {
+    // the form stays hidden until the details have arrived (a second at most), so the captain never sees a blank "your vessel"
+    var sections = document.querySelectorAll('main > .section'), welcome = document.querySelector('.welcome');
+    sections.forEach(function(s){ s.style.visibility='hidden'; }); if (welcome) welcome.style.visibility='hidden';
+    fetch(API + '/api/link/' + CODE, { cache: 'no-store' })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(body){ return { ok: r.ok, body: body }; }); })
+      .then(function(res){
+        sections.forEach(function(s){ s.style.visibility=''; }); if (welcome) welcome.style.visibility='';
+        if (res.ok && res.body && res.body.exp) { LINK = res.body; fill(LINK); }
+        else showLoadError(res.body && res.body.reason === 'expired' ? 'expired' : 'bad');
+      })
+      .catch(function(){ sections.forEach(function(s){ s.style.visibility=''; }); if (welcome) welcome.style.visibility=''; showLoadError('bad'); });
+  } else if (LINK && !LINK.expired) { fill(LINK); } else { showLoadError(LINK && LINK.expired ? 'expired' : 'bad'); }
 
   /* star inputs — reusable so we can bind stars rendered later (the priorities panel) too */
   function bindStars(root){
@@ -423,7 +444,7 @@
     }
     function val(id){ var el=document.getElementById(id); return el ? el.value : ''; }
     var payload = {
-      p: LINK_RAW, role: roleEl.value, name: val('reviewerName'),
+      p: CODE ? undefined : LINK_RAW, c: CODE || undefined, role: roleEl.value, name: val('reviewerName'),
       overall:starVal('q6'), presence:starVal('q1'), excellence:starVal('q2'), port:starVal('q7'),
       replenish:starVal('q4'), suppliers:starVal('q8'), fuel: fuelVal(),
       appoint: appointVal(),

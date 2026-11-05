@@ -33,7 +33,7 @@ The picker carries a **preview of the journey card** (title, "N nm from <place>"
 
 ## Open items (5 Nov 2026)
 - GitHub repo `CIPS-SP/CIPS_SITE_LIVE` (private): `dev` and `main` are both on GitHub (`dev` last pushed 5 Nov with the 5 Nov journey changes; `main` released 5 Nov, same as `dev` including `review-drop-box/`). Push again only when Simon says push. Cloudflare Pages project `cipslive` is live at https://cipslive.pages.dev (5 Nov; builds `main`, previews off, noindex), so every release to `main` goes online there. cips.agency is not connected yet.
-- Review drop box live since 5 Nov 2026 (https://cips-review-drop-box.simon-92c.workers.dev, see `review-drop-box/README.md`); `site/review/config.js` points at it except on localhost. Never print or commit its two secrets. Still to do: the Desk's half (brief only with Simon's say-so).
+- Review drop box live since 5 Nov 2026 (https://cips-review-drop-box.simon-92c.workers.dev, see `review-drop-box/README.md`); `site/review/config.js` points at it except on localhost. Review links are short (`/review/?kinship-7KQ4M2XD`, code held in the box, `review-drop-box/src/code.js`). Never print or commit its two secrets. Still to do: the Desk's half (brief only with Simon's say-so).
 
 ## The quay and the finale (4 Nov 2026)
 - Quay: the Washdown call-out fades about a second after the spray starts (`quay-work.js`, `putTag('D', ...)`); the camera's pan onto the quay finishes by q = 0.17 (`beat.js`, `wq`) so the brow's landward end is in frame when tanker A's second driver reaches it.
