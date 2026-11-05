@@ -10,8 +10,8 @@ Everything here was checked against the code and `git log` on 5 Nov 2026. If the
 
 - **Repo:** `C:\Users\amity\GitHub\Code\CIPS-SITE-LIVE`. Branches: `dev` (Test/Dev, where all editing happens, checked out) and `main` (Live, README only so far).
 - **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, created by Simon). **Both branches are pushed** (checked 5 Nov: `origin/dev` = `f97c223`, `origin/main` = `b4590db`, README only). Push again only when Simon says "push" (no force).
-- **Local only, not pushed (5 Nov):** `46eddb4` notes (hosting plan: `main` only on Cloudflare), and the 5 Nov journey changes (finale plotter waits at each shot, Enlarge carries over, quay clip pauses after two plays, globe chevron's first heading). `git log origin/dev..dev` lists them.
-- **Earlier commits on `dev` (pushed), newest first:**
+- **Pushed 5 Nov (Simon said push):** `46eddb4` notes (hosting plan: `main` only on Cloudflare), `3dcd1a1` the 5 Nov journey changes (finale plotter waits at each shot, Enlarge carries over, quay clip pauses after two plays, globe chevron's first heading) and the notes commit after it. `git log origin/dev..dev` shows anything newer that is still local.
+- **Earlier commits on `dev`, newest first:**
   - `f97c223` this handover note; CLAUDE.md standing rules
   - `55be5f1` quay: washdown tag fades 1 s after spraying; pan onto the quay faster; finale: plotter follows the yacht in the departure film
   - `65bcd17` ping at the departure while the picker is open; "Scroll to start the journey"
@@ -110,8 +110,8 @@ One long page, `site/index.html` (about 1,030 lines, LF endings; contains legacy
 
 ## 8. Open jobs, in a sensible order
 
-1. **Simon looks at 5 Nov work on his PC** (the quay pan and washdown tag were approved 5 Nov): the finale plotter waiting at each shot, Enlarge carrying over, the quay clip pausing after two plays, the globe chevron's first heading. Then decide how to **shorten the quay scroll** (see below).
-   - Quay scroll, measured 5 Nov: only 59 of the 2,842 story seconds have nothing moving (25 s before tanker A, 14 s at the end, a few seconds between jobs). So the scroll can only get shorter at the same on-screen speeds by telling a shorter story: overlapping jobs that now run alone (113-587 s tanker A's crew and hose on their own; 2209-2828 s hose A coming back and tanker A leaving, mostly on their own), dropping a run (provisions or a garbage run), or shorter walks. Simon to choose.
+1. **Simon looks at 5 Nov work on his PC** (the quay pan and washdown tag were approved 5 Nov): the finale plotter waiting at each shot, Enlarge carrying over, the quay clip pausing after two plays, the globe chevron's first heading.
+   - **Quay scroll: on hold** (5 Nov, Simon: "leave the scroll untouched for now"). Do not change it until he asks. Measured 5 Nov: only 59 of the 2,842 story seconds have nothing moving (25 s before tanker A, 14 s at the end, a few seconds between jobs). So the scroll can only get shorter at the same on-screen speeds by telling a shorter story: overlapping jobs that now run alone (113-587 s tanker A's crew and hose on their own; 2209-2828 s hose A coming back and tanker A leaving, mostly on their own), dropping a run (provisions or a garbage run), or shorter walks. Simon to choose.
 2. **Cloudflare** account and project for `main` only (previews off), its `*.pages.dev` address first (noindex, optionally Cloudflare Access), later cips.agency (`www` by CNAME; apex needs Cloudflare DNS or a redirect).
 3. **Drop box deploy + `REVIEW_API`**, then a short Desk brief.
 4. **Plotter sync for the arrival clips** (if Simon wants it).

@@ -32,7 +32,7 @@ Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.m
 The picker carries a **preview of the journey card** (title, "N nm from <place>", destination, what for, speed, ETA) under the choices; it opens on the Mediterranean and follows each choice and the name. Its numbers come from the route the globe plans: `beat.js` (`publishKinRoute`) puts them on `CIPS_VESSEL.route` and fires `cips:route`; the real voyage card in the panel uses the same route (ETA counts down along it). Choosing a departure, or opening the picker, turns the globe to it (`focusOn`); once the journey is under way `tick()` keeps the globe turned to the vessel all the way (as it already did for a routed ship). "Scroll to start the journey" (the first scroll presses it) folds the picker away (`.voyage-mode`) and leaves the card with "Scroll to continue".
 
 ## Open items (5 Nov 2026)
-- GitHub repo `CIPS-SP/CIPS_SITE_LIVE` (private): `dev` and `main` are both pushed (checked 5 Nov: `dev` at `f97c223`, `main` README only). Push again only when Simon says push. Still needed: the Cloudflare account/project.
+- GitHub repo `CIPS-SP/CIPS_SITE_LIVE` (private): `dev` and `main` are both on GitHub (`dev` last pushed 5 Nov with the 5 Nov journey changes; `main` README only). Push again only when Simon says push. Still needed: the Cloudflare account/project.
 - Deploy the review drop box and set `site/review/config.js`.
 
 ## The quay and the finale (4 Nov 2026)
