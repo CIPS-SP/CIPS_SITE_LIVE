@@ -1242,8 +1242,8 @@ export async function mount(stage, o, ctx){
   const SPRITE = dotSprite(64);
   // 5 Nov 2026, Simon: the city dots as pin pricks / stars of light: a small white-hot core in a warm orange halo, with a faint four-point glint (drawn white; the colour is in the picture)
   const STAR = (() => { const s = 64, c = document.createElement('canvas'); c.width = c.height = s; const g = c.getContext('2d'), m = s / 2;
-    const rg = g.createRadialGradient(m, m, 0, m, m, m); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.16, 'rgba(255,244,222,1)'); rg.addColorStop(0.3, 'rgba(255,160,70,.9)');
-    rg.addColorStop(0.55, 'rgba(244,83,0,.35)'); rg.addColorStop(1, 'rgba(244,83,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, s, s);
+    const rg = g.createRadialGradient(m, m, 0, m, m, m); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.14, 'rgba(255,240,215,1)'); rg.addColorStop(0.3, 'rgba(255,140,50,.95)');
+    rg.addColorStop(0.5, 'rgba(244,83,0,.5)'); rg.addColorStop(0.75, 'rgba(244,83,0,.14)'); rg.addColorStop(1, 'rgba(244,83,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, s, s);
     g.globalCompositeOperation = 'lighter'; for (const [w, h] of [[s, 1.6], [1.6, s]]) { const lg = w > h ? g.createLinearGradient(0, 0, s, 0) : g.createLinearGradient(0, 0, 0, s);
       lg.addColorStop(0, 'rgba(255,200,140,0)'); lg.addColorStop(0.5, 'rgba(255,236,210,.55)'); lg.addColorStop(1, 'rgba(255,200,140,0)'); g.fillStyle = lg; g.fillRect(m - w / 2, m - h / 2, w, h); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
@@ -2304,7 +2304,7 @@ export async function mount(stage, o, ctx){
     // camera arrives (ARC_NEAR_K). The world view (the start) is unchanged.
     const ARC_NEAR_K = 0.5, camDepth = Math.max(1e-6, camera.position.z - CFG.radius);
     ARC_TH.value = CFG.arcThickness * Math.min(1, camDepth / (FAR_Z - CFG.radius)) * lerp(1, ARC_NEAR_K, smooth(REORIENT_END, 0.65, p));
-    if (endpointMat) endpointMat.size = CFG.endpointSize * 1.6 * Math.min(1, camDepth / (FAR_Z - CFG.radius));   // 5 Nov 2026, Simon: the city dots stay pin pricks as we zoom in (they swelled with the zoom) // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
+    if (endpointMat) endpointMat.size = CFG.endpointSize * 2.4 * Math.min(1, camDepth / (FAR_Z - CFG.radius));   // 5 Nov 2026, Simon: the city dots stay pin pricks as we zoom in (they swelled with the zoom) // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
   
     // world globe stays visible until the very end of this beat's own track — cloud-pass crossfades in over it
     // (fadePrev), so fading the globe out early here just left a blank gap before the next beat's imagery arrived.
