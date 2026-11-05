@@ -21,6 +21,8 @@ const CSS_URL = new URL('./video-moment.css', import.meta.url).href;
 let wideSetting = false;   // the Expand choice carries from one moment (and one beat) to the next
 // 5 Nov 2026, Simon: the ON SCENE box flashed up while the page was loading. It was added before its own stylesheet had arrived, so it showed unstyled for a moment.
 // Each box now stays hidden until the stylesheet has loaded (or failed).
+// seconds of a film with `cuts` left out -> seconds of the file (cuts: [[from, to], ...] in file seconds, in order)
+export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) t += c[1] - c[0]; else break; } return t; }
 let cssReady = null;
 function loadCss() {
   if (cssReady) return cssReady;
@@ -70,7 +72,9 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   const fullOff = m => { m.on = false; m.box.classList.remove('on'); try { m.v.pause(); } catch (e) {} };
   // 31 Oct 2026, Simon: the film and the shrink that follows it must both be scrolled (or both timed); a `scrub: [a, b]` moment is scrolled: the picture is the film at (p - a) / (b - a) of its length, paused, going backwards as well. Seeks are one at a time and the
   // last wanted time is applied when the one in flight lands (the film is cut with a keyframe every 4 frames so a seek is cheap).
-  const scrubTo = (m, p) => { if (still || !m.v.duration) return; m.want = Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))) * Math.max(0, m.v.duration - 0.05); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
+  // 5 Nov 2026, Simon: `cuts: [[from, to], ...]` (film seconds) are left out of a scrubbed film: the scroll runs through the rest as if they were not there (the file itself is not re-cut). cutTime() turns
+  // seconds of the kept film into seconds of the file; beat.js uses the same to keep the plotter in step.
+  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))) * kept); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
   F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
   function updateFull(p) {
     for (const m of F) {

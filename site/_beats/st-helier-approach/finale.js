@@ -19,7 +19,7 @@ const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t
 // does not move; then the pull-back (5.5 s, was 7.5 s), the film (its own length), the closing line and the shrink follow. AUTO: [from r, to r, seconds].
 export const CLOSE_R = 0.003;   // the services card starts to close here (beat.js)
 const HOLD_R = CLOSE_R + 0.0006, HOLD_S = 3.8, PREROLL = 0.05;   // (HOLD_R: just past it, so the card has certainly started)
-const AUTO = [[CLOSE_R, 0.20, 5.5], [0.20, 0.62, 15.4], [0.62, 0.74, 3.0], [0.74, 1.0, 3.6]], RESUME_MS = 1300;
+const AUTO = [[CLOSE_R, 0.20, 5.5], [0.20, 0.62, 11.1], [0.62, 0.74, 3.0], [0.74, 1.0, 3.6]], RESUME_MS = 1300;
 const autoRate = r => { if (r < CLOSE_R) return PREROLL; for (const [a, b, sec] of AUTO) if (r >= a && r < b) return (b - a) / sec; return 0; };   // r per second
 
 export function createFinale({ stage, host, line = 'For your call at The Atlantic Gateway.', tail = 0.11294, reduced = false }) {

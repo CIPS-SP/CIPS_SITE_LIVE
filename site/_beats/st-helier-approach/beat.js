@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { clamp01, lerp, smooth, cinematicSilk } from '../runtime/stage.js';
 import { scoreAt } from '../_shared/zoom-score.js';
 import { mountNavPlotter } from '../_shared/nav-plotter.js';
-import { mountVideoMoment } from '../_shared/video-moment.js';
+import { mountVideoMoment, cutTime } from '../_shared/video-moment.js';
 import { createWakeSimulation, makeOcean, BOUNDS, SHIP_LENGTH_WORLD, setWakeParams, PAGE_T0 } from '../_shared/sea-wake.js';
 import { GEO } from '../seaway-wake/game/geography-data.js';
 import { CFG } from '../seaway-wake/game/config.js';
@@ -42,7 +42,7 @@ export const defaults = {
     { id:'pier-heads', file:'journey-3-pier-heads', title:'Through the pier heads', from:0.30, to:0.47 },
     { id:'alongside', file:'journey-4-alongside', title:'Alongside', from:0.50, to:0.90 },
     { id:'quay-at-work', file:'journey-5-quay-at-work', title:'The quay at work', from:1.03, to:1.97, loops:2 },   // 5 Nov 2026, Simon: pauses after two plays; a click plays it on
-    { id:'departure', file:'journey-6-departure', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
+    { id:'departure', file:'journey-6-departure', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], cuts:[[6.04, 10.30]], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
   ],
   calm: 0.6, calmIn: [0.0, 0.10],   // 16 Oct 2026, Simon: "make the sea calmer in the small roads and harbour": 0 = the open-sea look noirmont ends on, 1 = glassy; eased in over the first 10% so there is no step at the seam
   wakeIntensity: 0.55, wakeFade: [0.95, 1.0], wakeRun: 1.8, bob: 0.22, shipSpeed: 40, flow: 0.5, sunElevation: 55, wakeCenterY: 0,
@@ -562,20 +562,20 @@ export async function mount(stage, o, ctx) {
     const hdg = d => { const a = pos(d - 0.012), b = pos(d + 0.012), cosLat = Math.cos(a[0] * Math.PI / 180); return ((Math.atan2((b[1] - a[1]) * cosLat, b[0] - a[0]) * 180 / Math.PI) + 360) % 360; };
     return { pos, hdg, dOf, total, dStart: DENSE.total };
   })();
-  const FILM_S = 15.35, FILM_PZ = [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
+  // 5 Nov 2026, Simon: shot 4 (just outside the pier heads) and the speed burst at the start of shot 5 (the Small Roads) are left out: film 6.04 to 10.30 s (FILM_CUTS, the same as the moment's `cuts`); 15.4 s -> 11.1 s.
+  const FILM_CUTS = [[6.04, 10.30]], FILM_S = 15.35 - 4.26, FILM_PZ = [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
   // 5 Nov 2026, Simon: the ship no longer runs along the line between the shots (it rushed); it waits where each shot is taken and only creeps a little while the shot lasts, jumping to the next spot at each cut.
   // SOG 3.0 kn in the harbour, 5.0 kn from the Small Roads on. FILM_SHOTS: [film seconds from, to, nm along EXIT at the start and end of the shot, knots]; the cuts (1.80, 2.84, 6.04, 7.96, 12.20 s) were read off the film.
   const FILM_SHOTS = (() => { const dK = EXIT.dOf(K_TURN), dGap = EXIT.dOf(GAP_MID), dX = EXIT.dOf(X_TURN), dS = EXIT.dStart, H = 3.0, SEA = 5.0;
     return [[0, 1.80, 0, 0.004, H],                                       // easing off the berth
             [1.80, 2.84, 0.45 * dK, 0.47 * dK, H],                        // overhead: half way up the channel
             [2.84, 6.04, 0.80 * dK, 0.88 * dK, H],                        // inside the pier heads, heading for the gap
-            [6.04, 7.96, dGap + 0.25 * (dX - dGap), dGap + 0.32 * (dX - dGap), H],   // looking back at the harbour: just out through the pier heads
-            [7.96, 12.20, dX + 0.35 * (dS - dX), dX + 0.38 * (dS - dX), SEA],          // overhead on the water: the Small Roads
+            [10.30, 12.20, dX + 0.365 * (dS - dX), dX + 0.38 * (dS - dX), SEA],        // overhead on the water: the Small Roads (from 10.30 s; shot 4, 6.04 to 7.96, and the start of this one are cut)
             [12.20, 15.40, Math.min(EXIT.total, dS + 0.30), Math.min(EXIT.total, dS + 0.34), SEA]];   // far out, the open sea
   })();
   function exitAt(pz, hdg0) {   // the plotter's ship at this point of the scroll: null until the film starts
     if (pz <= FILM_PZ[0]) return null;
-    const tf = clamp01((pz - FILM_PZ[0]) / (FILM_PZ[1] - FILM_PZ[0])) * FILM_S;
+    const tf = cutTime(FILM_CUTS, clamp01((pz - FILM_PZ[0]) / (FILM_PZ[1] - FILM_PZ[0])) * FILM_S);   // (seconds of the file)
     let i = 0; while (i < FILM_SHOTS.length - 1 && tf >= FILM_SHOTS[i][1]) i++;
     const s = FILM_SHOTS[i], d = lerp(s[2], s[3], clamp01((tf - s[0]) / (s[1] - s[0]))), out = EXIT.hdg(d);
     return { pos: EXIT.pos(d), hdg: hdg0 + (((out - hdg0 + 540) % 360) - 180) * smooth(0, 1.8, tf), kn: s[4] };   // the ship starts on the berth's heading and swings onto the way out during the first shot
