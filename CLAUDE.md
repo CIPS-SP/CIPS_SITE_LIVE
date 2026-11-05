@@ -1,13 +1,18 @@
 # CIPS Site LIVE: notes for Claude
 
-Public website of Channel Island Port Services (cips.agency). Read `README.md` first for the branches and the folders.
+Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.md` first** (state, map of the site, the journey in detail, how to test, editing traps, open jobs), then `README.md` for the branches and the folders. Keep `HANDOVER.md` true: when something it says changes, fix it in the same turn.
 
 ## Who and how
 - Simon Porritt (MD) is not a developer. Explain choices briefly and plainly; show him what you built before moving on.
 - Work on branch `dev`. **`main` is Live and only changes by a deliberate release, when Simon says so.**
 - **Never push without Simon saying "push".** Commit locally as you go; end commit messages with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
 - Confirm before anything outward-facing (pushing, deploying, releasing, emailing, changing Airtable).
-- In copy, do not call a ship "her"; say the ship, the yacht, Kinship.
+- In copy, do not call a ship "her"; say the ship, the yacht, Kinship. Use they/them for anyone whose pronouns are unstated.
+- Simon views only locally (`Open CIPS Site LIVE (Windows).bat`, `http://localhost:8080`); never give him Vercel or preview links, never cite Howard's branches or URLs.
+- Never edit Howard's lab (`CIPS-TAG/CIPS/HLC-globe-lab`); reading is fine. Lucas Freight is a separate, confidential project: keep its files, names and terms out of this repo.
+- Do not kill processes by id; stop only servers you started. Never message another session without Simon's say-so. Only `git add` specific files.
+- Verify in a browser and say plainly what you could not check. Before listing "what is left", check the claim in the code and `git log`.
+- Editing traps: `globe-live/beat.js`, `live.js`, `beat.html`, `flights.js` are CRLF and `index.html`, `globe-enhancements.js`, `quay-work.js` are LF; never `sed -i` (it strips CRs), patch with Python bytes; write long scripts to a file, not a heredoc. More in `HANDOVER.md` section 7.
 
 ## The rules of this repo
 - `site/` is everything public and **must be self-contained: no request to any outside server** (no CDNs, fonts, tiles, images, APIs, analytics). The one allowed exception is the CIPS review drop box address in `site/review/config.js`. Links people click are fine.
