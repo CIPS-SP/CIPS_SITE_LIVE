@@ -248,6 +248,7 @@ export async function run(list, opts = {}) {
     }
   }
   requestAnimationFrame(frame);
+  requestAnimationFrame(() => requestAnimationFrame(() => dispatchEvent(new Event('cips:scenes-ready'))));   // 5 Nov 2026: every scene is built and drawing (index.html keeps its loading screen up for this, up to a limit)
   addEventListener('resize', () => beats.forEach(b => b.ctrl?.resize?.()), { passive: true });
   return {
     beats,

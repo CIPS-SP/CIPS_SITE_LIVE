@@ -957,8 +957,12 @@
     /* the loading screen goes once the globe is drawn; if the globe cannot load it says so */
     (function () {
       var el = document.getElementById('globeLoader'); if (!el) return;
-      var done = function () { el.classList.add('gone'); setTimeout(function () { el.remove(); }, 700); };
-      addEventListener('cips:globe-ready', done, { once: true });
+      var gone = false, done = function () { if (gone) return; gone = true; el.classList.add('gone'); setTimeout(function () { el.remove(); }, 700); };
+      /* 5 Nov 2026, Simon (the globe was jerky to drag for the first few seconds while the rest of the journey was still being built behind it): the screen stays up after the globe
+         is drawn until the other scenes are built too (cips:scenes-ready, from the runtime) and 0.6 s more, but never longer than 3 s after the globe is ready */
+      var scenes = false; addEventListener('cips:scenes-ready', function () { scenes = true; }, { once: true });
+      addEventListener('cips:globe-ready', function () { var t0 = Date.now();
+        (function wait() { if (scenes) setTimeout(done, 600); else if (Date.now() - t0 >= 3000) done(); else setTimeout(wait, 100); })(); }, { once: true });
       addEventListener('cips:globe-failed', function () { var l = el.querySelector('.lbl'); if (l) l.textContent = 'The globe could not load. Please refresh the page'; var sub = el.querySelector('.sub'); if (sub) sub.remove(); }, { once: true });
     })();
   </script>
