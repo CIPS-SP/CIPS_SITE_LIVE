@@ -94,7 +94,7 @@ try {
 const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : [join(d, e.name)]));
 const all = walk(SITE).map((p) => relative(SITE, p).replace(/\\/g, '/'));
 const unused = all.filter((f) => !requested.has(f) && f !== '_headers' && f !== 'robots.txt');
-if (!apiHost) for (const k of ['/api/reviews']) problems.missing.delete(k);   // until the drop box has an address, the review sections use their placeholder quotes: expected
+for (const k of ['/api/reviews']) problems.missing.delete(k);   // this check serves site/ on this PC, where the pages ask their own address for the reviews (review/config.js: the drop box only online); with none, the review sections keep their placeholder quotes: expected
 const bad = problems.missing.size + problems.outside.size + problems.errors.length;
 console.log('\n=== CHECK REPORT ===');
 console.log('files in site/:', all.length, '| requested during the run:', requested.size, '| never requested:', unused.length);

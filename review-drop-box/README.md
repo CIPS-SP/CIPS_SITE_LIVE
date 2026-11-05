@@ -2,7 +2,7 @@
 
 A tiny public service that holds captains' review answers in a queue until the Desk collects them, and serves the approved-reviews list the Desk publishes. **It has no Airtable key and cannot read or write Airtable.** Design: `CIPS-TAG/CIPS/DOCS/SPEC-reviews.md` (sections 4 to 6; the spec stays in CIPS-TAG, read it there).
 
-Built 3 Nov 2026 in CIPS-TAG; copied into CIPS SITE LIVE on 5 Nov 2026, and this copy is the one to work on and deploy (the CIPS-TAG copy is left as it was). **Not deployed yet** (needs a Cloudflare account, see "Putting it live"). Everything here was tested locally; nothing has touched Airtable except the two new fields noted in the spec.
+Built 3 Nov 2026 in CIPS-TAG; copied into CIPS SITE LIVE on 5 Nov 2026, and this copy is the one to work on and deploy (the CIPS-TAG copy is left as it was). **Deployed 5 Nov 2026** on Simon@cips.agency's Cloudflare account: Worker `cips-review-drop-box` at **https://cips-review-drop-box.simon-92c.workers.dev**, KV namespace `BOX` (id in `wrangler.toml`), `ALLOWED_ORIGINS` = cipslive.pages.dev, cips.agency, www.cips.agency. The two secrets are set on the Worker and kept for Simon outside the repo (`Documents\CIPS review drop box - secrets.txt`, to move into his password manager); the Desk on Render needs the same two. Tested live 5 Nov: health, empty list, CORS only for the allowed sites, collect refused without the password, a tampered link refused, a signed test answer accepted, collected with the Desk's password (it appeared after about 30 s: KV lists lag up to a minute, so the Desk should not expect an answer the instant it is sent) and acknowledged, queue empty again. Wrangler was signed out afterwards (Simon's wish): run `npx wrangler login` again for the next deploy, and `npx wrangler logout` after. Nothing has touched Airtable except the two new fields noted in the spec.
 
 ```
 src/link.js       sign and verify review links (the Desk copies this to sign; the box uses it to verify)
@@ -13,7 +13,7 @@ tools/            make-test-link.mjs (stand-in for the Desk's link maker), fake-
 test/run.mjs      28 checks: node test/run.mjs
 wrangler.toml     Cloudflare settings (fill in the storage id)
 ```
-This folder sits beside `site/` and is **not** part of the published website (Cloudflare Pages publishes `site/` only; the box is deployed separately with `wrangler`). The review page is `../site/review/index.html` (hidden, `noindex`, reached only through a signed link). Its one setting is `../site/review/config.js` (`window.REVIEW_API`, the box's address; empty = same address as the page, for local testing).
+This folder sits beside `site/` and is **not** part of the published website (Cloudflare Pages publishes `site/` only; the box is deployed separately with `wrangler`). The review page is `../site/review/index.html` (hidden, `noindex`, reached only through a signed link). Its one setting is `../site/review/config.js` (`window.REVIEW_API`, the box's address; on localhost it is emptied, so the page talks to its own address and local tests never reach the real queue).
 
 ## Try it locally (no accounts, no installs, Node 20 or later)
 ```bash

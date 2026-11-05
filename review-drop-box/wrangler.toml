@@ -7,11 +7,12 @@ send_metrics = false
 
 [vars]
 # Website addresses allowed to post answers and read the approved list (comma separated).
-ALLOWED_ORIGINS = "https://cips.agency"
+# 5 Nov 2026: the live site on Cloudflare Pages (cipslive.pages.dev) and, ready for go-live, cips.agency with and without www.
+ALLOWED_ORIGINS = "https://cipslive.pages.dev,https://cips.agency,https://www.cips.agency"
 
 [[kv_namespaces]]
 binding = "BOX"
-id = "REPLACE_WITH_THE_KV_NAMESPACE_ID"
+id = "2c88883b101e4edfaac53006ad8c7465"   # KV namespace "BOX", created 5 Nov 2026 on Simon@cips.agency's Account
 
 # Secrets are NOT kept here. Set them with:
 #   wrangler secret put SIGNING_SECRET
