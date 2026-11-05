@@ -6,5 +6,8 @@
   "scripts": {
     "test": "node test/run.mjs",
     "dev": "node dev/dev-server.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.158.0"
   }
 }

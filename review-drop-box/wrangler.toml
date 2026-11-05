@@ -2,6 +2,8 @@
 name = "cips-review-drop-box"
 main = "src/worker.js"
 compatibility_date = "2025-09-01"
+# Don't send wrangler's anonymous usage reports to Cloudflare.
+send_metrics = false
 
 [vars]
 # Website addresses allowed to post answers and read the approved list (comma separated).

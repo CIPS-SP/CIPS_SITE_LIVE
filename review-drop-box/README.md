@@ -45,6 +45,7 @@ Desk calls carry `Authorization: Bearer <COLLECT_SECRET>`. Raw IP addresses are 
 **Published list** (`PUT /api/reviews`): `{reviews:[{overall, appoint, didWell, ship, port, when, role}], averages:{<key>:{label, value}}, priorities:{<key>:{label, desc, stat:{avg,pct,n}}}, count}`, same shape as the old `get-reviews.php` with `role` added. Put `ship` in only when Quote consent was ticked.
 
 ## Putting it live (Simon, when ready)
+0. Wrangler (Cloudflare's deploy tool) is a dev tool of this folder: `npm install` here, then run it as `npx wrangler ...` (wrangler 4; installed 5 Nov 2026 without the esbuild/workerd install scripts, which it does not need for deploying). Sign in once with `npx wrangler login`. Only the deploy needs it; the local test server and checks still need nothing installed.
 1. A Cloudflare account (free plan). The box is a standalone Worker, so it works with the website wherever that ends up hosted.
 2. Create a KV namespace; put its id in `wrangler.toml`; set `ALLOWED_ORIGINS` to the website's address.
 3. Set two secrets (`wrangler secret put SIGNING_SECRET`, `wrangler secret put COLLECT_SECRET`), long random values, and give the same two to the Desk's settings on Render.
