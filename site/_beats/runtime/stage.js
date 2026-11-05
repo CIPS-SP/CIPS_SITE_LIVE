@@ -40,6 +40,7 @@ export async function run(list, opts = {}) {
   // images going up to the graphics card) kept the browser busy for seconds, so the finished globe could not reach the screen: the loading screen went and the page stayed dark.
   // Now the globe is shown first: after mounting it the runtime waits for `cips:globe-ready` (or `cips:globe-failed`, or 12 s) and a few frames, and between later scenes it lets a frame through.
   const globeShown = new Promise(res => { addEventListener('cips:globe-ready', res, { once: true }); addEventListener('cips:globe-failed', res, { once: true }); setTimeout(res, 12000); });
+  let mainLoop = false;   // true once frame() runs; until then the globe is drawn by its own little loop (below), or it showed only its CSS glow with no dots, labels or arcs
   const frames = n => new Promise(res => { const f = () => (--n <= 0 ? res() : requestAnimationFrame(f)); requestAnimationFrame(f); });
   const breathe = () => Promise.race([frames(2), new Promise(res => setTimeout(res, 120))]).then(() => new Promise(res => setTimeout(res, 0)));   // (a hidden tab has no frames: never wait on them alone)
 
@@ -106,7 +107,7 @@ export async function run(list, opts = {}) {
       if (ctrl && typeof ctrl.exit === 'function') Object.assign(handoff, ctrl.exit() || {});
     } catch (e) { console.error(`[beats] ${name}: mount failed`, e); (layer || section).classList.add('beat-failed'); }
     beats.push({ name, item, section, stage, layer, ctrl, visible: false, lastP: -1, group: item.group || null });
-    if (name === 'globe-live') { await globeShown; await Promise.race([frames(6), new Promise(res => setTimeout(res, 400))]); }
+    if (name === 'globe-live') { if (ctrl) { const pre = () => { if (mainLoop || !ctrl) return; try { ctrl.update(0, { changed: true }); } catch (e) {} requestAnimationFrame(pre); }; requestAnimationFrame(pre); } await globeShown; await Promise.race([frames(6), new Promise(res => setTimeout(res, 400))]); }
     else if (i < list.length - 1) await breathe();
   }
   // size the pinned groups: height = sum of member tracks; compute each member's slice
@@ -200,7 +201,7 @@ export async function run(list, opts = {}) {
     (window.__warmLog || (window.__warmLog = [])).push([b.name, b.warmN, +(performance.now() - w0).toFixed(0), +ap.toFixed(2), calm ? 'calm' : 'moving']);   // (dev aid: how long each step took)
   }
   function frame(t) {
-    requestAnimationFrame(frame);
+    requestAnimationFrame(frame); mainLoop = true;
     adaptQuality(t); frameId++;
     for (const gname in groups) { const g = groups[gname]; const sc = -g.section.getBoundingClientRect().top; if (Math.abs(sc - (g._prevSc ?? sc)) > 0.5) g._moveAt = performance.now(); g._prevSc = sc; g._scrolled = sc; g._fid = frameId; }
     if (hud) { let label = '';
