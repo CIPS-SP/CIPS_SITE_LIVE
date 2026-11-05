@@ -8,8 +8,9 @@ Everything here was checked against the code and `git log` on 5 Nov 2026. If the
 
 ## 1. Where things stand (5 Nov 2026)
 
-- **Repo:** `C:\Users\amity\GitHub\Code\CIPS-SITE-LIVE`. Branches: `dev` (Test/Dev, where all editing happens, checked out) and `main` (Live, README only so far).
-- **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, created by Simon). **Both branches are pushed** (checked 5 Nov: `origin/dev` = `f97c223`, `origin/main` = `b4590db`, README only). Push again only when Simon says "push" (no force).
+- **Repo:** `C:\Users\amity\GitHub\Code\CIPS-SITE-LIVE`. Branches: `dev` (Test/Dev, where all editing happens, checked out) and `main` (Live).
+- **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, created by Simon). Push only when Simon says "push" (no force).
+- **First release 5 Nov (Simon said "release"):** `main` fast-forwarded to `64f7103` (the 5 Nov journey work and notes) and pushed, so Cloudflare has a site to publish. Commits after that (from `46a053f`, the review drop box folder) are on `dev` only.
 - **Pushed 5 Nov (Simon said push):** `46eddb4` notes (hosting plan: `main` only on Cloudflare), `3dcd1a1` the 5 Nov journey changes (finale plotter waits at each shot, Enlarge carries over, quay clip pauses after two plays, globe chevron's first heading) and the notes commit after it. `git log origin/dev..dev` shows anything newer that is still local.
 - **Earlier commits on `dev`, newest first:**
   - `f97c223` this handover note; CLAUDE.md standing rules
@@ -20,7 +21,7 @@ Everything here was checked against the code and `git log` on 5 Nov 2026. If the
   - (older: `a3681b3`, `b7e642b` departure chooser, `609a49f` CLAUDE.md, `b30aba7` baked map tiles, `2f8545c`, `1320578` seed from CIPS-TAG at `e07c897`, `b4590db` start of repo)
 - **Not yet done (all need Simon's yes, none started):**
   1. (Done: both branches are on GitHub.)
-  2. Cloudflare account and Pages project (output dir `site`, no build command). **Plan agreed 5 Nov:** publish `main` only, first at its own `<project>.pages.dev` address (unlisted, noindex, optionally behind Cloudflare Access), then add cips.agency to the same project when Simon goes public. Preview deployments off: `dev` is never published, Simon checks it locally. Never move nameservers or touch email DNS.
+  2. Cloudflare account (Simon set it up 5 Nov) and Pages project, connected to GitHub, Simon does the clicks (output dir `site`, no build command, production branch `main`, preview deployments None; `site/_headers` already sends noindex on any `*.pages.dev` address). **Plan agreed 5 Nov:** publish `main` only, first at its own `<project>.pages.dev` address (unlisted, noindex, optionally behind Cloudflare Access), then add cips.agency to the same project when Simon goes public. Preview deployments off: `dev` is never published, Simon checks it locally. Never move nameservers or touch email DNS.
   3. Deploy the review drop box (Cloudflare Worker, code now in this repo's `review-drop-box/`, copied from CIPS-TAG 5 Nov and tested end to end locally: 28 checks pass, the review page's answer reached the box and a stand-in Desk collected it) and set `REVIEW_API` in `site/review/config.js` (it is `''` now, which means "same address as the page", fine for local tests only).
   4. A short brief for the CIPS Desk session so it collects the reviews (Desk is a separate project on Render; only message another session with Simon's say-so).
 - **The other repo** `C:\Users\amity\GitHub\Code\CIPS-TAG` (branch `simon/dev`) is ahead of its origin by **7 unpushed commits** (the go-live package commits, the revert, two changelog commits). It was reverted to its pre-package state (tag `package-work-4nov` keeps the package commits). It also has uncommitted changes to three `shots/board-*.jpg` and an untracked `plates-build/backup-before-quay-fix/` folder: leave them alone unless Simon asks.
