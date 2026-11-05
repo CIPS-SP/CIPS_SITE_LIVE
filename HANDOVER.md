@@ -9,16 +9,17 @@ Everything here was checked against the code and `git log` on 5 Nov 2026. If the
 ## 1. Where things stand (5 Nov 2026)
 
 - **Repo:** `C:\Users\amity\GitHub\Code\CIPS-SITE-LIVE`. Branches: `dev` (Test/Dev, where all editing happens, checked out) and `main` (Live, README only so far).
-- **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, empty, created by Simon). **Nothing has been pushed.** Push `dev` and `main` only when Simon says "push" (no force).
-- **Unpushed commits on `dev`, newest first:**
+- **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, created by Simon). **Both branches are pushed** (checked 5 Nov: `origin/dev` = `f97c223`, `origin/main` = `b4590db`, README only). Push again only when Simon says "push" (no force).
+- **Recent commits on `dev` (all pushed), newest first:**
+  - `f97c223` this handover note; CLAUDE.md standing rules
   - `55be5f1` quay: washdown tag fades 1 s after spraying; pan onto the quay faster; finale: plotter follows the yacht in the departure film
   - `65bcd17` ping at the departure while the picker is open; "Scroll to start the journey"
   - `17bbd80` journey-card preview in the picker; ships, flights and pills off; globe follows the chosen route
   - `15ee9e8` launch script (`Open CIPS Site LIVE (Windows).bat` and `tools/serve.mjs`)
   - (older: `a3681b3`, `b7e642b` departure chooser, `609a49f` CLAUDE.md, `b30aba7` baked map tiles, `2f8545c`, `1320578` seed from CIPS-TAG at `e07c897`, `b4590db` start of repo)
 - **Not yet done (all need Simon's yes, none started):**
-  1. Push to GitHub.
-  2. Cloudflare account and Pages project (output dir `site`, no build command; `dev.<project>.pages.dev` for dev, `cips.agency` for main). Never move nameservers or touch email DNS.
+  1. (Done: both branches are on GitHub.)
+  2. Cloudflare account and Pages project (output dir `site`, no build command). **Plan agreed 5 Nov:** publish `main` only, first at its own `<project>.pages.dev` address (unlisted, noindex, optionally behind Cloudflare Access), then add cips.agency to the same project when Simon goes public. Preview deployments off: `dev` is never published, Simon checks it locally. Never move nameservers or touch email DNS.
   3. Deploy the review drop box (Cloudflare Worker, code in `CIPS-TAG/CIPS/review-drop-box`) and set `REVIEW_API` in `site/review/config.js` (it is `''` now, which means "same address as the page", fine for local tests only).
   4. A short brief for the CIPS Desk session so it collects the reviews (Desk is a separate project on Render; only message another session with Simon's say-so).
 - **The other repo** `C:\Users\amity\GitHub\Code\CIPS-TAG` (branch `simon/dev`) is ahead of its origin by **7 unpushed commits** (the go-live package commits, the revert, two changelog commits). It was reverted to its pre-package state (tag `package-work-4nov` keeps the package commits). It also has uncommitted changes to three `shots/board-*.jpg` and an untracked `plates-build/backup-before-quay-fix/` folder: leave them alone unless Simon asks.
@@ -108,7 +109,7 @@ One long page, `site/index.html` (about 1,030 lines, LF endings; contains legacy
 ## 8. Open jobs, in a sensible order
 
 1. **Simon looks at 4 Nov work on his PC:** the quay pan at the brow moment, the washdown tag, the finale plotter. Tune `wq` / `FILM_KEYS` from his words.
-2. **Push** (on his word), then Cloudflare account and project, a `*.pages.dev` test address (noindex), later cips.agency (`www` by CNAME; apex needs Cloudflare DNS or a redirect).
+2. **Cloudflare** account and project for `main` only (previews off), its `*.pages.dev` address first (noindex, optionally Cloudflare Access), later cips.agency (`www` by CNAME; apex needs Cloudflare DNS or a redirect).
 3. **Drop box deploy + `REVIEW_API`**, then a short Desk brief.
 4. **Plotter sync for the arrival clips** (if Simon wants it).
 5. **Still wireframe:** Cruise, Offshore, Shipping sector pages; Desk LIVE. Open facts to confirm: Guernsey/Alderney wording, 160 m pontoon vs 70 m, ~130 m LOA, Portugal/Caribbean, clients we may name; proof numbers are `[X]` placeholders. Permission to show the associates' logos (ICS, British Superyacht, Superyacht Ready, Captain's Recommended Service, Water Taxi CI); a clean Atlantic Gateway logo; a bigger Water Taxi CI file.

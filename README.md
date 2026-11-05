@@ -6,10 +6,10 @@ The public CIPS website (cips.agency): **only what the live site needs, self-con
 
 | Branch | What it is | Where it shows |
 |---|---|---|
-| `dev` (Test/Dev) | Where the live site is **edited and previewed**. | Cloudflare gives it a stable preview address: `dev.<project>.pages.dev`. |
-| `main` (Live) | What the public sees. **Only changed by a deliberate release.** | `cips.agency` |
+| `dev` (Test/Dev) | Where the live site is **edited and checked**. | Only on this PC (`http://localhost:8080`); never published. |
+| `main` (Live) | What goes online. **Only changed by a deliberate release.** | First its own unlisted `<project>.pages.dev` address; later `cips.agency`, when we go public. |
 
-A change is made on `dev`, checked at the preview address, and only then released to `main` (on Simon's say-so). Nothing reaches the public by accident.
+A change is made on `dev`, checked locally, and only then released to `main` (on Simon's say-so). Nothing reaches the public by accident.
 
 ## Looking at it on your PC
 Double-click **`Open CIPS Site LIVE (Windows).bat`** in this folder. A black window opens (the small local web server: leave it open while you look) and your browser opens the site at `http://localhost:8080`. It shows whatever branch is checked out here, changes nothing, and never caches, so you always see the current files. It needs Node.js (the LTS version from nodejs.org). The same thing from a terminal: `node tools/serve.mjs` (`--port 8090` for another port, `--no-open` to skip opening the browser).
@@ -26,7 +26,7 @@ tools/    editing helpers, never published: the Tailwind compiler, the self-cont
 1. Work on the `dev` branch. Edit files under `site/`.
 2. If you add or change page classes (Tailwind), recompile the styles: `cd tools && npm install && npm run tailwind` (writes `site/css/tailwind.css`).
 3. Run the check: `cd tools && node check.mjs`. It serves `site/` on its own, scrolls the whole journey (desktop and phone) and the other pages, and fails if anything is missing, throws an error, or asks anything outside the site for a file.
-4. Commit and push `dev`; look at the preview address.
+4. Commit on `dev` and look at it locally (push only when Simon says so).
 5. Release: merge `dev` into `main` (fast-forward). Only when told to.
 
 ## Rules that keep it self-contained
