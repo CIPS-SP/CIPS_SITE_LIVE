@@ -1493,11 +1493,11 @@ export async function mount(stage, o, ctx){
       sh.uniforms.uThickness = ARC_TH;
       sh.vertexShader = sh.vertexShader
         .replace('#include <common>', '#include <common>\nattribute vec3 aOffset;\nattribute float aProgress;\nuniform float uThickness;\nuniform float uTime;\nuniform float uOffset;\nvarying float vProgress;')
-        .replace('#include <begin_vertex>', '#include <begin_vertex>\nfloat cpr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat cst = clamp(cpr - 1.0, 0.0, 1.0);\nfloat cen = clamp(cpr, 0.0, 1.0);\nfloat cfr = clamp((aProgress - cst) / max(cen - cst, 1e-4), 0.0, 1.0);\nfloat chd = 1.0 - smoothstep(0.0, 0.018, cen - aProgress);\nfloat taper = mix(0.12, 1.0, cfr * cfr) * (1.0 + 0.8 * chd);\ntransformed += aOffset * uThickness * taper;\nvProgress = aProgress;');   // 5 Nov 2026: a comet, not a ribbon: the tail tapers to a thread and the head swells a little
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nfloat cpr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat cst = clamp(cpr - 1.0, 0.0, 1.0);\nfloat cen = clamp(cpr, 0.0, 1.0);\nfloat cfr = clamp((aProgress - cst) / max(cen - cst, 1e-4), 0.0, 1.0);\nfloat taper = mix(0.12, 1.0, cfr * cfr);\ntransformed += aOffset * uThickness * taper;\nvProgress = aProgress;');   // 5 Nov 2026: a comet, not a ribbon: the tail tapers to a thread (Simon: no thicker head)
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying float vProgress;\nuniform float uTime;\nuniform float uOffset;')
         .replace('#include <color_fragment>',
-          '#include <color_fragment>\nfloat pr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat st = clamp(pr - 1.0, 0.0, 1.0);\nfloat en = clamp(pr, 0.0, 1.0);\nif (vProgress < st || vProgress > en) discard;\nfloat frac = (vProgress - st) / max(en - st, 1e-4);\ndiffuseColor.a *= frac * frac;\nfloat hd = 1.0 - smoothstep(0.0, 0.014, en - vProgress);\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0, 0.9, 0.74), hd);\ndiffuseColor.a = min(1.0, diffuseColor.a * (1.0 + 0.8 * hd));'); // bright, white-hot head, fading tail (5 Nov 2026: the head was the same orange as the rest)
+          '#include <color_fragment>\nfloat pr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat st = clamp(pr - 1.0, 0.0, 1.0);\nfloat en = clamp(pr, 0.0, 1.0);\nif (vProgress < st || vProgress > en) discard;\nfloat frac = (vProgress - st) / max(en - st, 1e-4);\ndiffuseColor.a *= frac * frac;'); // bright head, fading tail (5 Nov 2026, Simon: the head stays orange, not white)
     };
     const mesh = new THREE.Mesh(geo, mat);
     mesh.frustumCulled = false;
@@ -2304,7 +2304,7 @@ export async function mount(stage, o, ctx){
     // camera arrives (ARC_NEAR_K). The world view (the start) is unchanged.
     const ARC_NEAR_K = 0.5, camDepth = Math.max(1e-6, camera.position.z - CFG.radius);
     ARC_TH.value = CFG.arcThickness * Math.min(1, camDepth / (FAR_Z - CFG.radius)) * lerp(1, ARC_NEAR_K, smooth(REORIENT_END, 0.65, p));
-    if (endpointMat) endpointMat.size = CFG.endpointSize * 1.25 * Math.min(1, camDepth / (FAR_Z - CFG.radius));   // 5 Nov 2026, Simon: the city dots stay pin pricks as we zoom in (they swelled with the zoom) // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
+    if (endpointMat) endpointMat.size = CFG.endpointSize * 1.6 * Math.min(1, camDepth / (FAR_Z - CFG.radius));   // 5 Nov 2026, Simon: the city dots stay pin pricks as we zoom in (they swelled with the zoom) // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
   
     // world globe stays visible until the very end of this beat's own track — cloud-pass crossfades in over it
     // (fadePrev), so fading the globe out early here just left a blank gap before the next beat's imagery arrived.
