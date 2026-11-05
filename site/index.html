@@ -212,27 +212,31 @@
 
     /* ===================== GLOBE OPENING ACT ===================== */
     /* 5 Nov 2026, Simon: "Building the matrix" replaced by a loading screen. It is part of the page itself, so it is there from the first moment (the globe's own
-       message only arrived once its scene had loaded), fades in only after 0.35 s (a quick load never shows it), and fades out when the globe is drawn (cips:globe-ready). */
+       message only arrived once its scene had loaded); its dark background covers the page at once (a globe drawn underneath early is never seen and then covered
+       again), its globe and words fade in after 0.35 s (a quick load never shows them), and it fades out when the globe is drawn (cips:globe-ready).
+       Design "Horizon" (Simon's pick of four, 5 Nov): the globe's own glow, orange above and blue below as on the real globe (the inset shadows follow globe-live/beat.css),
+       gently breathing, with the dots shimmering through; the real globe then comes up in the same place. */
     #globeLoader { position:absolute; top:0; left:0; right:0; height:100vh; height:100svh; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
-      background:radial-gradient(ellipse at 50% 46%, #0b1a2c 0%, #06101d 45%, #04070e 100%); color:#9fc3d6; pointer-events:none;
-      transition:opacity .6s ease; }
-    /* (5 Nov 2026, later: the dark background covers the page from the first moment, so a globe drawn underneath early is never seen and then covered again; only the icon and words wait 0.35 s) */
+      background:radial-gradient(ellipse at 50% 46%, #0b1a2c 0%, #06101d 45%, #04070e 100%); pointer-events:none; transition:opacity .6s ease; }
     #globeLoader > * { opacity:0; animation:glIn .5s ease .35s forwards; }
     #globeLoader.gone { opacity:0 !important; }
-    #globeLoader svg { width:104px; height:104px; overflow:visible; }
-    #globeLoader .dot { fill:none; stroke:#4fb0e4; stroke-width:2.2; stroke-linecap:round; stroke-dasharray:0 6.2; }
-    #globeLoader .rim { fill:none; stroke:#45d3bb; stroke-width:2.6; stroke-linecap:round; stroke-dasharray:0 5.4; }
-    #globeLoader .mer { transform-box:fill-box; transform-origin:center; animation:glTurn 3.6s linear infinite; }
-    #globeLoader .mer.m2 { animation-delay:-1.2s; } #globeLoader .mer.m3 { animation-delay:-2.4s; }
-    #globeLoader .glow { fill:#45d3bb; opacity:.9; animation:glPing 1.8s ease-out infinite; transform-box:fill-box; transform-origin:center; }
-    #globeLoader .lbl { font:500 11.5px 'JetBrains Mono', ui-monospace, monospace; letter-spacing:.24em; text-transform:uppercase; color:#b9d3e0; }
-    #globeLoader .bar { position:relative; width:150px; height:1px; background:rgba(159,195,214,.18); overflow:hidden; margin-top:-8px; }
-    #globeLoader .bar i { position:absolute; top:0; bottom:0; width:40%; background:linear-gradient(90deg, transparent, #45d3bb, transparent); animation:glBar 1.6s ease-in-out infinite; }
+    #globeLoader .orb { width:min(170px, 40vw); aspect-ratio:1; border-radius:50%; position:relative; background:#03060c;
+      box-shadow: inset 0 3px 7px -2px #fff, inset 0 12px 19px -7px #FFE7D6, inset 0 22px 30px -14px #FF834A, inset 0 39px 51px -22px #FF5500,
+                  inset 0 -12px 20px -7px #9fb4ff, inset 0 -25px 42px -17px #3d6bff, 0 0 60px -18px rgba(255,110,40,.55), 0 10px 60px -24px rgba(61,107,255,.6);
+      animation:glIn .5s ease .35s forwards, glBreathe 3.2s ease-in-out infinite; }
+    #globeLoader .orb::after { content:''; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle, rgba(217,231,239,.85) 0 1px, transparent 1.6px) 0 0/9px 9px;
+      -webkit-mask:radial-gradient(circle at 50% 50%, #000 0 58%, transparent 72%); mask:radial-gradient(circle at 50% 50%, #000 0 58%, transparent 72%);
+      opacity:.08; animation:glDots 3.2s ease-in-out infinite; }
+    #globeLoader .lbl { font:300 15px 'Jost', system-ui, sans-serif; letter-spacing:.32em; padding-left:.32em; text-transform:uppercase; color:#cfdde6; }
+    #globeLoader .sub { font:400 10.5px 'JetBrains Mono', ui-monospace, monospace; letter-spacing:.22em; text-transform:uppercase; color:#6f8798; margin-top:-14px; }
+    #globeLoader .sub i { display:inline-block; width:1.2em; text-align:left; font-style:normal; }
+    #globeLoader .sub i::after { content:''; animation:glEll 1.5s steps(4) infinite; }
     @keyframes glIn { to { opacity:1; } }
-    @keyframes glTurn { 0% { transform:scaleX(1); } 50% { transform:scaleX(-1); } 100% { transform:scaleX(1); } }
-    @keyframes glPing { 0% { transform:scale(.6); opacity:.95; } 100% { transform:scale(2.6); opacity:0; } }
-    @keyframes glBar { 0% { left:-40%; } 100% { left:100%; } }
-    @media (prefers-reduced-motion:reduce) { #globeLoader .mer, #globeLoader .glow, #globeLoader .bar i { animation:none; } }
+    @keyframes glBreathe { 0%, 100% { filter:brightness(.85); } 50% { filter:brightness(1.12); } }
+    @keyframes glDots { 0%, 100% { opacity:.08; } 50% { opacity:.38; } }
+    @keyframes glEll { 0% { content:''; } 25% { content:'.'; } 50% { content:'..'; } 75% { content:'...'; } }
+    @media (prefers-reduced-motion:reduce) { #globeLoader .orb { animation:glIn .5s ease .35s forwards; } #globeLoader .orb::after { animation:none; opacity:.25; } #globeLoader .sub i::after { animation:none; content:'...'; } }
     .beat-globe-live [data-g="status"] { display:none !important; }   /* the old "Building the matrix" line: the loader above does its job */
     #openingAct { position:relative; z-index:1; background:#04070e; min-height:600vh; }   /* 5 Nov 2026 (load speed): holds the home page well below the first screen while the journey is still being built, so its lazy-loading photos wait instead of competing with the globe (the journey's real height takes over once it is laid out) */
     /* 31 Oct 2026, Simon: the journey ends by shrinking its whole frame into the hero picture (st-helier-approach/finale.js sets has-finale on <html>). For that the home page starts one window height early, so the hero rises up
@@ -541,7 +545,7 @@
   <main id="top">
 
     <!-- ================= OPENING ACT — built from the shared beat library (_beats/) ================= -->
-    <div id="openingAct"><div id="globeLoader" role="status" aria-live="polite"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="rim" cx="50" cy="50" r="44"/><ellipse class="dot" cx="50" cy="50" rx="44" ry="15"/><ellipse class="dot" cx="50" cy="30" rx="37" ry="9" opacity=".6"/><ellipse class="dot" cx="50" cy="70" rx="37" ry="9" opacity=".6"/><ellipse class="dot mer" cx="50" cy="50" rx="30" ry="44"/><ellipse class="dot mer m2" cx="50" cy="50" rx="30" ry="44"/><ellipse class="dot mer m3" cx="50" cy="50" rx="30" ry="44"/><circle class="glow" cx="47" cy="38" r="3"/></svg><div class="lbl">Loading the globe</div><div class="bar"><i></i></div></div><div id="beats"></div></div>
+    <div id="openingAct"><div id="globeLoader" role="status" aria-live="polite"><div class="orb" aria-hidden="true"></div><div class="lbl">Loading the globe</div><div class="sub">Preparing your journey<i></i></div></div><div id="beats"></div></div>
     <!-- "Back to the globe": a pill offered from the main site (scroll up, or just after "Skip to CIPS") that returns to the START of the globe journey -->
     <button id="skipToCips" type="button">Skip to CIPS <span class="arr" aria-hidden="true">↓</span></button>
     <button id="backToGlobe" type="button" aria-label="Go back to the globe and play the CIPS journey"><span class="arr" aria-hidden="true">↑</span><span>Back to the globe &mdash; <b>play the CIPS journey</b></span></button>
@@ -955,7 +959,7 @@
       var el = document.getElementById('globeLoader'); if (!el) return;
       var done = function () { el.classList.add('gone'); setTimeout(function () { el.remove(); }, 700); };
       addEventListener('cips:globe-ready', done, { once: true });
-      addEventListener('cips:globe-failed', function () { var l = el.querySelector('.lbl'); if (l) l.textContent = 'The globe could not load. Please refresh the page'; var bar = el.querySelector('.bar'); if (bar) bar.remove(); }, { once: true });
+      addEventListener('cips:globe-failed', function () { var l = el.querySelector('.lbl'); if (l) l.textContent = 'The globe could not load. Please refresh the page'; var sub = el.querySelector('.sub'); if (sub) sub.remove(); }, { once: true });
     })();
   </script>
   <script type="module">
