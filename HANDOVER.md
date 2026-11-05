@@ -10,7 +10,7 @@ Everything here was checked against the code and `git log` on 5 Nov 2026. If the
 
 - **Repo:** `C:\Users\amity\GitHub\Code\CIPS-SITE-LIVE`. Branches: `dev` (Test/Dev, where all editing happens, checked out) and `main` (Live).
 - **GitHub:** `origin` = https://github.com/CIPS-SP/CIPS_SITE_LIVE.git (private, created by Simon). Push only when Simon says "push" (no force).
-- **First release 5 Nov (Simon said "release"):** `main` fast-forwarded to `64f7103` (the 5 Nov journey work and notes) and pushed, so Cloudflare has a site to publish. Commits after that (from `46a053f`, the review drop box folder) are on `dev` only.
+- **Released 5 Nov (Simon said "release", then "push" for both branches):** `main` was first fast-forwarded to `64f7103`, then to `65703bc` with the review drop box folder (`review-drop-box/`, beside `site/`, not published). `dev` and `main` were then identical on GitHub, plus this notes fix on both. Cloudflare publishes only `site/`.
 - **Pushed 5 Nov (Simon said push):** `46eddb4` notes (hosting plan: `main` only on Cloudflare), `3dcd1a1` the 5 Nov journey changes (finale plotter waits at each shot, Enlarge carries over, quay clip pauses after two plays, globe chevron's first heading) and the notes commit after it. `git log origin/dev..dev` shows anything newer that is still local.
 - **Earlier commits on `dev`, newest first:**
   - `f97c223` this handover note; CLAUDE.md standing rules
