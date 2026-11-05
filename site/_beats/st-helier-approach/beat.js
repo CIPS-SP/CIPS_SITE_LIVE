@@ -41,7 +41,7 @@ export const defaults = {
   videoMoments: [
     { id:'pier-heads', file:'journey-3-pier-heads', title:'Through the pier heads', from:0.30, to:0.47 },
     { id:'alongside', file:'journey-4-alongside', title:'Alongside', from:0.50, to:0.90 },
-    { id:'quay-at-work', file:'journey-5-quay-at-work', title:'The quay at work', from:1.03, to:1.97 },
+    { id:'quay-at-work', file:'journey-5-quay-at-work', title:'The quay at work', from:1.03, to:1.97, loops:2 },   // 5 Nov 2026, Simon: pauses after two plays; a click plays it on
     { id:'departure', file:'journey-6-departure', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
   ],
   calm: 0.6, calmIn: [0.0, 0.10],   // 16 Oct 2026, Simon: "make the sea calmer in the small roads and harbour": 0 = the open-sea look noirmont ends on, 1 = glassy; eased in over the first 10% so there is no step at the seam
@@ -551,8 +551,7 @@ export async function mount(stage, o, ctx) {
   // ---- chapter 5, the way out (4 Nov 2026, Simon: "make sure the plotter updates and tracks relative to the vessel positions on the video clips of the yacht leaving the harbour and small roads") ----
   // The film (videos/journey/journey-6-departure.mp4, 15.4 s) is scrubbed by the scroll over pz 2.20 to 2.62 (videoMoments, above) and leaves the berth, goes up the channel, out between the pier heads and
   // along the Small Roads to open water. While it plays, the plotter's ship goes the same way: back along the arrival path, then on back along the arrival route (EXIT), at the film's own time.
-  // FILM_KEYS: [seconds into the film, nm along EXIT, knots], read off the film's frames (0 to 3.5 s the berth and the basin, 4.5 to 7.5 s the aerials of the harbour and the pier heads, 9 to 12 s overhead on the water in the
-  // Small Roads, 13.5 s on far out). Tune them here if the ship on the plotter ever runs ahead of, or behind, the yacht in the picture.
+  // FILM_SHOTS (below) say where the plotter's ship waits during each shot of the film. Tune them there if the ship on the plotter is ever in the wrong place for the picture.
   const EXIT = (() => {
     const pts = DENSE.pts.slice().reverse().concat([ROUTE[2], ROUTE[1], ROUTE[0]]), cum = [0];
     for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + nmBetween(pts[i - 1], pts[i]));
@@ -564,14 +563,22 @@ export async function mount(stage, o, ctx) {
     return { pos, hdg, dOf, total, dStart: DENSE.total };
   })();
   const FILM_S = 15.35, FILM_PZ = [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
-  const FILM_KEYS = (() => { const dK = EXIT.dOf(K_TURN), dGap = EXIT.dOf(GAP_MID), dX = EXIT.dOf(X_TURN), dS = EXIT.dStart;
-    return [[0, 0, 0.3], [1.5, 0.03, 1.5], [3.5, 0.5 * dK, 3.5], [4.5, 0.85 * dK, 4.5], [6.0, dK, 5], [7.5, dGap, 5], [9.0, dX, 6.5], [12.0, dS, 10.5], [13.5, dS + 0.5, 12], [15.4, Math.min(EXIT.total, dS + 1.4), 13]]; })();
+  // 5 Nov 2026, Simon: the ship no longer runs along the line between the shots (it rushed); it waits where each shot is taken and only creeps a little while the shot lasts, jumping to the next spot at each cut.
+  // SOG 3.0 kn in the harbour, 5.0 kn from the Small Roads on. FILM_SHOTS: [film seconds from, to, nm along EXIT at the start and end of the shot, knots]; the cuts (1.80, 2.84, 6.04, 7.96, 12.20 s) were read off the film.
+  const FILM_SHOTS = (() => { const dK = EXIT.dOf(K_TURN), dGap = EXIT.dOf(GAP_MID), dX = EXIT.dOf(X_TURN), dS = EXIT.dStart, H = 3.0, SEA = 5.0;
+    return [[0, 1.80, 0, 0.004, H],                                       // easing off the berth
+            [1.80, 2.84, 0.45 * dK, 0.47 * dK, H],                        // overhead: half way up the channel
+            [2.84, 6.04, 0.80 * dK, 0.88 * dK, H],                        // inside the pier heads, heading for the gap
+            [6.04, 7.96, dGap + 0.25 * (dX - dGap), dGap + 0.32 * (dX - dGap), H],   // looking back at the harbour: just out through the pier heads
+            [7.96, 12.20, dX + 0.35 * (dS - dX), dX + 0.38 * (dS - dX), SEA],          // overhead on the water: the Small Roads
+            [12.20, 15.40, Math.min(EXIT.total, dS + 0.30), Math.min(EXIT.total, dS + 0.34), SEA]];   // far out, the open sea
+  })();
   function exitAt(pz, hdg0) {   // the plotter's ship at this point of the scroll: null until the film starts
     if (pz <= FILM_PZ[0]) return null;
     const tf = clamp01((pz - FILM_PZ[0]) / (FILM_PZ[1] - FILM_PZ[0])) * FILM_S;
-    let i = 0; while (i < FILM_KEYS.length - 2 && tf > FILM_KEYS[i + 1][0]) i++;
-    const a = FILM_KEYS[i], b = FILM_KEYS[i + 1], k = clamp01((tf - a[0]) / (b[0] - a[0])), d = lerp(a[1], b[1], k), out = EXIT.hdg(d);
-    return { pos: EXIT.pos(d), hdg: hdg0 + (((out - hdg0 + 540) % 360) - 180) * smooth(0, 3, tf), kn: lerp(a[2], b[2], k) };   // she starts on the berth's heading and swings onto the way out over the first three seconds
+    let i = 0; while (i < FILM_SHOTS.length - 1 && tf >= FILM_SHOTS[i][1]) i++;
+    const s = FILM_SHOTS[i], d = lerp(s[2], s[3], clamp01((tf - s[0]) / (s[1] - s[0]))), out = EXIT.hdg(d);
+    return { pos: EXIT.pos(d), hdg: hdg0 + (((out - hdg0 + 540) % 360) - 180) * smooth(0, 1.8, tf), kn: s[4] };   // the ship starts on the berth's heading and swings onto the way out during the first shot
   }
   const plotter = o.nav !== false ? mountNavPlotter(stage, { GEO: plotGEO, route: plotRoute, shipLatLng: () => exitFix ? exitFix.pos : curPos, headingDeg: () => exitFix ? exitFix.hdg : curHdg, speedKts: () => exitFix ? exitFix.kn : curSpeed, zoomTarget: () => plotZoom, hiChart: [{ src: ctx.base + 'assets/chart-mid.webp', meta: ctx.base + 'assets/chart-mid.json', from: 0.25, span: 0.10 }, { src: ctx.base + 'assets/chart-hi.webp', meta: ctx.base + 'assets/chart-hi.json', from: 0.8, span: 0.4 }]   /* the wide z16 chart over the whole approach from a quarter of the main chart's scale, the sharp z18 harbour chart over it for the closest zooms (23 Oct 2026, Simon: the sharp chart showed as a rectangle) */, compact: coarse, assetsBase: seaway, markNames: NAVAID_UNNAMED }) : null;
   const vm = (o.video !== false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage, { moments: o.videoMoments.map(m => Object.assign({ src: ctx.base + '../../videos/journey/' + m.file + '.mp4', poster: ctx.base + '../../videos/journey/' + m.file + '.jpg' }, m)), plotter, reduced: ctx.reduced }) : null;

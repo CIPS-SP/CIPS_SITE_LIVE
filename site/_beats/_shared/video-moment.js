@@ -77,8 +77,10 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // loaded, a silent hidden play-and-pause starts the decoder up ahead of time; start() then seeks to 0 and plays as before (a clip that is being shown is never paused by this).
   const prime = m => { if (still || m.primed || m.bad) return; m.primed = true; const v = m.v; const go = () => { if (active === m) return; const pr = v.play(); if (pr && pr.then) pr.then(() => { if (active !== m) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }).catch(() => {}); }; if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go, { once: true }); };
   const ensure = m => { if (m.loaded || m.bad) return; m.loaded = true; if (!still) { m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); prime(m); } };
+  function syncWide() { root.classList.toggle('wide', wideSetting); bigBtn.textContent = wideSetting ? '⤣' : '⤢'; bigBtn.title = wideSetting ? 'Smaller' : 'Enlarge'; bigBtn.setAttribute('aria-label', wideSetting ? 'Make the footage smaller' : 'Enlarge the footage'); }
   function start(m) {
-    m.ended = false; userPaused = false;
+    m.ended = false; userPaused = false; m.plays = 1; m.onLoop = false;
+    syncWide();   // 5 Nov 2026, Simon: the next clip opens at the size the visitor left the last one (each beat's box is built at load, before any choice, so it is matched here, when a clip opens)
     M.forEach(x => x.v.classList.toggle('cur', x === m)); titleEl.textContent = m.title || ''; bar.style.width = '0'; root.classList.add('on');
     if (still) { m.v.src || (m.v.src = m.src); root.classList.add('still'); return; }   // poster + play button
     root.classList.remove('still'); try { m.v.currentTime = 0; } catch (e) {}
@@ -94,10 +96,10 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // a click on the picture pauses or plays it (the play triangle is the same button the still-image mode uses); paused stays paused until the visitor leaves the window
   frame.addEventListener('click', () => {
     if (!active) return; const v = active.v;
-    if (root.classList.contains('still') || v.paused) { if (!v.src) { v.src = active.src; v.load(); } root.classList.remove('still'); userPaused = false; if (active.ended) { active.ended = false; try { v.currentTime = 0; } catch (e) {} } v.play().catch(() => {}); }
+    if (root.classList.contains('still') || v.paused) { if (!v.src) { v.src = active.src; v.load(); } root.classList.remove('still'); userPaused = false; if (active.ended) { active.ended = false; try { v.currentTime = 0; } catch (e) {} } active.onLoop = true; v.play().catch(() => {}); }
     else { userPaused = true; v.pause(); root.classList.add('still'); }
   });
-  bigBtn.addEventListener('click', () => { wideSetting = !wideSetting; root.classList.toggle('wide', wideSetting); bigBtn.textContent = wideSetting ? '⤣' : '⤢'; bigBtn.title = wideSetting ? 'Smaller' : 'Enlarge'; bigBtn.setAttribute('aria-label', wideSetting ? 'Make the footage smaller' : 'Enlarge the footage'); });
+  bigBtn.addEventListener('click', () => { wideSetting = !wideSetting; syncWide(); });
   root.querySelector('.vm-x').addEventListener('click', () => { if (active) { dismissed.add(active.id); swap(null); } });
   root.addEventListener('pointerdown', e => e.stopPropagation());   // like the plotter: a drag on this panel is not a drag on the scene or a scroll nudge
   if (wideSetting) bigBtn.textContent = '⤣';
@@ -130,7 +132,10 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     // 29 Oct 2026, Simon: "it should only stop if you leave the window, forwards or backwards". The clip used to fade at its end if the visitor was still scrolling and stay away until they left the window and came back, so footage
     // vanished inside its window (worst on a scroll back). Now a clip that ends while the scroll is inside its window simply plays again, and keeps looping for as long as they are inside it; one that has been left forwards
     // (`finish`) plays out to its end and stops; closing it with the x, or a click to pause, still holds it until they leave the window.
-    if (active && active.ended && !userPaused) { const outside = (p > active.to && !held) || p < active.from; if (!outside && !still) { active.ended = false; try { active.v.currentTime = 0; } catch (e) {} active.v.play().catch(() => {}); } else if (outside) { done.add(active.id); swap(null); } }
+    if (active && active.ended && !userPaused) { const outside = (p > active.to && !held) || p < active.from; if (!outside && !still) {
+      // 5 Nov 2026, Simon: a moment with `loops: n` stops after n plays and waits on its last frame with the play button; a click plays it on, looping as before
+      if (active.loops && active.plays >= active.loops && !active.onLoop) { userPaused = true; root.classList.add('still'); }
+      else { active.plays++; active.ended = false; try { active.v.currentTime = 0; } catch (e) {} active.v.play().catch(() => {}); } } else if (outside) { done.add(active.id); swap(null); } }
     if (active) { place(); const d = active.v.duration; if (d > 0) bar.style.width = (active.v.currentTime / d * 100).toFixed(1) + '%'; }
   }
   // the runtime stops calling update() while the beat is off screen; stop the footage then too, and let it play afresh when the visitor comes back

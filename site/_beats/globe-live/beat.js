@@ -738,10 +738,19 @@ export async function mount(stage, o, ctx){
     return shown;
   }
   const kinPanelEl = stage.querySelector('[data-live="panel"]');
+  // 5 Nov 2026, Simon: the chevron appeared pointing along the first few miles of the route and then turned onto its track as soon as it moved (from Monaco the route first runs 337 deg for about 12 nm, out
+  // of the port to the shipping lane, then 247 deg: too short a hop to see at globe scale, so it looked like a turn on the spot). Over the first KIN_LOOK_NM of the route it now points along the route
+  // as it runs at that distance, so it appears already on its track; from there on it follows the route's own heading as before.
+  const KIN_LOOK_NM = 40;
+  function kinFwdAhead(route, uPos, n) {
+    const D = Math.min(route.total - 2, Math.max(uPos * route.total, KIN_LOOK_NM)); if (!(D > 0)) return null;
+    const pt = d => { const s = voyageRouteSample(route, d / route.total); return s.a.clone().lerp(s.b, s.t).normalize(); };
+    const a = pt(D), b = pt(D + 2); return b.angleTo(a) > 1e-7 ? b.sub(a).normalize() : null;
+  }
   function placeKinPing() {   // a small bright ping where the vessel will start (the first point of her route), same marker as the real one at the start of the journey
     const pts = kinRoute.pts, a = pts[0].clone().normalize();
     let b = pts[1]; for (let k = 1; k < pts.length && k < 40; k++) { b = pts[k]; if (b.distanceTo(pts[0]) > 1e-5) break; }
-    const f = b.clone().sub(a); f.sub(a.clone().multiplyScalar(f.dot(a))).normalize();
+    const f = kinFwdAhead(kinRoute, 0, a) || b.clone().sub(a); f.sub(a.clone().multiplyScalar(f.dot(a))).normalize();
     const lift = CFG.radius * KIN.lift, world = globe.localToWorld(a.clone().multiplyScalar(lift)), sp = worldToStagePx(world);
     const spAhead = worldToStagePx(globe.localToWorld(a.clone().addScaledVector(f, 0.02).normalize().multiplyScalar(lift)));
     const ang = Math.atan2(spAhead.y - sp.y, spAhead.x - sp.x) * 180 / Math.PI;
@@ -779,7 +788,7 @@ export async function mount(stage, o, ctx){
     if (kinRoute) {
       const uPos = kinRouteProgress(kinRoute, p), samp = voyageRouteSample(kinRoute, uPos);
       n = samp.a.clone().lerp(samp.b, samp.t).normalize();
-      fwd = samp.b.clone().sub(samp.a).normalize();
+      fwd = kinFwdAhead(kinRoute, uPos, n) || samp.b.clone().sub(samp.a).normalize();
     } else {
       const i = Math.min(kin.pts.length - 2, Math.floor(u * (kin.pts.length - 1))), t = u * (kin.pts.length - 1) - i;
       const a = kin.pts[i], b = kin.pts[i + 1]; n = a.clone().lerp(b, t).normalize();
