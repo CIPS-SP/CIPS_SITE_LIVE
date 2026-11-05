@@ -1,0 +1,16 @@
+# Cloudflare settings for the CIPS review drop box. See README.md "Putting it live".
+name = "cips-review-drop-box"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Website addresses allowed to post answers and read the approved list (comma separated).
+ALLOWED_ORIGINS = "https://cips.agency"
+
+[[kv_namespaces]]
+binding = "BOX"
+id = "REPLACE_WITH_THE_KV_NAMESPACE_ID"
+
+# Secrets are NOT kept here. Set them with:
+#   wrangler secret put SIGNING_SECRET
+#   wrangler secret put COLLECT_SECRET

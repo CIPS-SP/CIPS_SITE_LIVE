@@ -23,7 +23,7 @@ Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.m
 
 ## Related things that live elsewhere
 - `CIPS-TAG` (folder next to this one, branch `simon/dev`) is the lab and the old working site with live ships. Do not edit `HLC-globe-lab` there (Howard's). This repo was seeded from it on 4 Nov 2026 and now diverges on purpose.
-- Reviews: the captain's review page is `site/review/`. Its answers go to the review drop box (Cloudflare Worker, code and README in `CIPS-TAG/CIPS/review-drop-box`), and the CIPS Desk (a separate project on Render) collects them. Design: `CIPS-TAG/CIPS/DOCS/SPEC-reviews.md`.
+- Reviews: the captain's review page is `site/review/`. Its answers go to the review drop box (Cloudflare Worker, code and README in `review-drop-box/` in this repo, copied from CIPS-TAG on 5 Nov 2026; work on this copy, not the CIPS-TAG one; it is outside `site/` and never published with the site), and the CIPS Desk (a separate project on Render) collects them. Design: `CIPS-TAG/CIPS/DOCS/SPEC-reviews.md`.
 - Hosting plan (Simon, 5 Nov 2026): Cloudflare Pages (output directory `site`, no build command), production branch `main` only, first at its own `<project>.pages.dev` address (unlisted, noindex, optionally behind Cloudflare Access), wired to cips.agency later when Simon goes public. Preview deployments off: `dev` is never published, it is checked locally. Never move nameservers or touch email DNS records.
 
 ## The visitor's vessel (done 4 Nov 2026)

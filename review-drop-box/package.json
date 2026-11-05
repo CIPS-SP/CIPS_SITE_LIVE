@@ -1,0 +1,10 @@
+{
+  "name": "cips-review-drop-box",
+  "private": true,
+  "type": "module",
+  "description": "Holds captains' review answers until the CIPS Desk collects them. No Airtable key. See README.md.",
+  "scripts": {
+    "test": "node test/run.mjs",
+    "dev": "node dev/dev-server.mjs"
+  }
+}

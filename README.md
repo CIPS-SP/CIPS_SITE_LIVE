@@ -19,6 +19,7 @@ Double-click **`Open CIPS Site LIVE (Windows).bat`** in this folder. A black win
 ```
 site/     everything that is published (Cloudflare Pages "build output directory" = site, no build command)
 tools/    editing helpers, never published: the Tailwind compiler, the self-containment check
+review-drop-box/  the review drop box (a Cloudflare Worker, deployed separately with wrangler; never published with the site). See its README.
 ```
 
 ## Editing
@@ -44,5 +45,5 @@ Built on 4 Nov 2026 from the CIPS working repo (`CIPS-TAG`, branch `simon/dev`, 
 
 ## Related
 
-- Reviews: the hidden review page is `site/review/`; answers go to the CIPS review drop box (a small Cloudflare Worker, code in the working repo's `CIPS/review-drop-box`) and the CIPS Desk collects them. Design: `CIPS/DOCS/SPEC-reviews.md` in the working repo.
+- Reviews: the hidden review page is `site/review/`; answers go to the CIPS review drop box (a small Cloudflare Worker, code in `review-drop-box/` in this repo) and the CIPS Desk collects them. Design: `CIPS/DOCS/SPEC-reviews.md` in the working repo.
 - The Desk is a separate project and is not part of this site.
