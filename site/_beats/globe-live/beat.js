@@ -1240,6 +1240,14 @@ export async function mount(stage, o, ctx){
     return tex;
   }
   const SPRITE = dotSprite(64);
+  // 5 Nov 2026, Simon: the city dots as pin pricks / stars of light: a small white-hot core in a warm orange halo, with a faint four-point glint (drawn white; the colour is in the picture)
+  const STAR = (() => { const s = 64, c = document.createElement('canvas'); c.width = c.height = s; const g = c.getContext('2d'), m = s / 2;
+    const rg = g.createRadialGradient(m, m, 0, m, m, m); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.16, 'rgba(255,244,222,1)'); rg.addColorStop(0.3, 'rgba(255,160,70,.9)');
+    rg.addColorStop(0.55, 'rgba(244,83,0,.35)'); rg.addColorStop(1, 'rgba(244,83,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, s, s);
+    g.globalCompositeOperation = 'lighter'; for (const [w, h] of [[s, 1.6], [1.6, s]]) { const lg = w > h ? g.createLinearGradient(0, 0, s, 0) : g.createLinearGradient(0, 0, 0, s);
+      lg.addColorStop(0, 'rgba(255,200,140,0)'); lg.addColorStop(0.5, 'rgba(255,236,210,.55)'); lg.addColorStop(1, 'rgba(255,200,140,0)'); g.fillStyle = lg; g.fillRect(m - w / 2, m - h / 2, w, h); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  let endpointMat = null;
   
   // point-in-ring (ray casting), ring = [[lon,lat],...]
   function pointInRing(x, y, ring) {
@@ -1444,7 +1452,8 @@ export async function mount(stage, o, ctx){
     for (let i = 0; i <= N; i++) {
       const t = i / N;
       const u = slerpUnit(sa, sb, t);
-      const h = R * (1 + CFG.arcHeight * ang * Math.sin(Math.PI * t)); // lift, peaks mid-route
+      // 5 Nov 2026, Simon (close up the arcs looked flat, lying on the surface): short routes now rise more for their length (the extra fades out on long routes, so the world view is as it was)
+      const h = R * (1 + ang * (CFG.arcHeight + 0.12 * Math.exp(-ang / 0.15)) * Math.sin(Math.PI * t)); // lift, peaks mid-route
       pts.push(u.multiplyScalar(h));
     }
     const curve = new THREE.CatmullRomCurve3(pts);
@@ -1483,12 +1492,12 @@ export async function mount(stage, o, ctx){
       sh.uniforms.uOffset = { value: offset };
       sh.uniforms.uThickness = ARC_TH;
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nattribute vec3 aOffset;\nattribute float aProgress;\nuniform float uThickness;\nvarying float vProgress;')
-        .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += aOffset * uThickness;\nvProgress = aProgress;');
+        .replace('#include <common>', '#include <common>\nattribute vec3 aOffset;\nattribute float aProgress;\nuniform float uThickness;\nuniform float uTime;\nuniform float uOffset;\nvarying float vProgress;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nfloat cpr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat cst = clamp(cpr - 1.0, 0.0, 1.0);\nfloat cen = clamp(cpr, 0.0, 1.0);\nfloat cfr = clamp((aProgress - cst) / max(cen - cst, 1e-4), 0.0, 1.0);\nfloat chd = 1.0 - smoothstep(0.0, 0.018, cen - aProgress);\nfloat taper = mix(0.12, 1.0, cfr * cfr) * (1.0 + 0.8 * chd);\ntransformed += aOffset * uThickness * taper;\nvProgress = aProgress;');   // 5 Nov 2026: a comet, not a ribbon: the tail tapers to a thread and the head swells a little
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying float vProgress;\nuniform float uTime;\nuniform float uOffset;')
         .replace('#include <color_fragment>',
-          '#include <color_fragment>\nfloat pr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat st = clamp(pr - 1.0, 0.0, 1.0);\nfloat en = clamp(pr, 0.0, 1.0);\nif (vProgress < st || vProgress > en) discard;\nfloat frac = (vProgress - st) / max(en - st, 1e-4);\ndiffuseColor.a *= frac * frac;'); // bright head, fading tail
+          '#include <color_fragment>\nfloat pr = mod(uTime * 2.0 + uOffset, 2.5);\nfloat st = clamp(pr - 1.0, 0.0, 1.0);\nfloat en = clamp(pr, 0.0, 1.0);\nif (vProgress < st || vProgress > en) discard;\nfloat frac = (vProgress - st) / max(en - st, 1e-4);\ndiffuseColor.a *= frac * frac;\nfloat hd = 1.0 - smoothstep(0.0, 0.014, en - vProgress);\ndiffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0, 0.9, 0.74), hd);\ndiffuseColor.a = min(1.0, diffuseColor.a * (1.0 + 0.8 * hd));'); // bright, white-hot head, fading tail (5 Nov 2026: the head was the same orange as the rest)
     };
     const mesh = new THREE.Mesh(geo, mat);
     mesh.frustumCulled = false;
@@ -1509,8 +1518,8 @@ export async function mount(stage, o, ctx){
     arr.forEach((p, i) => { const v = lonLatToVec3(p.lng, p.lat, CFG.radius * 1.004); pos[i*3]=v.x; pos[i*3+1]=v.y; pos[i*3+2]=v.z; });
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const pts = new THREE.Points(geo, new THREE.PointsMaterial({
-      color: new THREE.Color(CFG.endpointColor), size: CFG.endpointSize, map: SPRITE,
+    const pts = new THREE.Points(geo, endpointMat = new THREE.PointsMaterial({
+      color: 0xffffff, size: CFG.endpointSize, map: STAR,   // (5 Nov 2026: the star picture carries the colour; was CFG.endpointColor on the soft dot)
       sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
     }));
     pts.frustumCulled = false;
@@ -2294,7 +2303,8 @@ export async function mount(stage, o, ctx){
     // screen as the camera closed in. Now it is scaled with the camera's height above the globe: the same fine thread on screen at any zoom, easing to about half as the
     // camera arrives (ARC_NEAR_K). The world view (the start) is unchanged.
     const ARC_NEAR_K = 0.5, camDepth = Math.max(1e-6, camera.position.z - CFG.radius);
-    ARC_TH.value = CFG.arcThickness * Math.min(1, camDepth / (FAR_Z - CFG.radius)) * lerp(1, ARC_NEAR_K, smooth(REORIENT_END, 0.65, p)); // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
+    ARC_TH.value = CFG.arcThickness * Math.min(1, camDepth / (FAR_Z - CFG.radius)) * lerp(1, ARC_NEAR_K, smooth(REORIENT_END, 0.65, p));
+    if (endpointMat) endpointMat.size = CFG.endpointSize * 1.25 * Math.min(1, camDepth / (FAR_Z - CFG.radius));   // 5 Nov 2026, Simon: the city dots stay pin pricks as we zoom in (they swelled with the zoom) // arcs thin as we approach (zoomK no longer needed: the depth scaling covers any extra zoom)
   
     // world globe stays visible until the very end of this beat's own track — cloud-pass crossfades in over it
     // (fadePrev), so fading the globe out early here just left a blank gap before the next beat's imagery arrived.
