@@ -91,6 +91,7 @@ export function installGlobeEnhancements(root = '#beats') {
     ${R} [data-live="panel"]{max-height:75vh;max-height:75dvh;overflow-y:auto;touch-action:pan-y}
     ${S}.globe-ship-selected:not(.following) .kin-callout-card:not([data-g]){display:none!important}
     ${R} .globe-prompt-dismissed{display:none!important}
+    #globe-simulation-indicator{display:none!important}   /* 6 Nov 2026, Simon: no Simulation pill */
     #globe-simulation-indicator{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));z-index:250;border:1px solid #ef9a5870;border-radius:999px;background:#081820ee;color:#ef9a58;padding:7px 13px;font:600 11px/1.3 Arial,sans-serif;letter-spacing:.08em;pointer-events:none}
   `;
   document.head.appendChild(style);
