@@ -103,6 +103,7 @@
 .qr .idx .rvb:focus-visible{outline:1px solid var(--mint);outline-offset:-8px}
 .qr .idx .rvb[hidden]{display:block;visibility:hidden}
 .qr .idx .st{color:var(--mint);letter-spacing:.12em;margin-right:10px}
+.qr .idx .row p.rated{font-size:14.5px;color:#aab6c1;margin:-2px 0 8px}   /* 6 Nov 2026, Simon: the rating line under a quoted review */
 .qr .idx .st i{font-style:normal;color:#33404c}
 .qr .idx .rvc{position:absolute;right:58px;top:10px;font:400 10px 'JetBrains Mono';letter-spacing:.1em;color:#55626e}
 @media(prefers-reduced-motion:reduce){.qr .idx .rvs .row{transition:none}}

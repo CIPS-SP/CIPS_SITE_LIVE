@@ -736,8 +736,11 @@
         wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });
         reviews.slice(0, 30).forEach(function(r){
           var who = (r.ship ? esc(r.ship) : 'Verified master'), when = [r.port, r.when].filter(Boolean).map(esc).join(' · ');
-          var quote = (r.didWell && r.didWell.trim()) ? ('“' + esc(r.didWell) + '”') : ('Rated ' + (r.overall||'-') + '/5 on the CIPS Port Call Index.' + (r.appoint === 'Yes' ? ' Will appoint again.' : ''));
-          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = '<p>' + quote + '</p><small>' + stars(r.overall) + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
+          // the line made from the review's own answers: its overall rating, and "Will appoint again." when they said yes (6 Nov 2026, Simon: shown under the quote too, not only when there is no quote)
+          var rated = 'Rated ' + (r.overall||'-') + '/5 on the CIPS Port Call Index.' + (r.appoint === 'Yes' ? ' Will appoint again.' : '');
+          var quoted = !!(r.didWell && r.didWell.trim());
+          var body = quoted ? '<p>“' + esc(r.didWell) + '”</p><p class="rated">' + esc(rated) + '</p>' : '<p>' + esc(rated) + '</p>';
+          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = body + '<small>' + stars(r.overall) + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
         });
         cycle();
       }).catch(function(){ /* keep the illustrative examples on any error */ });
