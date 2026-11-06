@@ -129,9 +129,9 @@ export function installGlobeEnhancements(root = '#beats') {
     addEventListener('touchmove', e => { if (ty === null || e.touches.length !== 1 || ty - e.touches[0].clientY < 24) return; ty = null; lastAt = performance.now(); attempt(true); }, { capture: true, passive: true });
     const st = document.createElement('style');
     st.textContent = `
-      ${S} [data-live="panel"].unfold{animation:pickerUnfold 1.8s cubic-bezier(.25,.6,.2,1) both, pickerGlow 1.5s ease-out 1.5s 2}
+      ${S} [data-live="panel"].unfold{animation:pickerUnfold 1.8s cubic-bezier(.25,.6,.2,1) backwards, pickerGlow 1.5s ease-out 1.5s 2}   /* backwards: the reveal mask goes once the card is open, so it cannot trim the glow (6 Nov, Simon: the glow was cut off on the right) */
       @keyframes pickerUnfold{0%{clip-path:inset(0 0 100% 0);opacity:.25}55%{opacity:1}100%{clip-path:inset(0 0 0 0);opacity:1}}
-      @keyframes pickerGlow{0%{box-shadow:0 0 0 0 rgba(255,138,30,0)}35%{box-shadow:0 0 0 2px rgba(255,138,30,.95),0 0 42px 10px rgba(255,138,30,.45)}100%{box-shadow:0 0 0 1px rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0)}}
+      @keyframes pickerGlow{0%{box-shadow:inset 0 0 0 0 rgba(255,138,30,0),inset 0 0 0 0 rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0)}35%{box-shadow:inset 0 0 0 2px rgba(255,138,30,.95),inset 0 0 26px 2px rgba(255,138,30,.32),0 0 22px 3px rgba(255,138,30,.45)}100%{box-shadow:inset 0 0 0 2px rgba(255,138,30,0),inset 0 0 0 0 rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0)}}   /* the ring and part of the glow are drawn inside the card's edge, so they show all the way round even where the globe area trims what lies outside it */
       @media (prefers-reduced-motion:reduce){${S} [data-live="panel"].unfold{animation:none}}`;
     document.head.appendChild(st);
   }
