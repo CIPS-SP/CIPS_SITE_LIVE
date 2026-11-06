@@ -75,7 +75,7 @@ async function run(label, page, mobile, scroll, after) {
   c.close();
 }
 
-const PAGES = ['sectors/yachting.html', 'sectors/cruise.html', 'sectors/offshore.html', 'sectors/shipping.html', 'desk-live.html', 'desk-live-login.html', 'review/index.html', '404.html'];   // 404.html: Cloudflare Pages shows it for any address that does not exist
+const PAGES = ['sectors/yachting.html', 'sectors/cruise.html', 'sectors/offshore.html', 'sectors/shipping.html', 'desk-live.html', 'desk-live-login.html', 'review/index.html', 'legal/privacy.html', 'legal/cookies.html', 'legal/terms.html', '404.html'];   // 404.html: Cloudflare Pages shows it for any address that does not exist
 try {
   if (want('--desktop')) await run('home desktop', 'index.html', false, true);
   if (want('--phone')) await run('home phone', 'index.html', true, true);
