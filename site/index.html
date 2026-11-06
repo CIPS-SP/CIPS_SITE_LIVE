@@ -30,7 +30,8 @@
            locked anywhere else with no mini-game open, it is put back at the top, where that lock makes sense. */
     try { history.scrollRestoration = 'manual'; } catch (e) { /* older browsers */ }
     (function () {
-      var fix = function () { var b = document.body; if (!b || b.style.overflow !== 'hidden' || document.querySelector('.splay-overlay') || scrollY <= 2) return; scrollTo({ top: 0, behavior: 'instant' }); };
+      /* 6 Nov 2026: it used to send the page back to the top; that also undid the header links (Simon: "the header links aren't working"). Far down the page with the scroll held and no mini-game open, it now just lets the page scroll again. */
+      var fix = function () { var b = document.body; if (!b || b.style.overflow !== 'hidden' || document.querySelector('.splay-overlay') || scrollY <= innerHeight) return; b.style.overflow = ''; document.documentElement.style.overflow = ''; };
       addEventListener('pageshow', function () { setTimeout(fix, 300); });
       document.addEventListener('visibilitychange', function () { if (!document.hidden) setTimeout(fix, 300); });
       setInterval(fix, 1000);
@@ -1071,6 +1072,15 @@
       lastY = scrollY; armed = true; collapseJourney(); showPill();
     }
     skipBtn.addEventListener('click', skipToCips);
+    /* 6 Nov 2026, Simon ("the header links aren't working properly"): a header link to a section of the main site (Sectors, Islands, Services, Atlantic Gateway, Desk LIVE, Contact) leaves the journey the way Skip to CIPS does
+       (the globe holds the page still until the journey starts, so the browser's own jump went nowhere, or landed somewhere the page could not be scrolled from), then goes to the section, below the header. */
+    document.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('header a[href^="#"]'); if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const id = a.getAttribute('href').slice(1), t = id && id !== 'top' ? document.getElementById(id) : null; if (!t) return;
+      e.preventDefault();
+      if (!collapsed) skipToCips(); else { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; }
+      requestAnimationFrame(() => { const header = document.querySelector('header')?.offsetHeight || 0; scrollTo({ top: t.getBoundingClientRect().top + scrollY - header, behavior: 'instant' }); lastY = scrollY; try { history.replaceState(null, '', '#' + id); } catch (_) {} });
+    });
     setInterval(() => {                                                                    // show it through the journey; not on top of the globe's own skip link, not on the main site
       const inGame = !!document.querySelector('.splay-overlay'), own = document.querySelector('.skip-globe');
       const ownShown = (el => {                                                              // 28 Oct 2026, Simon: this pill takes over the moment the globe's own Skip pill is gone: off screen, hidden, or faded out with the opening copy
