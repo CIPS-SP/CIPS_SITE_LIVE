@@ -229,11 +229,12 @@
 .qr .frame{background-image:linear-gradient(rgba(224,30,160,.20) 1px,transparent 1px),linear-gradient(90deg,rgba(224,30,160,.20) 1px,transparent 1px)}
 .qr .frame, .qr .hero, .qr .stats, .qr .sec, .qr .beyond, .qr footer{border-color:#eccae0}
 .qr .stats div{padding:28px 26px}
-.qr .stats div:nth-child(2) b{font-size:34px;line-height:48.4px}
+.qr .stats b{font-size:clamp(24px, calc(3.7vw - 9px), 40px)}   /* 6 Nov 2026, Simon: the four figures one size (VAT & duty free alone was 34px, the rest 44px). The longest, "VAT & duty free", must fit a quarter of the row: 40px at full width, a little smaller on narrower screens */
 .qr .deskhead{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
 .qr .deskhead .sub{margin-bottom:44px}
 .qr .deskhead .roundel{width:176px;height:176px;flex:none;margin:-14px 0 0}
 @media(max-width:900px){.qr .stats{grid-template-columns:1fr}
+.qr .stats b{font-size:40px}
 .qr .deskhead .roundel{width:84px;height:84px}}
 .qr .pstrip{gap:12px;padding:44px 32px 44px}
 .qr .pstrip img{border-right:0}
