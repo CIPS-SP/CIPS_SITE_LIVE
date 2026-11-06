@@ -9,7 +9,7 @@ Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.m
 - Confirm before anything outward-facing (pushing, deploying, releasing, emailing, changing Airtable).
 - In copy, do not call a ship "her"; say the ship, the yacht, Kinship. Use they/them for anyone whose pronouns are unstated.
 - Simon views only locally (`Open CIPS Site LIVE (Windows).bat`, `http://localhost:8080`); never give him Vercel or preview links, never cite Howard's branches or URLs.
-- Never edit Howard's lab (`CIPS-TAG/CIPS/HLC-globe-lab`); reading is fine. Lucas Freight is a separate, confidential project: keep its files, names and terms out of this repo.
+- Never edit Howard's lab (`CIPS-TAG/CIPS/HLC-globe-lab`); reading is fine. Lucas Freight is a separate, confidential project: keep its files and terms out of this repo. The one exception (Simon, 6 Nov 2026: "they are currently a partner we work with"): the Lucas Freight logo and name in the home page's Trusted Partners strip (`images/logos/lucas-freight.png`).
 - Do not kill processes by id; stop only servers you started. Never message another session without Simon's say-so. Only `git add` specific files.
 - Verify in a browser and say plainly what you could not check. Before listing "what is left", check the claim in the code and `git log`.
 - Editing traps: `globe-live/beat.js`, `live.js`, `beat.html`, `flights.js` are CRLF and `index.html`, `globe-enhancements.js`, `quay-work.js` are LF; never `sed -i` (it strips CRs), patch with Python bytes; write long scripts to a file, not a heredoc. More in `HANDOVER.md` section 7.

@@ -289,6 +289,7 @@
 .qr .assoc img[src*="water-taxi"]{height:64px}
 .qr .assoc img[src*="le-mourier"]{height:66px}
 .qr .assoc img[src*="la-collette"]{height:52px}
+.qr .assoc img[src*="lucas"]{height:40px}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.qr .assoc .track{animation:none;width:auto;flex-wrap:wrap;justify-content:center;row-gap:32px}
 .qr .assoc .track [aria-hidden]{display:none}
