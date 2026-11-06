@@ -89,6 +89,20 @@
 .qr .idx .row{padding:16px 26px;border-top:1px solid #1f2a35}
 .qr .idx .row p{margin:0 0 4px;font-size:17.5px}
 .qr .idx .row small{font:400 11px 'JetBrains Mono';color:#7d8b98;letter-spacing:.08em}
+/* 6 Nov 2026, Simon: one review at a time with arrows. The reviews are stacked in one grid cell, so the card keeps the height of the longest and does not jump */
+.qr .idx .rv{position:relative;display:flex;align-items:stretch;border-top:1px solid #1f2a35}
+.qr .idx .rvs{flex:1;min-width:0;display:grid}
+.qr .idx .rvs .row{grid-area:1/1;border-top:0;padding:22px 6px 20px;opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s}
+.qr .idx .rvs .row.on{opacity:1;visibility:visible}
+.qr .idx .rvs .row:only-child{opacity:1;visibility:visible}
+.qr .idx .rvb{flex:none;width:52px;background:none;border:0;color:#7d8b98;font:300 34px/1 'Inter Tight';cursor:pointer;padding:0 0 4px}
+.qr .idx .rvb:hover{color:#fff}
+.qr .idx .rvb:focus-visible{outline:1px solid var(--mint);outline-offset:-8px}
+.qr .idx .rvb[hidden]{display:block;visibility:hidden}
+.qr .idx .st{color:var(--mint);letter-spacing:.12em;margin-right:10px}
+.qr .idx .st i{font-style:normal;color:#33404c}
+.qr .idx .rvc{position:absolute;right:58px;top:10px;font:400 10px 'JetBrains Mono';letter-spacing:.1em;color:#55626e}
+@media(prefers-reduced-motion:reduce){.qr .idx .rvs .row{transition:none}}
 .qr .people{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:center}
 .qr .people .pt{position:relative;width:100%;max-width:370px}
 .qr .people .pt img{width:100%;display:block;aspect-ratio:1;object-fit:cover;object-position:50% 0}

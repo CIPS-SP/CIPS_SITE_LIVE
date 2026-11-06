@@ -642,9 +642,12 @@
 
       <div class="sec" id="proof"><div class="split"><div><div class="eyebrow">Port Call Index</div><h2>Don't take our word. <span class="grad">Take the master's.</span></h2><p class="sub" style="margin:0">Every score is tied to a real booking and verified by our team before it is published.</p><!-- 6 Nov 2026, Simon: the old reviews pages are gone; this button comes back with a new full reviews page: <div class="ctas"><a class="btn" href="reviews.html">Read every review →</a></div> --></div>
         <div class="panel idx" id="homeReviewCards"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cips port call index</span></div><div class="top"><div class="big">5.0</div><span>★★★★★ VERIFIED</span></div>
-          <div class="row"><p>“Made the Jersey visit exceptionally smooth.”</p><small>CAPT. MATT ALLEN · M/Y LALABE</small></div>
-          <div class="row"><p>“Welcomed with fresh local produce on arrival.”</p><small>ZOLTAN SIPOS · OCEAN DREAMWALKER III</small></div>
-          <div class="row"><p>“Very good service on a short stay.”</p><small>CAPT. BO · T/S GUNILLA</small></div>
+          <!-- 6 Nov 2026, Simon: one review at a time, with its own star rating, and an arrow at each end to go through the rest (the script below the page fills it from the drop box when there are published reviews) -->
+          <div class="rv"><button type="button" class="rvb" data-d="-1" aria-label="Previous review">&lsaquo;</button><div class="rvs" aria-live="polite">
+          <div class="row"><p>“Made the Jersey visit exceptionally smooth.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CAPT. MATT ALLEN · M/Y LALABE</small></div>
+          <div class="row"><p>“Welcomed with fresh local produce on arrival.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>ZOLTAN SIPOS · OCEAN DREAMWALKER III</small></div>
+          <div class="row"><p>“Very good service on a short stay.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CAPT. BO · T/S GUNILLA</small></div>
+          </div><button type="button" class="rvb" data-d="1" aria-label="Next review">&rsaquo;</button><span class="rvc"></span></div>
         </div>
       </div></div>
 
@@ -709,15 +712,26 @@
       var r = document.getElementById('homeReplay'); if (r) r.addEventListener('click', function(){ var b = document.getElementById('backToGlobe'); if (b) b.click(); else window.scrollTo({top:0,behavior:'smooth'}); });
       // Port Call Index: the live reviews replace the three illustrative ones as soon as there are real ones
       function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+      // one review at a time; the arrows go round them all (6 Nov 2026, Simon)
+      function stars(n){ n = Math.max(0, Math.min(5, Math.round(+n || 0))); return n ? '<span class="st" aria-label="' + n + ' out of 5">' + '★★★★★'.slice(0, n) + '<i>' + '★★★★★'.slice(n) + '</i></span>' : ''; }
+      function cycle(){
+        var wrap = document.getElementById('homeReviewCards'); if (!wrap) return;
+        var rows = [].slice.call(wrap.querySelectorAll('.rvs .row')), c = wrap.querySelector('.rvc'), i = 0, many = rows.length > 1;
+        function show(n){ i = (n + rows.length) % rows.length; rows.forEach(function(r, k){ r.classList.toggle('on', k === i); r.setAttribute('aria-hidden', k === i ? 'false' : 'true'); }); if (c) c.textContent = many ? (i + 1) + ' / ' + rows.length : ''; }
+        [].forEach.call(wrap.querySelectorAll('.rvb'), function(b){ b.hidden = !many; b.onclick = function(){ show(i + (+b.getAttribute('data-d'))); }; });
+        if (rows.length) show(0);
+      }
+      cycle();
       fetch((window.REVIEW_API || '') + '/api/reviews').then(function(x){ return x.json(); }).then(function(data){
         var reviews = (data && data.reviews) ? data.reviews : []; if (!reviews.length) return;
-        var wrap = document.getElementById('homeReviewCards'); if (!wrap) return;
+        var wrap = document.querySelector('#homeReviewCards .rvs'); if (!wrap) return;
         wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });
-        reviews.slice(0, 3).forEach(function(r){
+        reviews.slice(0, 30).forEach(function(r){
           var who = (r.ship ? esc(r.ship) : 'Verified master'), when = [r.port, r.when].filter(Boolean).map(esc).join(' · ');
           var quote = (r.didWell && r.didWell.trim()) ? ('“' + esc(r.didWell) + '”') : ('Rated ' + (r.overall||'-') + '/5 on the CIPS Port Call Index.' + (r.appoint === 'Yes' ? ' Will appoint again.' : ''));
-          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = '<p>' + quote + '</p><small>' + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
+          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = '<p>' + quote + '</p><small>' + stars(r.overall) + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
         });
+        cycle();
       }).catch(function(){ /* keep the illustrative examples on any error */ });
     })();
     </script>
