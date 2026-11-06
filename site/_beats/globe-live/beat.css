@@ -78,7 +78,7 @@
     letter-spacing:.05em;cursor:pointer;box-shadow:0 8px 24px rgba(244,83,0,.4)}
 .beat-globe-live .gcta-btn:hover{background:#ff6a1a}
 /* nudges a captain who scrolls instead of clicking — beat.js triggers this on a wheel/keyboard scroll attempt while gated */
-.beat-globe-live .gcta-btn.pulse{animation:voyageCtaPulse 1.4s ease-in-out 2}
+.beat-globe-live .gcta-btn.pulse{animation:voyageCtaPulse 1.4s ease-in-out 3}
 @keyframes voyageCtaPulse{
   0%{box-shadow:0 8px 24px rgba(244,83,0,.4);transform:scale(1)}
   35%{box-shadow:0 8px 30px rgba(255,138,30,.95),0 0 34px 8px rgba(255,138,30,.6);transform:scale(1.055)}

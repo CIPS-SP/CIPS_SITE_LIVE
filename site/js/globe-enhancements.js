@@ -30,7 +30,7 @@ export function installGlobeEnhancements(root = '#beats') {
     ${R} [data-g="voyageCta"] .gcta-btn:hover::after{width:100%}
     /* 25 Oct 2026, Simon: a bolder nudge when someone tries to scroll the locked globe (beat.js adds .pulse): glow, ripple and swell (no bottom line: Simon, too much) */
     @keyframes voyageNudge{0%{box-shadow:0 0 0 0 rgba(255,138,30,.8),0 0 0 0 rgba(255,138,30,0);transform:scale(1)}40%{box-shadow:0 0 0 0 rgba(255,138,30,.55),0 0 38px 12px rgba(255,138,30,.8);transform:scale(1.07)}100%{box-shadow:0 0 0 22px rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0);transform:scale(1)}}
-    ${R} [data-g="voyageCta"] .gcta-btn.pulse{animation:voyageNudge 1s ease-out 2}
+    ${R} [data-g="voyageCta"] .gcta-btn.pulse{animation:voyageNudge 1s ease-out 3}   /* 6 Nov 2026, Simon: three pulses (was two) */
       /* no box-shadow override: Simon's orange glow and scroll-nudge pulse (voyageCtaPulse, beat.css) must show through */
     /* Observe the Channel Islands caps the scroll; its two exits ("Jump to the approaches", "Find a ship to take in")
        must show while it is armed, and the "scroll to move on" hint is wrong there, so it is hidden. */
@@ -98,7 +98,7 @@ export function installGlobeEnhancements(root = '#beats') {
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
   if (voyageButton) { voyageButton.textContent = 'Scroll the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
   /* 6 Nov 2026, Simon: "Scroll the journey" (was "Play the journey"), so a visitor who just scrolls never has to click. Each separate scroll attempt
-     (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first pulses the button twice; the second opens (Simon 6 Nov,
+     (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first pulses the button three times; the second opens (Simon 6 Nov,
      was the third) the departure picker by itself, which unfolds slowly (1.8 s) with an orange glow (.unfold) to draw the eye. A further, separate scroll then starts the journey (arrangeDeparture).
      Clicking the button still opens the picker straight away. */
   if (voyageButton) {
@@ -115,7 +115,7 @@ export function installGlobeEnhancements(root = '#beats') {
       if (!fresh || !ctaShowing()) return;
       attempts += 1;
       if (attempts >= 2) { attempts = 0; autoOpen(); return; }
-      voyageButton.classList.remove('pulse'); void voyageButton.offsetWidth; voyageButton.classList.add('pulse');   // two pulses (voyageNudge)
+      voyageButton.classList.remove('pulse'); void voyageButton.offsetWidth; voyageButton.classList.add('pulse');   // three pulses (voyageNudge; Simon 6 Nov, was two)
     };
     const onScroll = () => { const now = performance.now(), fresh = now - lastAt > 700; lastAt = now; attempt(fresh); };
     addEventListener('wheel', e => { if (e.deltaY > 0) onScroll(); }, { capture: true, passive: true });
