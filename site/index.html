@@ -715,6 +715,8 @@
       function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       // one review at a time; the arrows go round them all (6 Nov 2026, Simon)
       function stars(n){ n = Math.max(0, Math.min(5, Math.round(+n || 0))); return n ? '<span class="st" aria-label="' + n + ' out of 5">' + '★★★★★'.slice(0, n) + '<i>' + '★★★★★'.slice(n) + '</i></span>' : ''; }
+      // the score's stars filled to the exact score: 4.5 = four full stars and half of the fifth (6 Nov 2026, Simon)
+      function partStars(v){ v = Math.max(0, Math.min(5, +v || 0)); var h = ''; for (var k = 0; k < 5; k++) { var f = Math.max(0, Math.min(1, v - k)); h += '<span class="s"><i style="width:' + Math.round(f * 100) + '%">★</i>★</span>'; } return '<span class="stp" role="img" aria-label="' + (Math.round(v * 10) / 10) + ' out of 5">' + h + '</span>'; }
       function cycle(){
         var wrap = document.getElementById('homeReviewCards'); if (!wrap) return;
         var rows = [].slice.call(wrap.querySelectorAll('.rvs .row')), c = wrap.querySelector('.rvc'), i = 0, many = rows.length > 1;
@@ -730,7 +732,7 @@
         if (scores.length) {
           var avg = scores.reduce(function(a, b){ return a + b; }, 0) / scores.length, el = document.getElementById('pciScore'), st = document.getElementById('pciStars');
           if (el) el.textContent = (Math.round(avg * 10) / 10).toFixed(1);
-          if (st) st.innerHTML = stars(avg).replace(' class="st"', '') + ' VERIFIED &middot; ' + scores.length + (scores.length === 1 ? ' REVIEW' : ' REVIEWS');
+          if (st) st.innerHTML = partStars(avg) + ' VERIFIED &middot; ' + scores.length + (scores.length === 1 ? ' REVIEW' : ' REVIEWS');
         }
         var wrap = document.querySelector('#homeReviewCards .rvs'); if (!wrap) return;
         wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });

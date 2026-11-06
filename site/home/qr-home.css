@@ -87,6 +87,9 @@
 .qr .idx .ttl i{font-style:normal;color:#7d8b98;letter-spacing:.08em}
 .qr .idx .top{padding:10px 26px 26px;display:flex;align-items:flex-end;gap:18px}
 .qr .idx .big+span i{font-style:normal;color:#33404c}
+.qr .idx .stp{margin-right:6px}   /* 6 Nov 2026: the score's part-filled stars: each star grey, with a green copy over it cut to the filled share */
+.qr .idx .stp .s{position:relative;display:inline-block;color:#33404c;margin-right:.14em}
+.qr .idx .stp .s i{position:absolute;left:0;top:0;overflow:hidden;white-space:nowrap;color:var(--mint);font-style:normal}
 .qr .idx .big{font:300 92px/1 'Inter Tight';letter-spacing:-.04em}
 .qr .idx .big+span{color:var(--mint);font:500 12px 'JetBrains Mono';letter-spacing:.14em;padding-bottom:14px}
 .qr .idx .row{padding:16px 26px;border-top:1px solid #1f2a35}
