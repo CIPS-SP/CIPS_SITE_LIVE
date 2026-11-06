@@ -113,6 +113,7 @@
 .qr .people{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:center}
 /* 6 Nov 2026, Simon: Simon and Howard side by side, each with their name; Howard's photo to follow (a placeholder square for now) */
 .qr .people .pts{display:grid;grid-template-columns:1fr 1fr;gap:30px;width:100%;max-width:470px}
+.qr .people .pts.one{grid-template-columns:1fr;max-width:340px}   /* one photo for now (Howard's to follow) */
 .qr .people .pt{position:relative;width:100%}
 .qr .people .ph{position:relative}
 .qr .people .ph img{width:100%;display:block;aspect-ratio:1;object-fit:cover;object-position:50% 0}
