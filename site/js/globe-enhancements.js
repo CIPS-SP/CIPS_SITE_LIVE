@@ -1,7 +1,7 @@
 /* Globe enhancements (Howard, 21 Sep 2026): the globe improvements first made on the Monaco page (/monaco/?s=simon),
    applied to the main site's globe. A presentation layer only: the shared globe (_beats/globe-live) is unchanged and
    remains the owner of vessel selection and route calculation. Its two controllers, ship-picker.mjs and voyage-prompt.mjs, are this site's own copies in js/ (copied from the Monaco page on 30 Oct 2026; the live site shares no files with it).
-   - intro: a compact "Scroll the journey" button (was "Play the journey", before that "Start your voyage"); two scroll attempts pulse it, the third opens the picker by itself; the chooser is titled "Choose your ship"
+   - intro: a compact "Scroll the journey" button (was "Play the journey", before that "Start your voyage"); one scroll attempt pulses it, the second opens the picker by itself; the chooser is titled "Choose your ship"
    - chooser: real controls moved into a tidy panel; "Go to Ship", "Choose another ship", "Simulate route to Jersey",
      a persistent Simulation label, Escape steps back one level
    - route: the calculation stays readable, then a one-time "Scroll to continue your journey" cue, dismissed on scroll
@@ -98,8 +98,8 @@ export function installGlobeEnhancements(root = '#beats') {
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
   if (voyageButton) { voyageButton.textContent = 'Scroll the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
   /* 6 Nov 2026, Simon: "Scroll the journey" (was "Play the journey"), so a visitor who just scrolls never has to click. Each separate scroll attempt
-     (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first and the second pulse the button twice; the third opens
-     the departure picker by itself, which unfolds with an orange glow (.unfold) to draw the eye. A further, separate scroll then starts the journey (arrangeDeparture).
+     (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first pulses the button twice; the second opens (Simon 6 Nov,
+     was the third) the departure picker by itself, which unfolds slowly (1.8 s) with an orange glow (.unfold) to draw the eye. A further, separate scroll then starts the journey (arrangeDeparture).
      Clicking the button still opens the picker straight away. */
   if (voyageButton) {
     const ctaShowing = () => voyageButton.getClientRects().length > 0 && !voyageButton.closest('[hidden]') && (stage.classList.contains('globe-intro') || stage.classList.contains('voyage-gate'));
@@ -108,13 +108,13 @@ export function installGlobeEnhancements(root = '#beats') {
     stage.__newGesture = false;   // read by arrangeDeparture: after the picker opened by itself, only a NEW scroll starts the journey
     const autoOpen = () => {
       voyageButton.classList.remove('pulse'); stage.dataset.autoOpened = String(performance.now()); voyageButton.click();
-      if (panelEl) { panelEl.classList.remove('unfold'); void panelEl.offsetWidth; panelEl.classList.add('unfold'); setTimeout(() => panelEl.classList.remove('unfold'), 4200); }
+      if (panelEl) { panelEl.classList.remove('unfold'); void panelEl.offsetWidth; panelEl.classList.add('unfold'); setTimeout(() => panelEl.classList.remove('unfold'), 4800); }
     };
     const attempt = fresh => {
       stage.__newGesture = fresh;
       if (!fresh || !ctaShowing()) return;
       attempts += 1;
-      if (attempts >= 3) { attempts = 0; autoOpen(); return; }
+      if (attempts >= 2) { attempts = 0; autoOpen(); return; }
       voyageButton.classList.remove('pulse'); void voyageButton.offsetWidth; voyageButton.classList.add('pulse');   // two pulses (voyageNudge)
     };
     const onScroll = () => { const now = performance.now(), fresh = now - lastAt > 700; lastAt = now; attempt(fresh); };
@@ -129,7 +129,7 @@ export function installGlobeEnhancements(root = '#beats') {
     addEventListener('touchmove', e => { if (ty === null || e.touches.length !== 1 || ty - e.touches[0].clientY < 24) return; ty = null; lastAt = performance.now(); attempt(true); }, { capture: true, passive: true });
     const st = document.createElement('style');
     st.textContent = `
-      ${S} [data-live="panel"].unfold{animation:pickerUnfold .9s cubic-bezier(.2,.75,.25,1) both, pickerGlow 1.5s ease-out .75s 2}
+      ${S} [data-live="panel"].unfold{animation:pickerUnfold 1.8s cubic-bezier(.25,.6,.2,1) both, pickerGlow 1.5s ease-out 1.5s 2}
       @keyframes pickerUnfold{0%{clip-path:inset(0 0 100% 0);opacity:.25}55%{opacity:1}100%{clip-path:inset(0 0 0 0);opacity:1}}
       @keyframes pickerGlow{0%{box-shadow:0 0 0 0 rgba(255,138,30,0)}35%{box-shadow:0 0 0 2px rgba(255,138,30,.95),0 0 42px 10px rgba(255,138,30,.45)}100%{box-shadow:0 0 0 1px rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0)}}
       @media (prefers-reduced-motion:reduce){${S} [data-live="panel"].unfold{animation:none}}`;
