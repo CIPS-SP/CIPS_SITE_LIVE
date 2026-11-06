@@ -505,7 +505,7 @@
           <a href="#gateway" class="nav-link hover:text-white transition-colors">Atlantic Gateway</a>
           <a href="#deskl" class="nav-link hover:text-white transition-colors">Desk LIVE</a>
           <a href="#proof" class="nav-link hover:text-white transition-colors">Reviews</a>
-          <a href="#contact" class="nav-link hover:text-white transition-colors">Contact</a>
+          <a href="#touch" class="nav-link hover:text-white transition-colors">Contact</a>
         </nav>
 
         <!-- WhatsApp: a small round logo in the top bar at every width, menu open or closed (Howard, 21 Sep 2026) -->
@@ -534,7 +534,7 @@
         <a href="#deskl" class="mobile-link py-3 border-b border-white/5">Desk LIVE</a>
         <a href="desk-live-login.html" class="mobile-link py-3 border-b border-white/5">Log in to CIPS Desk LIVE</a>
         <a href="#proof" class="mobile-link py-3 border-b border-white/5">Reviews</a>
-        <a href="#contact" class="mobile-link py-3 border-b border-white/5">Contact</a>
+        <a href="#touch" class="mobile-link py-3 border-b border-white/5">Contact</a>
         <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="mobile-link mt-3 py-3 rounded-full text-center font-semibold bg-[#25D366] text-white inline-flex items-center justify-center gap-2">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
           WhatsApp
@@ -656,7 +656,7 @@
       <div class="banner" style="margin:0"><img loading="lazy" src="images/home/corbiere.jpg" alt="La Corbière lighthouse at sunset" style="object-position:50% 24%"><span class="t">La Corbière, Jersey</span></div>
 
       <!-- 6 Nov 2026, Simon: The personal touch moved down, below the La Corbière picture, just above Contact us -->
-      <div class="sec"><div class="people"><div class="pt"><img src="images/people/simon-porritt.jpg" alt="Simon Porritt, Managing Director of CIPS" width="1026" height="1282" loading="lazy" decoding="async"></div><div><div class="eyebrow">The personal touch</div><h2>One call. <span class="grad">A person who answers.</span></h2><p class="sub" style="margin-bottom:22px">CIPS is led by Simon Porritt and a small team on the quay. Whatever the vessel, you deal with someone who knows the plan, before you have to ask.</p><a class="btn" href="#contact">Speak to Simon's team</a></div></div></div>
+      <div class="sec" id="touch"><div class="people">   <!-- id: the header's Contact goes here (6 Nov 2026, Simon: The personal touch, with Contact us just below) --><div class="pt"><img src="images/people/simon-porritt.jpg" alt="Simon Porritt, Managing Director of CIPS" width="1026" height="1282" loading="lazy" decoding="async"></div><div><div class="eyebrow">The personal touch</div><h2>One call. <span class="grad">A person who answers.</span></h2><p class="sub" style="margin-bottom:22px">CIPS is led by Simon Porritt and a small team on the quay. Whatever the vessel, you deal with someone who knows the plan, before you have to ask.</p><a class="btn" href="#contact">Speak to Simon's team</a></div></div></div>
 
       <section class="sec grid-bg" id="contact">
         <div class="split" style="align-items:flex-start">
@@ -1106,7 +1106,15 @@
       const id = a.getAttribute('href').slice(1), t = id && id !== 'top' ? document.getElementById(id) : null; if (!t) return;
       e.preventDefault();
       if (!collapsed) skipToCips(); else { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; }
-      requestAnimationFrame(() => { const header = document.querySelector('header')?.offsetHeight || 0; scrollTo({ top: t.getBoundingClientRect().top + scrollY - header, behavior: 'instant' }); lastY = scrollY; try { history.replaceState(null, '', '#' + id); } catch (_) {} });
+      try { history.replaceState(null, '', '#' + id); } catch (_) {}
+      /* 6 Nov 2026, Simon (from the globe, Reviews landed at The personal touch): things above the section can still be changing size just after the jump (photos arriving, the journey being taken out),
+         so for 2.5 s the section is kept just below the header, until the visitor scrolls, swipes or presses a key themselves */
+      const until = performance.now() + 2500; let mine = true; const stop = () => { mine = false; };
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev => addEventListener(ev, stop, { once: true, passive: true }));
+      const hold = () => { if (!mine) return; const header = document.querySelector('header')?.offsetHeight || 0, off = t.getBoundingClientRect().top - header;
+        if (Math.abs(off) > 1.5) scrollTo({ top: scrollY + off, behavior: 'instant' }); lastY = scrollY;
+        if (performance.now() < until) requestAnimationFrame(hold); else ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev => removeEventListener(ev, stop)); };
+      requestAnimationFrame(hold);
     });
     setInterval(() => {                                                                    // show it through the journey; not on top of the globe's own skip link, not on the main site
       const inGame = !!document.querySelector('.splay-overlay'), own = document.querySelector('.skip-globe');
