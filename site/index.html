@@ -641,7 +641,7 @@
           <p class="dlnote">Concept screens: every name, vessel and figure is made up.</p></div></div></div>
 
       <div class="sec" id="proof"><div class="split"><div><div class="eyebrow">Port Call Index</div><h2>Don't take our word. <span class="grad">Take the master's.</span></h2><p class="sub" style="margin:0">Every score is tied to a real booking and verified by our team before it is published.</p><!-- 6 Nov 2026, Simon: the old reviews pages are gone; this button comes back with a new full reviews page: <div class="ctas"><a class="btn" href="reviews.html">Read every review →</a></div> --></div>
-        <div class="panel idx" id="homeReviewCards"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cips port call index</span></div><div class="top"><div class="big">5.0</div><span>★★★★★ VERIFIED</span></div>
+        <div class="panel idx" id="homeReviewCards"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cips port call index</span></div><div class="ttl">CIPS overall score <i>· the average of every verified review</i></div><div class="top"><div class="big" id="pciScore">5.0</div><span id="pciStars">★★★★★ VERIFIED</span></div>
           <!-- 6 Nov 2026, Simon: one review at a time, with its own star rating, and an arrow at each end to go through the rest (the script below the page fills it from the drop box when there are published reviews) -->
           <div class="rv"><button type="button" class="rvb" data-d="-1" aria-label="Previous review">&lsaquo;</button><div class="rvs" aria-live="polite">
           <div class="row"><p>“Made the Jersey visit exceptionally smooth.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CAPT. MATT ALLEN · M/Y LALABE</small></div>
@@ -725,6 +725,13 @@
       cycle();
       fetch((window.REVIEW_API || '') + '/api/reviews').then(function(x){ return x.json(); }).then(function(data){
         var reviews = (data && data.reviews) ? data.reviews : []; if (!reviews.length) return;
+        // 6 Nov 2026, Simon: the big score is the CIPS overall score: the average of the overall star rating of every published (verified) review
+        var scores = reviews.map(function(r){ return +r.overall; }).filter(function(n){ return n >= 1 && n <= 5; });
+        if (scores.length) {
+          var avg = scores.reduce(function(a, b){ return a + b; }, 0) / scores.length, el = document.getElementById('pciScore'), st = document.getElementById('pciStars');
+          if (el) el.textContent = (Math.round(avg * 10) / 10).toFixed(1);
+          if (st) st.innerHTML = stars(avg).replace(' class="st"', '') + ' VERIFIED &middot; ' + scores.length + (scores.length === 1 ? ' REVIEW' : ' REVIEWS');
+        }
         var wrap = document.querySelector('#homeReviewCards .rvs'); if (!wrap) return;
         wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });
         reviews.slice(0, 30).forEach(function(r){

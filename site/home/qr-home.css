@@ -83,7 +83,10 @@
 .qr .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(12,17,22,.55),transparent 60%)}
 .qr .banner .t{position:absolute;left:32px;bottom:22px;z-index:2;color:#fff;font:500 12px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase}
 .qr .idx{padding:0}
-.qr .idx .top{padding:26px;display:flex;align-items:flex-end;gap:18px}
+.qr .idx .ttl{padding:22px 26px 0;font:500 11px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;color:#cfdde6}   /* 6 Nov 2026, Simon: say what the big number is */
+.qr .idx .ttl i{font-style:normal;color:#7d8b98;letter-spacing:.08em}
+.qr .idx .top{padding:10px 26px 26px;display:flex;align-items:flex-end;gap:18px}
+.qr .idx .big+span i{font-style:normal;color:#33404c}
 .qr .idx .big{font:300 92px/1 'Inter Tight';letter-spacing:-.04em}
 .qr .idx .big+span{color:var(--mint);font:500 12px 'JetBrains Mono';letter-spacing:.14em;padding-bottom:14px}
 .qr .idx .row{padding:16px 26px;border-top:1px solid #1f2a35}
