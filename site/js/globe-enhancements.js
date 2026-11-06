@@ -1,7 +1,7 @@
 /* Globe enhancements (Howard, 21 Sep 2026): the globe improvements first made on the Monaco page (/monaco/?s=simon),
    applied to the main site's globe. A presentation layer only: the shared globe (_beats/globe-live) is unchanged and
    remains the owner of vessel selection and route calculation. Its two controllers, ship-picker.mjs and voyage-prompt.mjs, are this site's own copies in js/ (copied from the Monaco page on 30 Oct 2026; the live site shares no files with it).
-   - intro: a compact "Play the journey" button (was "Start your voyage"); the chooser is titled "Choose your ship"
+   - intro: a compact "Scroll the journey" button (was "Play the journey", before that "Start your voyage"); a scroll pulses it twice, then it opens the picker by itself; the chooser is titled "Choose your ship"
    - chooser: real controls moved into a tidy panel; "Go to Ship", "Choose another ship", "Simulate route to Jersey",
      a persistent Simulation label, Escape steps back one level
    - route: the calculation stays readable, then a one-time "Scroll to continue your journey" cue, dismissed on scroll
@@ -96,7 +96,24 @@ export function installGlobeEnhancements(root = '#beats') {
   document.head.appendChild(style);
 
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
-  if (voyageButton) { voyageButton.textContent = 'Play the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
+  if (voyageButton) { voyageButton.textContent = 'Scroll the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
+  /* 6 Nov 2026, Simon: "Scroll the journey" (was "Play the journey"). A visitor who just scrolls never has to click: a scroll on the globe before the button is pressed
+     pulses it twice (beat.js voyagePulse, as before), and when those two pulses end the button presses itself, so the departure picker opens; a further scroll then
+     starts the journey (arrangeDeparture, after a short pause so the picker is seen). A finger swipe counts as a scroll too (the wheel and keys already did). */
+  if (voyageButton) {
+    const ctaShowing = () => voyageButton.getClientRects().length > 0 && !voyageButton.closest('[hidden]') && (stage.classList.contains('globe-intro') || stage.classList.contains('voyage-gate'));
+    // opens on a timer, not on the animation's end: with animations off (reduced motion, a hidden tab) the pulse never "ends"
+    let openTimer = 0;
+    const autoOpen = () => { openTimer = 0; if (!ctaShowing()) return; voyageButton.classList.remove('pulse'); stage.dataset.autoOpened = String(performance.now()); voyageButton.click(); };
+    new MutationObserver(() => { if (voyageButton.classList.contains('pulse') && !openTimer && ctaShowing()) openTimer = setTimeout(autoOpen, 2400); })
+      .observe(voyageButton, { attributes: true, attributeFilter: ['class'] });   // two pulses of about 1 s each, then open
+    let ty = null;
+    addEventListener('touchstart', e => { ty = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
+    addEventListener('touchmove', e => {
+      if (ty === null || e.touches.length !== 1 || ty - e.touches[0].clientY < 24 || !ctaShowing() || voyageButton.classList.contains('pulse')) return;
+      ty = null; void voyageButton.offsetWidth; voyageButton.classList.add('pulse');   // the same two pulses a wheel scroll gives
+    }, { passive: true });
+  }
   const pickerTitle = stage.querySelector('[data-live="panel"] .lhead b');
   if (pickerTitle) pickerTitle.textContent = 'Where are you sailing from?';
 
@@ -175,7 +192,11 @@ function arrangeDeparture(stage, S) {
   stage.querySelector('[data-g="voyageCtaBtn"]')?.addEventListener('click', () => V.set({}, { focus: true }));
   // 4 Nov 2026, Simon: no separate "Start the journey" press: the button reads "Scroll to start the journey" and the first scroll gesture (wheel, swipe, arrow / page keys)
   // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
-  const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0;
+  const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0
+    && performance.now() - (+stage.dataset.autoOpened || -1e9) > 1100;   // 6 Nov 2026: when the picker opened by itself (Scroll the journey), wait a moment so it is seen before a scroll starts the journey
+  let pty = null;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026)
+  window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
+  window.addEventListener('touchmove', e => { if (pty !== null && e.touches.length === 1 && pty - e.touches[0].clientY > 24 && pickerOpen()) { pty = null; start.click(); } }, { passive: true });
   window.addEventListener('wheel', e => { if (e.deltaY > 0 && pickerOpen()) start.click(); }, { capture: true, passive: true });
   window.addEventListener('keydown', e => {
     if (!['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey) return;
