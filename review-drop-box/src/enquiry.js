@@ -19,7 +19,9 @@ export const TOPICS = { port: 'Port call', cargo: 'Cargo/Freight', project: 'Pro
 const KEEP_DAYS = 30;
 const MIN_FILL_MS = 2500; // quicker than a person can fill the form: a robot
 const PER_IP_HOUR = 5;
-const PER_DAY = 150; // all visitors together; above it the page offers the email-app route instead
+// all visitors together; above it the page offers the email-app route instead. 60 (was 150; 7 Nov 2026, B6): each enquiry costs
+// about 8 storage writes and the free plan allows about 1,000 a day for everything, reviews included.
+const PER_DAY = 60;
 const SEND_PER_DAY = 250; // Brevo's free plan allows 300 a day; the rest wait for tomorrow (they are saved)
 const BACKOFF_MIN = [1, 5, 15, 30, 60]; // then hourly
 const RUN_BATCH = 15; // enquiries looked at per scheduled run (a Worker has 50 subrequests per run on the free plan)
@@ -96,6 +98,8 @@ async function count(env, key, ttl, limit) {
 // saves a checked enquiry; returns the stored item, or null when the box is too busy
 export async function saveEnquiry(env, enquiry, ipKey, now) {
   const hour = Math.floor(now / 3600000);
+  // the day's cap is checked first by reading only: once it is reached a flood from new addresses costs no writes at all (B6)
+  if (parseInt((await env.BOX.get('rl:enqday:' + day(now))) || '0', 10) >= PER_DAY) return null;
   if (!(await count(env, 'rl:enq:' + ipKey + ':' + hour, 7200, PER_IP_HOUR))) return null;
   if (!(await count(env, 'rl:enqday:' + day(now), 2 * 86400, PER_DAY))) return null;
   const id = now.toString(36).padStart(9, '0') + '-' + crypto.randomUUID();

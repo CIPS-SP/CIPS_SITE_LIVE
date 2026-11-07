@@ -34,6 +34,11 @@ const PER_BOOKING = 12;
 const QUEUE_DAYS = 30;
 const LINK_DAYS = 60; // a short link's default life, when the Desk gives no expiry
 const MISSES_PER_HOUR = 30; // wrong or unknown codes looked up from one address: stops anyone working through codes
+// 7 Nov 2026 (SECURITY-PLAN.md B6): Cloudflare's free plan allows about 1,000 storage (KV) writes a day for everything. Misses are
+// recorded (2 writes each) only up to this many a day across all addresses; after that they are refused without writing, so a
+// flood of made-up codes cannot use up the day's writes and stop real reviews and enquiries being saved. (Codes are 8 characters
+// from 31: guessing one is hopeless even unrecorded.)
+const MISS_RECORDS_PER_DAY = 100;
 const EMPTY_LIST = { reviews: [], averages: {}, priorities: {}, count: 0 };
 
 const json = (obj, status = 200, extra = {}) =>
@@ -93,7 +98,8 @@ async function bump(env, key, ttl, limit) {
   return true;
 }
 
-const ipHash = async (request) => (await sha256Hex(request.headers.get('CF-Connecting-IP') || 'unknown')).slice(0, 24); // the address itself is never stored
+// the address itself is never stored; mixed with a secret (7 Nov 2026, B5) so the short fingerprint cannot be turned back into the address
+const ipHash = async (request, env) => (await sha256Hex((env.SIGNING_SECRET || '') + '|' + (request.headers.get('CF-Connecting-IP') || 'unknown'))).slice(0, 24);
 
 // a short code's stored details (cleaned when stored) and whether the link is still good
 async function readCode(env, code, now) {
@@ -121,11 +127,14 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
   const look = /^\/api\/link\/([^/]{1,40})$/.exec(path);
   if (look && method === 'GET') {
     const cors = corsFor(request, env, 'GET');
-    const hour = Math.floor(now / 3600000), missKey = 'rl:miss:' + (await ipHash(request)) + ':' + hour;
+    const hour = Math.floor(now / 3600000), missKey = 'rl:miss:' + (await ipHash(request, env)) + ':' + hour;
     if (parseInt((await env.BOX.get(missKey)) || '0', 10) >= MISSES_PER_HOUR) return json({ error: 'busy' }, 429, cors);
     const got = await readCode(env, normCode(look[1]), now);
     if (!got.ok) {
-      if (got.reason === 'unknown') await bump(env, missKey, 7200, MISSES_PER_HOUR + 1); // only misses are counted, so real captains cost nothing
+      if (got.reason === 'unknown') { // only misses are counted, so real captains cost nothing; and only up to the day's cap (B6)
+        const dayKey = 'rl:missday:' + new Date(now).toISOString().slice(0, 10);
+        if (parseInt((await env.BOX.get(dayKey)) || '0', 10) < MISS_RECORDS_PER_DAY) { await bump(env, missKey, 7200, MISSES_PER_HOUR + 1); await bump(env, dayKey, 2 * 86400, MISS_RECORDS_PER_DAY); }
+      }
       return json({ error: 'link', reason: got.reason }, got.reason === 'expired' ? 410 : 404, cors);
     }
     const p = got.payload;
@@ -165,7 +174,7 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     if (!checked.ok) return json({ error: checked.error }, 400, cors);
 
     const hour = Math.floor(now / 3600000);
-    const ipKey = 'rl:ip:' + (await ipHash(request)) + ':' + hour;
+    const ipKey = 'rl:ip:' + (await ipHash(request, env)) + ':' + hour;
     if (!(await bump(env, ipKey, 7200, IP_PER_HOUR))) return json({ error: 'busy' }, 429, cors);
     if (!(await bump(env, 'rl:bk:' + link.payload.b, 90 * 86400, PER_BOOKING))) return json({ error: 'busy' }, 429, cors);
 
@@ -185,7 +194,7 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     const checked = validateEnquiry(got.body);
     if (checked.trap) return json({ ok: true, ref: 'E-' + makeCode().slice(0, 6) }, 200, cors); // a robot: say thanks, keep nothing
     if (!checked.ok) return json({ error: checked.error }, 400, cors);
-    const item = await saveEnquiry(env, checked.enquiry, await ipHash(request), now);
+    const item = await saveEnquiry(env, checked.enquiry, await ipHash(request, env), now);
     if (!item) return json({ error: 'busy' }, 429, cors);
     const sending = trySend(env, item, now).catch(() => {}); // straight away; the schedule tries again if this fails
     if (ctx && ctx.waitUntil) ctx.waitUntil(sending); else await sending;

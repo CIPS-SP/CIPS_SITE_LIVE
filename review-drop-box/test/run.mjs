@@ -238,6 +238,13 @@ await t('unknown codes: not found, and after 30 misses an hour the address must 
   assert.equal((await send(e, req('GET', '/api/link/33333333', { headers: ip }))).status, 429);
   assert.equal((await send(e, req('GET', '/api/link/33333333', { headers: { 'CF-Connecting-IP': '198.51.100.7' } }))).status, 404);
 });
+await t('a flood of made-up codes stops costing storage writes after 100 a day, and real codes still work', async () => {
+  const e = env(); const { code } = await (await makeLink(e)).json();
+  let writes = 0; const put = e.BOX.put.bind(e.BOX); e.BOX.put = (...a) => { writes++; return put(...a); };
+  for (let i = 0; i < 160; i++) await send(e, req('GET', '/api/link/2222222' + (i % 10), { headers: { 'CF-Connecting-IP': '10.0.' + Math.floor(i / 20) + '.' + i } }));
+  assert.ok(writes <= 200, 'writes ' + writes);
+  assert.equal((await send(e, req('GET', '/api/link/' + code, { headers: { 'CF-Connecting-IP': '192.0.2.50' } }))).status, 200);
+});
 await t('an answer sent with a code is stored with the booking from the box; a wrong code is refused', async () => {
   const e = env(); const { code } = await (await makeLink(e)).json();
   const ans = { role: 'Captain', overall: 5, appoint: 'Yes', didWell: 'Very good.', imp: {} };

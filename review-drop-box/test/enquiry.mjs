@@ -184,6 +184,12 @@ await t('code typed into the form arrives as harmless text in the HTML version t
   assert.match(inner, /&lt;b&gt;Test&lt;\/b&gt;/); assert.match(inner, /&amp; &quot;quotes&quot;/); assert.match(inner, /it&#39;s/);
   assert.match(m.textContent, /<a href="https:\/\/evil\.example">click<\/a>/); // the plain-text version keeps it as typed
 });
+await t('once the day is full, enquiries from new addresses are refused without writing anything (flood resistance)', async () => {
+  net = fakeNet(); const e = env(); let writes = 0; const put = e.BOX.put.bind(e.BOX); e.BOX.put = (...a) => { writes++; return put(...a); };
+  await e.BOX.put('rl:enqday:' + new Date(clock).toISOString().slice(0, 10), '60'); writes = 0;
+  for (let i = 0; i < 20; i++) assert.equal((await post(e, form(), { 'CF-Connecting-IP': '198.51.100.' + i })).status, 429);
+  assert.equal(writes, 0); assert.equal(net.sent.length, 0);
+});
 
 globalThis.fetch = realFetch;
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

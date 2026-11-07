@@ -44,7 +44,7 @@ The home page and yachting page enquiry forms post here too (`src/enquiry.js`, t
 
 | | |
 |---|---|
-| `POST /api/enquiry` | public. `{topic: port/cargo/project/registry/other, name, contact, message, main, fields:[{l,v}], website (trap), ms (time the form was open)}`. Checked and capped, trap or under 2.5 s thanked and dropped, 5 an hour per address and 150 a day in all, saved for 30 days, then emailed at once. Answers `{ok, ref}` (`E-XXXXXX`) only once saved. |
+| `POST /api/enquiry` | public. `{topic: port/cargo/project/registry/other, name, contact, message, main, fields:[{l,v}], website (trap), ms (time the form was open)}`. Checked and capped, trap or under 2.5 s thanked and dropped, 5 an hour per address and 60 a day in all (the day cap read before anything is written), saved for 30 days, then emailed at once. Answers `{ok, ref}` (`E-XXXXXX`) only once saved. |
 | `POST /api/brevo-webhook` | Brevo's transactional delivery reports, accepted only with `Authorization: Bearer <BREVO_WEBHOOK_TOKEN>`. Matched by `message-id`, or by the `enq-<id>` tag. `delivered` closes the enquiry; `hardBounce`, `blocked`, `spam`, `invalid`, `error` mark it a problem; `softBounce`, `deferred` are noted. |
 | `GET /api/enquiries` | Desk password. The latest 40 with their state (`saved`, `sent`, `delivered`, `problem`), `tries`, `lastError`. |
 | schedule, every 5 min | resends what failed (after 1, 5, 15, 30, 60 min, then hourly) and posts one alert to `ALERT_URL` for any enquiry not delivered after `ALERT_AFTER_MIN` (60) minutes or bounced. |
