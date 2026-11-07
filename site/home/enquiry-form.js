@@ -1,8 +1,8 @@
 /* The home page enquiry form (24 Oct 2026, Simon: not only port calls). A topic first, then the fields that suit it; name, contact and a message are always there.
    Fields for the other topics are hidden and disabled, so they are neither shown, required nor sent.
    7 Nov 2026 (Simon: send from the site): the answers go to the CIPS drop box (window.REVIEW_API, set in review/config.js; same address as reviews),
-   which SAVES them before it answers and then emails them to dutyagent@cips.agency (review-drop-box/src/enquiry.js). So "Thank you, your enquiry
-   has reached CIPS" is only shown once the box has it. If the box cannot be reached, the visitor is told so and offered their email app instead. */
+   which SAVES them before it answers and then emails them to dutyagent@cips.agency through Brevo (review-drop-box/src/enquiry.js). So "Thank you,
+   your enquiry is on its way to the CIPS team" is only shown once the box has it (Simon: not "sent", the email can take up to an hour if it has to be retried). If the box cannot be reached, the visitor is told so and offered their email app instead. */
 (function () {
   var f = document.querySelector('form[data-enquiry]'); if (!f) return;
   var T = {
@@ -58,7 +58,7 @@
     var box = document.createElement('div');
     box.className = 'full'; box.setAttribute('role', 'status'); box.tabIndex = -1;
     box.style.cssText = 'padding:22px 24px;border:1px solid var(--line, rgba(0,0,0,.12));border-radius:14px;background:var(--card, rgba(255,255,255,.6))';
-    box.innerHTML = '<p style="margin:0 0 8px;font-size:20px;font-weight:600;color:var(--ink, inherit)">Thank you, ' + esc(d.name.split(' ')[0]) + '. Your enquiry has reached CIPS.</p>' +
+    box.innerHTML = '<p style="margin:0 0 8px;font-size:20px;font-weight:600;color:var(--ink, inherit)">Thank you, ' + esc(d.name.split(' ')[0]) + '. Your enquiry is on its way to the CIPS team.</p>' +
       '<p style="margin:0;color:var(--ink2);font-size:15px">Your reference is <b>' + esc(ref) + '</b>. Our duty agent will get back to you at ' + esc(d.contact) + '. ' +
       'If it is urgent, call or WhatsApp <a href="tel:+447797720723" style="color:inherit">' + PHONE + '</a>, 24/7.</p>';
     f.innerHTML = ''; f.appendChild(box); box.focus({ preventScroll: true });

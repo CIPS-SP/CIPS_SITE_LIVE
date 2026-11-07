@@ -11,8 +11,8 @@
 //   PUT  /api/reviews   Desk     the approved list for the website
 //   GET  /api/reviews   public   that list (cached 5 min)
 //   GET  /api/health    public   "ok"
-//   POST /api/enquiry   public   a website enquiry: saved, then emailed to dutyagent@ (7 Nov 2026, src/enquiry.js)
-//   POST /api/resend-webhook  Resend  delivery reports, signed
+//   POST /api/enquiry   public   a website enquiry: saved, then emailed to dutyagent@ through Brevo (7 Nov 2026, src/enquiry.js)
+//   POST /api/brevo-webhook   Brevo   delivery reports (bearer token)
 //   GET  /api/enquiries Desk     the latest enquiries and whether each was delivered
 //   (and every 5 minutes, on a schedule: resend what failed, alert on anything not delivered)
 //
@@ -24,7 +24,7 @@
 import { verifyLink, cleanPayload, isExpired } from './link.js';
 import { validateAnswers, sanitizePublic } from './validate.js';
 import { makeCode, normCode, slugFor } from './code.js';
-import { validateEnquiry, saveEnquiry, trySend, verifyWebhook, onReport, runSchedule, listEnquiries } from './enquiry.js';
+import { validateEnquiry, saveEnquiry, trySend, webhookAllowed, onReport, runSchedule, listEnquiries } from './enquiry.js';
 
 const MAX_BODY = 16 * 1024; // review answers
 const MAX_PUBLISH = 256 * 1024; // the approved list
@@ -192,13 +192,14 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     return json({ ok: true, ref: item.ref }, 200, cors);
   }
 
-  // ---- Resend: delivery reports ----
-  if (path === '/api/resend-webhook' && method === 'POST') {
+  // ---- Brevo: delivery reports ----
+  if (path === '/api/brevo-webhook' && method === 'POST') {
+    if (!(await webhookAllowed(request, env.BREVO_WEBHOOK_TOKEN))) return json({ error: 'unauthorised' }, 401);
     const text = await request.text();
-    if (text.length > MAX_BODY || !(await verifyWebhook(request, text, env.RESEND_WEBHOOK_SECRET, now))) return json({ error: 'unauthorised' }, 401);
+    if (text.length > MAX_BODY) return json({ error: 'too large' }, 413);
     let ev; try { ev = JSON.parse(text); } catch (e) { return json({ error: 'bad request' }, 400); }
     await onReport(env, ev, now);
-    return json({ ok: true }); // unknown emails are fine too: Resend need not send them again
+    return json({ ok: true }); // unknown emails are fine too: Brevo need not send them again
   }
 
   // ---- Desk only ----

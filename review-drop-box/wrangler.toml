@@ -14,9 +14,9 @@ ALLOWED_ORIGINS = "https://cipslive.pages.dev,https://cips.agency,https://www.ci
 # Change to https://cips.agency/review/ when the site moves there.
 REVIEW_PAGE = "https://cipslive.pages.dev/review/"
 
-# Website enquiries (7 Nov 2026): who the email to dutyagent@cips.agency is from (a domain verified in Resend), and how many
-# minutes an enquiry may go without a "delivered" report from Resend before the alert goes out.
-MAIL_FROM = "CIPS website <website@send.cips.agency>"
+# Website enquiries (7 Nov 2026, sent through Brevo): who the email to dutyagent@cips.agency is from (a domain authenticated in
+# Brevo), and how many minutes an enquiry may go without a "delivered" report from Brevo before the alert goes out.
+MAIL_FROM = "CIPS website <website@cips.agency>"
 ALERT_AFTER_MIN = "60"
 
 # Every 5 minutes: resend enquiries whose email failed, and raise the alert for any not confirmed delivered.
@@ -30,6 +30,6 @@ id = "2c88883b101e4edfaac53006ad8c7465"   # KV namespace "BOX", created 5 Nov 20
 # Secrets are NOT kept here. Set them with:
 #   wrangler secret put SIGNING_SECRET
 #   wrangler secret put COLLECT_SECRET
-#   wrangler secret put RESEND_API_KEY          (a Resend key with "sending access" only, for the one domain)
-#   wrangler secret put RESEND_WEBHOOK_SECRET   (whsec_..., from the webhook set up in Resend)
-#   wrangler secret put ALERT_URL               (where the "not delivered" alert is posted, e.g. a private ntfy topic)
+#   wrangler secret put BREVO_API_KEY           (a Brevo API key, xkeysib-...)
+#   wrangler secret put BREVO_WEBHOOK_TOKEN     (a long random value; the same one goes in Brevo's webhook as its bearer token)
+#   wrangler secret put ALERT_URL               (where the "not delivered" alert is posted; channel still to choose)
