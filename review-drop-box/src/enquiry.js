@@ -126,7 +126,11 @@ export async function trySend(env, item, now, fetcher = fetch) {
   } catch (e) {
     item.lastError = 'could not reach Brevo: ' + String(e && e.name || e).slice(0, 100);
   }
-  if (item.status === 'saved') item.nextAt = now + (BACKOFF_MIN[item.tries - 1] || 60) * 60000;
+  if (item.status === 'saved') {
+    item.nextAt = now + (BACKOFF_MIN[item.tries - 1] || 60) * 60000;
+    // shown in Cloudflare's logs for the Worker: the reference and Brevo's reason only, never the visitor's details or the key
+    console.log('enquiry ' + item.ref + ' not sent (try ' + item.tries + '): ' + item.lastError);
+  }
   await put(env, item);
   return item;
 }
@@ -206,6 +210,7 @@ export async function keepKeyAlive(env, now, fetcher = fetch) {
     status = r.status; refused = r.status === 401 || r.status === 403;
   } catch (e) { return 'unreachable'; } // Brevo down: try again on the next run, nothing recorded
   await env.BOX.put('brevo:check', JSON.stringify({ at: now, ok: !refused, status }));
+  console.log('Brevo key check: ' + status + (refused ? ' (refused)' : ''));
   if (refused && env.ALERT_URL) {
     try {
       await fetcher(env.ALERT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain; charset=utf-8', Title: 'CIPS website: Brevo key refused', Priority: 'high', Tags: 'warning' },

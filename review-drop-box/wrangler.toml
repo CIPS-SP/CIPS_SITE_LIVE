@@ -21,6 +21,11 @@ REVIEW_PAGE = "https://cipslive.pages.dev/review/"
 MAIL_FROM = "CIPS Website <admin@cips.agency>"
 ALERT_AFTER_MIN = "60"
 
+# Keep the Worker's log lines (why an email was not sent, the weekly key check) so they can be read in the Cloudflare
+# dashboard: Workers & Pages > cips-review-drop-box > Observability / Logs. Free plan: kept a few days. No visitor details are logged.
+[observability]
+enabled = true
+
 # Every 5 minutes: resend enquiries whose email failed, and raise the alert for any not confirmed delivered.
 [triggers]
 crons = ["*/5 * * * *"]
