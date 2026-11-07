@@ -18,7 +18,7 @@ Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.m
 - `site/` is everything public and **must be self-contained: no request to any outside server** (no CDNs, fonts, tiles, images, APIs, analytics). The one allowed exception is the CIPS review drop box address in `site/review/config.js`. Links people click are fine.
 - No `../` paths out of `site/`; no files the pages do not use (no notes, tools, backups, old versions); every file under 24 MiB.
 - The globe shows **no ships and no flights, and no AIS / flights pills** (4 Nov 2026, Simon: switched off, we may bring them back). The switch is `TRAFFIC: false` in the `options.ais` of `site/index.html` (read in `_beats/globe-live/live.js`); set it to `true` to bring back the simulated fleet, the simulated flights and both pills. They are simulated either way (`window.CIPS_LIVE_DATA = false`): never describe them as live.
-- After changes: `cd tools && npm run tailwind` if classes changed, then `node check.mjs` (about 15 minutes for everything; flags `--desktop --phone --pages --doors`). It must report no missing files, no errors, nothing outside.
+- After changes: `cd tools && npm run tailwind` if classes changed, `node csp.mjs` if any inline `<script>` changed (the security headers allow each by fingerprint), then `node check.mjs` (about 15 minutes for everything; flags `--desktop --phone --pages --doors`). It must report no missing files, no errors, nothing outside.
 - Verify in a browser before saying something works (headless Chrome via the check, or the browser pane).
 
 ## Related things that live elsewhere

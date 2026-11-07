@@ -215,7 +215,7 @@ const obs = [];                                     // { kind, lane, z, heading,
 function logoEl(spec) {
   if (!spec) return null;
   const d = document.createElement('div'); d.className = 'brand'; d.style.left = spec.x + '%'; d.style.top = spec.y + '%';
-  d.innerHTML = `<img alt="${spec.name}" src="assets/game/logos/${spec.file}" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><b hidden>${spec.name}</b>`;
+  d.innerHTML = `<img alt="${spec.name}" src="assets/game/logos/${spec.file}"><b hidden>${spec.name}</b>`; { const im = d.firstChild; im.addEventListener('error', () => { im.hidden = true; im.nextElementSibling.hidden = false; }); }   // a listener, not onerror="": the security headers (site/_headers) block code written into attributes
   d.dataset.w = spec.w; return d;
 }
 function spawnEl(kind, cls = '') {

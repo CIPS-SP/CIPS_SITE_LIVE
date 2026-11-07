@@ -5,13 +5,15 @@
 //   - requests to ANYTHING outside the site (the review drop box named in site/review/config.js is the only exception)
 //   - script errors and console errors
 //   - files in site/ that were never requested (information: some load only on a click or in a state the scroll does not reach)
-// Exit code 1 if anything is missing, outside, or throws.   Usage: node check.mjs [--desktop] [--phone] [--pages] [--chrome <path>]
+//   - anything the security headers (site/_headers, written by csp.mjs) block: sent here as Cloudflare would send them
+// Exit code 1 if anything is missing, outside, blocked, or throws.   Usage: node check.mjs [--desktop] [--phone] [--pages] [--chrome <path>]
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { createReadStream, readFileSync, statSync, readdirSync, mkdtempSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, extname, join, normalize, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { withBlock } from './csp.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(here, '../site');
@@ -22,7 +24,11 @@ const want = (n) => !only || flag(n);
 const CHROME = (() => { const i = args.indexOf('--chrome'); if (i >= 0) return args[i + 1]; for (const p of ['C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', '/usr/bin/google-chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']) if (existsSync(p)) return p; throw new Error('Chrome not found: pass --chrome <path>'); })();
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.txt': 'text/plain', '.ico': 'image/x-icon', '.mp3': 'audio/mpeg', '.glb': 'model/gltf-binary' };
+// the security headers for every page, read from site/_headers (the "/*" rule), so the check sees what visitors' browsers see
+const HEADERS_TEXT = readFileSync(join(SITE, '_headers'), 'utf8');
+const SEC = (() => { const out = {}; let on = false; for (const l of HEADERS_TEXT.split(/\r?\n/)) { if (/^\S/.test(l)) on = l.trim() === '/*'; else if (on && l.includes(':')) { const i = l.indexOf(':'); out[l.slice(0, i).trim()] = l.slice(i + 1).trim(); } } return out; })();
 const server = http.createServer((req, res) => {
+  for (const [k, v] of Object.entries(SEC)) res.setHeader(k, v);
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname); if (p.endsWith('/')) p += 'index.html';
   const f = normalize(join(SITE, p));
   if (!f.startsWith(SITE) || !existsSync(f) || !statSync(f).isFile()) { res.writeHead(404); res.end('not found'); return; }
@@ -51,9 +57,10 @@ async function run(label, page, mobile, scroll, after) {
     if (m.method === 'Network.responseReceived' && P.response.status >= 400 && P.response.url.startsWith(BASE)) { const k = new URL(P.response.url).pathname; (problems.missing.get(k) || problems.missing.set(k, new Set()).get(k)).add(label); }
     if (m.method === 'Network.loadingFailed' && !P.canceled) { const u = reqs.get(P.requestId) || ''; if (u.startsWith(BASE) && !/net::ERR_ABORTED/.test(P.errorText)) { const k = new URL(u).pathname; (problems.missing.get(k) || problems.missing.set(k, new Set()).get(k)).add(label + ' (' + P.errorText + ')'); } }
     if (m.method === 'Runtime.exceptionThrown') problems.errors.push(`${label}: exception ${(P.exceptionDetails.exception?.description || P.exceptionDetails.text).split('\n')[0].slice(0, 180)}`);
+    if (m.method === 'Log.entryAdded' && P.entry.level === 'error' && /Content Security Policy|Permissions-Policy|Refused to/i.test(P.entry.text)) problems.errors.push(`${label}: BLOCKED ${P.entry.text.slice(0, 220)}`);
     if (m.method === 'Runtime.consoleAPICalled' && P.type === 'error') problems.errors.push(`${label}: console.error ${P.args.map((a) => a.value || a.description || '').join(' ').slice(0, 180)}`); };
   const send = (method, params = {}) => new Promise((res) => { const i = ++id; pend.set(i, res); c.send(JSON.stringify({ id: i, method, params })); });
-  await send('Network.enable'); await send('Page.enable'); await send('Runtime.enable'); await send('Network.setCacheDisabled', { cacheDisabled: true });
+  await send('Network.enable'); await send('Page.enable'); await send('Runtime.enable'); await send('Log.enable'); await send('Network.setCacheDisabled', { cacheDisabled: true });
   if (mobile) { await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }); await send('Emulation.setTouchEmulationEnabled', { enabled: true }); await send('Emulation.setUserAgentOverride', { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' }); }
   else await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await send('Page.navigate', { url: BASE + page });
@@ -93,8 +100,9 @@ try {
 // ---- report ----
 const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(join(d, e.name)) : [join(d, e.name)]));
 const all = walk(SITE).map((p) => relative(SITE, p).replace(/\\/g, '/'));
-const unused = all.filter((f) => !requested.has(f) && f !== '_headers' && f !== 'robots.txt');
+const unused = all.filter((f) => !requested.has(f) && f !== '_headers' && f !== 'robots.txt' && f !== '.well-known/security.txt');
 for (const k of ['/api/reviews']) problems.missing.delete(k);   // this check serves site/ on this PC, where the pages ask their own address for the reviews (review/config.js: the drop box only online); with none, the review sections keep their placeholder quotes: expected
+if (withBlock(HEADERS_TEXT) !== HEADERS_TEXT) problems.errors.push('site/_headers is out of date (an inline script changed): run  node csp.mjs  and check again');
 const bad = problems.missing.size + problems.outside.size + problems.errors.length;
 console.log('\n=== CHECK REPORT ===');
 console.log('files in site/:', all.length, '| requested during the run:', requested.size, '| never requested:', unused.length);

@@ -31,6 +31,13 @@ Notes from the tests (for B6):
 - A request with no Origin at all (a script, not a browser) is accepted like the form; only the rate limits and the daily cap stop a script. That is normal for a public form.
 - Each enquiry costs about 8 KV writes (two counters, the item, the pending mark, the send counter, the sent and delivered updates, the message id). At the 150-a-day cap that is about 1,200, above the free plan's 1,000 writes a day: a flood that fills the cap could also stop reviews being saved for the rest of the day. Fix with B6 (a Cloudflare rate-limit rule) or a lower daily cap.
 
+## A1 to A4 done (7 Nov 2026, on `dev`; C10 two-step sign-in done by Simon the same day)
+- **A1 headers:** `site/_headers` now sends, for every page, a Content-Security-Policy (only our own files, plus the drop box for `connect-src`; inline scripts allowed one by one by SHA-256 fingerprint; no plug-ins; no framing by other sites), `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, a `Permissions-Policy` (no camera, microphone, location, payment, USB and the like) and `Cross-Origin-Opener-Policy`. Written by `tools/csp.mjs`: **after editing any inline `<script>`, run `node csp.mjs`**; `check.mjs` now sends the same headers, reports anything they block, and fails if `_headers` is out of date (proved by breaking the fingerprints on purpose). Full check passed with the headers on. HSTS still waits for cips.agency (D13).
+- **A2 text into pages:** nothing a visitor types or puts in the address reaches a page as code. The vessel name is cleaned (letters, numbers, a few marks) and shown with `textContent`; reviews and the enquiry thank-you are escaped; the arrival game's radio uses `textContent`. Fixed: the game's logo fallback was an `onerror="..."` attribute, which the new policy blocks; now a listener. Note for later: the globe's ship and flight cards (`live.js`, `flights.js`) put names into the page unescaped; harmless while traffic is off and simulated, but **escape them before live AIS or flights ever come back**, and add their address to `connect-src` (the policy would block it otherwise).
+- **A3 what is public:** no notes, backups, keys, tokens or internal addresses in `site/`; only the licence files the fonts and libraries require. The phone-view aid (`js/dev-device.js`) shows only on localhost or with `?dev`: kept.
+- **A4 log-in page:** Simon, 7 Nov: the "Log in to CIPS Desk LIVE" links are hidden in the header and the mobile menu (index and yachting); the preview page stays, reachable only by its address. Put the links back when log-in is real.
+- **Also (Simon, 7 Nov):** the footer and legal tabs say **Privacy & Security**; the privacy notice has "Keeping your information safe" and "Reporting a security problem" (admin@cips.agency); `site/.well-known/security.txt` (expires 7 Nov 2027: renew it; its Policy address moves to cips.agency at go-live).
+
 ## The plan
 
 ### A. The website (Claude, on `dev`, checked locally before any release)
@@ -52,7 +59,7 @@ Notes from the tests (for B6):
 12. **Stopping fake CIPS emails.** Without DMARC, anyone can send email that claims to be from cips.agency; for a port agency the danger is fake invoices or bank details sent to clients. Add a DMARC record in GoDaddy on its own (not Brevo's): report-only first (`p=none`, reports to an address of CIPS's), then quarantine after a few weeks of clean reports, **but first deal with the website's enquiry emails** (sent by Brevo as admin@cips.agency, they would fail DMARC: see the tests above). Check at the same time that the SPF record covers Microsoft 365's outgoing mail. (Brevo is deliberately not authenticated for cips.agency, Simon 7 Nov, so Brevo can never send as CIPS.)
 
 ### D. When cips.agency goes public
-13. HSTS, the custom domain on the Pages project, removing `noindex` for cips.agency only, the drop box's allowed addresses and `REVIEW_PAGE`.
+13. HSTS, the custom domain on the Pages project, security.txt's Policy address, removing `noindex` for cips.agency only, the drop box's allowed addresses and `REVIEW_PAGE`.
 
 ### E. If something goes wrong
 14. A one-page "what to do" note: a leaked key (replace it in Cloudflare and Brevo), the site changed by someone else (roll back on Cloudflare Pages), a personal-data breach (Jersey law: tell the JOIC within 72 hours if it is a risk to people; keep a record either way).

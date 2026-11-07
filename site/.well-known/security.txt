@@ -1,0 +1,5 @@
+# How to report a security problem with the Channel Island Port Services website (RFC 9116)
+Contact: mailto:admin@cips.agency
+Expires: 2027-11-07T00:00:00Z
+Preferred-Languages: en
+Policy: https://cipslive.pages.dev/legal/privacy.html#report
