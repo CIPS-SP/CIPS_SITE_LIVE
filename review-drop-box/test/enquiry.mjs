@@ -173,6 +173,17 @@ await t('a refused Brevo key raises the alert, then re-checks daily (not every 5
   clock += 5 * 60000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 1); assert.equal(net.alerts.length, 1);
   clock += 86400000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 2); assert.equal(net.alerts.length, 2);
 });
+await t('code typed into the form arrives as harmless text in the HTML version too', async () => {
+  net = fakeNet(); const e = env();
+  await post(e, form({ name: 'Nasty <b>Test</b>', main: '<script>x</script>', message: '<a href="https://evil.example">click</a> <img src=x onerror=alert(1)> & "quotes"', fields: [{ l: 'Vessel', v: "<i>it's</i>" }] }));
+  const m = net.sent[0];
+  assert.ok(m.htmlContent.startsWith('<!doctype html>'));
+  const inner = m.htmlContent.replace(/^.*?<pre[^>]*>/s, '').replace(/<\/pre><\/body><\/html>$/, '');
+  assert.ok(!/[<>]/.test(inner), 'no raw < or > from the visitor');
+  assert.match(inner, /&lt;a href=&quot;https:\/\/evil\.example&quot;&gt;click&lt;\/a&gt;/);
+  assert.match(inner, /&lt;b&gt;Test&lt;\/b&gt;/); assert.match(inner, /&amp; &quot;quotes&quot;/); assert.match(inner, /it&#39;s/);
+  assert.match(m.textContent, /<a href="https:\/\/evil\.example">click<\/a>/); // the plain-text version keeps it as typed
+});
 
 globalThis.fetch = realFetch;
 console.log(`\n${passed} passed${process.exitCode ? ', some FAILED' : ''}`);

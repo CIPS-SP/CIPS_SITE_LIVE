@@ -12,12 +12,14 @@ What we already have going for us: the site is static and loads nothing from oth
 - cips.agency email: Microsoft 365 through GoDaddy, SPF `include:secureserver.net -all`, **no DMARC record**.
 
 ## Tests on the live enquiry route (7 Nov 2026, before the site's form uses it)
-All passed against https://cips-review-drop-box.simon-92c.workers.dev:
+**One failed, now fixed in the code (fix now):** in the email Simon received, `<b>` typed into the form showed as bold and `<a href>` as a working link. The box sent plain text only and Brevo built an HTML version from it without escaping, so a visitor could put a disguised link or a remote image into the duty agent's inbox. Fix: the box now sends its own HTML version with every character of the visitor's text escaped (`htmlContent` in `src/enquiry.js`, with a test). Needs deploying and the nasty test repeating.
+
+The rest passed against https://cips-review-drop-box.simon-92c.workers.dev:
 - Refused, nothing saved: another website (403; its browser pre-check gets no permission), a body over 16 KB (413), not JSON or not a form (400), a missing name (400), a made-up topic (400), GET on the route (404).
 - Robots: the trap field filled, or the form sent in under 2.5 s, gets a fake thank-you and reference; nothing is kept or emailed.
 - The enquiry list without the Desk password, or with a wrong one: 401. Fake Brevo delivery reports without the password, or with a wrong one: 401.
 - Rate limit: the 6th enquiry in an hour from one address is refused (429); the page then offers the email-app route.
-- Code in a message (`<script>`, links, an image, bold), a fake "Bcc:" line in the name and contact, and a message over 4,000 characters: saved and emailed as plain text, the extra lines folded into one, the message cut at 4,000, and no Reply-To (the contact no longer looks like an address).
+- A fake "Bcc:" line in the name and contact, and a message over 4,000 characters: the extra lines folded into one (nobody copied in), the message cut at 4,000, and no Reply-To (the contact no longer looks like an address). (Code in the message: see the failure above.)
 - Real enquiries: two delivered to dutyagent@ and marked delivered by Brevo's reports.
 
 Notes from the tests (for B6):

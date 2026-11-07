@@ -55,6 +55,8 @@ function sender(env) {
   return m ? { name: m[1] || 'CIPS website', email: m[2] } : { name: 'CIPS website', email: 'website@cips.agency' };
 }
 
+export const escHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 // the Brevo request body (https://developers.brevo.com/reference/sendtransacemail)
 export function emailFor(item, env) {
   const t = TOPICS[item.topic] || 'Enquiry';
@@ -68,6 +70,10 @@ export function emailFor(item, env) {
     to: [{ email: TO, name: 'CIPS duty agent' }],
     subject: ('CIPS enquiry ' + item.ref + ' - ' + t + ' - ' + (item.main || item.name)).slice(0, 180),
     textContent: lines.join('\n'),
+    // Our own HTML version, every character of the visitor's text escaped. Without it Brevo builds one from the text
+    // WITHOUT escaping, so <b> or <a href> typed into the form became bold text and a working link (found 7 Nov 2026).
+    htmlContent: '<!doctype html><html><body><pre style="font-family:Segoe UI,Arial,sans-serif;font-size:14px;white-space:pre-wrap;word-wrap:break-word">' +
+      escHtml(lines.join('\n')) + '</pre></body></html>',
     tags: ['enq-' + item.id], // comes back in Brevo's reports, as well as the message id
   };
   if (looksLikeEmail(item.contact)) mail.replyTo = { email: item.contact, name: item.name };
