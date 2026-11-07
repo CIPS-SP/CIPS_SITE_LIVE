@@ -11,6 +11,10 @@
 //   PUT  /api/reviews   Desk     the approved list for the website
 //   GET  /api/reviews   public   that list (cached 5 min)
 //   GET  /api/health    public   "ok"
+//   POST /api/enquiry   public   a website enquiry: saved, then emailed to dutyagent@ (7 Nov 2026, src/enquiry.js)
+//   POST /api/resend-webhook  Resend  delivery reports, signed
+//   GET  /api/enquiries Desk     the latest enquiries and whether each was delivered
+//   (and every 5 minutes, on a schedule: resend what failed, alert on anything not delivered)
 //
 // Settings (Cloudflare dashboard, never in the page or the repo):
 //   SIGNING_SECRET   secret   shared with the Desk, signs the review links
@@ -20,6 +24,7 @@
 import { verifyLink, cleanPayload, isExpired } from './link.js';
 import { validateAnswers, sanitizePublic } from './validate.js';
 import { makeCode, normCode, slugFor } from './code.js';
+import { validateEnquiry, saveEnquiry, trySend, verifyWebhook, onReport, runSchedule, listEnquiries } from './enquiry.js';
 
 const MAX_BODY = 16 * 1024; // review answers
 const MAX_PUBLISH = 256 * 1024; // the approved list
@@ -101,7 +106,7 @@ async function readCode(env, code, now) {
   return { ok: true, payload };
 }
 
-export async function handle(request, env, now = Date.now()) {
+export async function handle(request, env, now = Date.now(), ctx = null) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '') || '/';
   const method = request.method;
@@ -170,10 +175,37 @@ export async function handle(request, env, now = Date.now()) {
     return json({ ok: true }, 200, cors);
   }
 
+  // ---- public: a website enquiry. Saved first; the page is told "received" only once it is saved. ----
+  if (path === '/api/enquiry' && method === 'POST') {
+    const cors = corsFor(request, env, 'POST');
+    const origin = request.headers.get('Origin');
+    if (origin && !origins(env).includes(origin)) return json({ error: 'not allowed' }, 403, cors);
+    const got = await readJson(request, MAX_BODY);
+    if (got.error) return json({ error: got.error }, got.status, cors);
+    const checked = validateEnquiry(got.body);
+    if (checked.trap) return json({ ok: true, ref: 'E-' + makeCode().slice(0, 6) }, 200, cors); // a robot: say thanks, keep nothing
+    if (!checked.ok) return json({ error: checked.error }, 400, cors);
+    const item = await saveEnquiry(env, checked.enquiry, await ipHash(request), now);
+    if (!item) return json({ error: 'busy' }, 429, cors);
+    const sending = trySend(env, item, now).catch(() => {}); // straight away; the schedule tries again if this fails
+    if (ctx && ctx.waitUntil) ctx.waitUntil(sending); else await sending;
+    return json({ ok: true, ref: item.ref }, 200, cors);
+  }
+
+  // ---- Resend: delivery reports ----
+  if (path === '/api/resend-webhook' && method === 'POST') {
+    const text = await request.text();
+    if (text.length > MAX_BODY || !(await verifyWebhook(request, text, env.RESEND_WEBHOOK_SECRET, now))) return json({ error: 'unauthorised' }, 401);
+    let ev; try { ev = JSON.parse(text); } catch (e) { return json({ error: 'bad request' }, 400); }
+    await onReport(env, ev, now);
+    return json({ ok: true }); // unknown emails are fine too: Resend need not send them again
+  }
+
   // ---- Desk only ----
   const linkPath = /^\/api\/links(?:\/([^/]{1,40}))?$/.exec(path);
-  if (path === '/api/collect' || path === '/api/ack' || path === '/api/reviews' || linkPath) {
+  if (path === '/api/collect' || path === '/api/ack' || path === '/api/reviews' || path === '/api/enquiries' || linkPath) {
     if (!(await isDesk(request, env))) return json({ error: 'unauthorised' }, 401);
+    if (path === '/api/enquiries' && method === 'GET') return json({ items: await listEnquiries(env) }, 200, { 'Cache-Control': 'no-store' });
 
     // a new short link: the booking's details in, a code (and the ?vessel-CODE part of the link) out
     if (linkPath && !linkPath[1] && method === 'POST') {
@@ -240,7 +272,10 @@ export async function handle(request, env, now = Date.now()) {
 }
 
 export default {
-  fetch(request, env) {
-    return handle(request, env);
+  fetch(request, env, ctx) {
+    return handle(request, env, Date.now(), ctx);
+  },
+  scheduled(event, env, ctx) {
+    ctx.waitUntil(runSchedule(env, Date.now()));
   },
 };
