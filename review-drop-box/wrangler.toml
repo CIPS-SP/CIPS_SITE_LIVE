@@ -18,7 +18,7 @@ REVIEW_PAGE = "https://cipslive.pages.dev/review/"
 # enquiry may go without a "delivered" report from Brevo before the alert goes out.
 # Simon, 7 Nov: cips.agency is NOT authenticated in Brevo (so Brevo can never send as cips.agency). The sender is an address
 # verified in Brevo with a code; Brevo shows it as an @brevosend.com address. The email only ever goes to dutyagent@.
-MAIL_FROM = "CIPS website <dutyagent@cips.agency>"
+MAIL_FROM = "CIPS Website <admin@cips.agency>"
 ALERT_AFTER_MIN = "60"
 
 # Every 5 minutes: resend enquiries whose email failed, and raise the alert for any not confirmed delivered.
