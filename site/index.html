@@ -469,24 +469,7 @@
     </symbol>
   </svg>
 
-  <!-- ========================= TOP ANNOUNCEMENT BAR ========================= -->
-  <div class="bg-ink text-cream/90 text-[13px]">
-    <div class="max-w-8xl mx-auto px-5 sm:px-8 py-2.5 flex items-center justify-between gap-4">
-      <p class="hidden sm:flex items-center gap-2 tracking-wide">
-        <span class="divider-anchor">⚓</span>
-        <span>The Atlantic Gateway&nbsp;C.I. — Jersey · Guernsey · Alderney</span>
-      </p>
-      <div class="flex items-center gap-5 ml-auto">
-        <a href="tel:+447797720723" class="flex items-center gap-2 hover:text-goldl transition-colors">
-          <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
-          <span class="font-medium tracking-wide">+44 7797 720 723</span>
-        </a>
-        <span class="hidden md:inline-flex items-center gap-1.5 text-goldl/90">
-          <span class="w-1.5 h-1.5 rounded-full bg-goldl animate-pulse"></span> 24/7 Service
-        </span>
-      </div>
-    </div>
-  </div>
+  <!-- 7 Nov 2026, Simon: the top announcement bar is gone; its phone number and 24/7 are the call button in the header -->
 
   <!-- ========================= HEADER / NAV ========================= -->
   <header id="header" class="sticky top-0 z-50 transition-all duration-300 bg-ink/95 backdrop-blur supports-[backdrop-filter]:bg-ink/80 border-b border-white/5">
@@ -498,7 +481,7 @@
         </a>
 
         <!-- Desktop nav -->
-        <nav class="hidden lg:flex items-center gap-8 text-[15px] text-cream/85">
+        <nav class="hidden lg:flex items-center gap-5 xl:gap-8 text-[15px] text-cream/85">
           <a href="#desks" class="nav-link hover:text-white transition-colors">Sectors</a>
           <a href="#islands" class="nav-link hover:text-white transition-colors">Islands</a>
           <a href="#services" class="nav-link hover:text-white transition-colors">Services</a>
@@ -511,6 +494,13 @@
         <!-- WhatsApp: a small round logo in the top bar at every width, menu open or closed (Howard, 21 Sep 2026) -->
         <div class="flex items-center gap-3 ml-auto mr-2 lg:ml-0 lg:mr-0">
           <!-- Log in to CIPS Desk LIVE: link hidden 7 Nov 2026 (Simon; SECURITY-PLAN.md A4) until log-in is real: the preview page asked for a password that went nowhere. Put the <a> back to show it. -->
+          <!-- 7 Nov 2026, Simon (option C): the call button replaces the old top bar. Full number on wide screens; "24/7" and a phone icon below that. -->
+          <a href="tel:+447797720723" class="inline-flex items-center gap-2 h-10 px-3 xl:px-4 rounded-full border border-white/25 text-cream hover:bg-white/10 hover:border-white/40 transition-colors whitespace-nowrap" aria-label="Call CIPS, 24/7, on +44 7797 720 723" title="Call CIPS, 24/7">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#3ccf7a] animate-pulse" aria-hidden="true"></span>
+            <span class="hidden sm:inline text-[12px] font-semibold tracking-wide text-goldl">24/7</span>
+            <svg class="w-4 h-4 xl:hidden" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+            <span class="hidden xl:inline text-[14px] font-medium tracking-wide">+44 7797 720 723</span>
+          </a>
           <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="inline-flex items-center justify-center w-10 h-10 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-md transition-all" aria-label="Message CIPS on WhatsApp" title="WhatsApp CIPS">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
           </a>
@@ -533,7 +523,8 @@
         <a href="#deskl" class="mobile-link py-3 border-b border-white/5">Desk LIVE</a>
         <a href="#proof" class="mobile-link py-3 border-b border-white/5">Reviews</a>
         <a href="#touch" class="mobile-link py-3 border-b border-white/5">Contact</a>
-        <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="mobile-link mt-3 py-3 rounded-full text-center font-semibold bg-[#25D366] text-white inline-flex items-center justify-center gap-2">
+        <a href="tel:+447797720723" class="mobile-link mt-3 py-3 rounded-full text-center font-semibold border border-white/25 text-cream inline-flex items-center justify-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#3ccf7a]" aria-hidden="true"></span>Call +44 7797 720 723 · 24/7</a>
+        <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="mobile-link mt-2 py-3 rounded-full text-center font-semibold bg-[#25D366] text-white inline-flex items-center justify-center gap-2">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
           WhatsApp
         </a>
