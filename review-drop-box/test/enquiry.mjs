@@ -19,10 +19,11 @@ const req = (method, path, { body, headers = {}, raw } = {}) =>
 const form = (over = {}) => ({ topic: 'port', name: 'Alex Smith', contact: 'alex@yacht.example', message: 'Fuel and a berth, please.', main: 'Kinship', fields: [{ l: 'Vessel or company', v: 'Kinship' }, { l: 'Arrival', v: '12 Nov' }], ms: 40000, ...over });
 
 // a stand-in for Brevo (and the alert channel) that records what it is sent
-function fakeNet({ brevoStatus = 201 } = {}) {
-  const sent = [], alerts = [];
+function fakeNet({ brevoStatus = 201, keyStatus = 200 } = {}) {
+  const sent = [], alerts = [], checks = [];
   const f = async (url, init) => {
     if (url.startsWith('https://alert.example')) { alerts.push(init.body); return new Response('ok'); }
+    if (url.startsWith('https://brevo.example/v3/smtp/statistics/')) { checks.push(init.headers['api-key']); return new Response('{}', { status: keyStatus }); }
     if (url === 'https://brevo.example/v3/smtp/email') {
       if (brevoStatus !== 201) return new Response(JSON.stringify({ code: 'x', message: 'down' }), { status: brevoStatus });
       const m = JSON.parse(init.body); sent.push({ ...m, auth: init.headers['api-key'] });
@@ -30,7 +31,7 @@ function fakeNet({ brevoStatus = 201 } = {}) {
     }
     throw new Error('unexpected address ' + url);
   };
-  return { f, sent, alerts };
+  return { f, sent, alerts, checks };
 }
 const items = async (e) => (await (await handle(req('GET', '/api/enquiries', { headers: { Authorization: 'Bearer ' + COLLECT } }), e, clock)).json()).items;
 const post = (e, body, headers = {}) => handle(req('POST', '/api/enquiry', { body, headers: { Origin: ORIGIN, ...headers } }), e, clock);
@@ -158,6 +159,19 @@ await t('trySend leaves an already-sent enquiry alone', async () => {
   await post(e, form()); const [it] = await items(e);
   assert.equal(net.sent.length, 1);
   await trySend(e, it, clock, net.f); assert.equal(net.sent.length, 1);
+});
+await t('the Brevo key is used once a week so it never lapses after 90 quiet days', async () => {
+  net = fakeNet(); const e = env();
+  await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 1); assert.equal(net.checks[0], 'xkeysib-test');
+  clock += 6 * 86400000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 1);
+  clock += 1 * 86400000 + 60000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 2);
+  assert.equal(net.alerts.length, 0);
+});
+await t('a refused Brevo key raises the alert, then re-checks daily (not every 5 minutes)', async () => {
+  net = fakeNet({ keyStatus: 401 }); const e = env();
+  await runSchedule(e, clock, net.f); assert.equal(net.alerts.length, 1); assert.match(net.alerts[0], /refused/);
+  clock += 5 * 60000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 1); assert.equal(net.alerts.length, 1);
+  clock += 86400000; await runSchedule(e, clock, net.f); assert.equal(net.checks.length, 2); assert.equal(net.alerts.length, 2);
 });
 
 globalThis.fetch = realFetch;

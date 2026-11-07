@@ -186,7 +186,34 @@ export async function runSchedule(env, now, fetcher = fetch) {
       if (r.ok) for (const i of late) { i.alertedAt = new Date(now).toISOString(); await put(env, i); }
     } catch (e) { /* tried again on the next run */ }
   }
-  return { looked: listed.keys.length, late: late.length };
+  const key = await keepKeyAlive(env, now, fetcher);
+  return { looked: listed.keys.length, late: late.length, key };
+}
+
+// Brevo API keys stop working after 90 days unused, and a quiet spell on the site could leave the key unused that long.
+// Once a week the box makes one harmless call with it (a day's sending figures), which keeps it alive and shows at once
+// if it has been refused (expired or deleted): then the alert goes out, once a day until it works again.
+const KEY_CHECK_DAYS = 7;
+export async function keepKeyAlive(env, now, fetcher = fetch) {
+  if (!env.BREVO_API_KEY) return 'no key';
+  const last = JSON.parse((await env.BOX.get('brevo:check')) || '{}');
+  const ok = last.ok !== false;
+  if (now - (last.at || 0) < (ok ? KEY_CHECK_DAYS : 1) * 86400000) return 'not due';
+  let refused = false, status = 0;
+  try {
+    const r = await fetcher(String(env.BREVO_API || 'https://api.brevo.com/v3') + '/smtp/statistics/aggregatedReport?days=1', {
+      headers: { 'api-key': env.BREVO_API_KEY, Accept: 'application/json' }, signal: AbortSignal.timeout(10000) });
+    status = r.status; refused = r.status === 401 || r.status === 403;
+  } catch (e) { return 'unreachable'; } // Brevo down: try again on the next run, nothing recorded
+  await env.BOX.put('brevo:check', JSON.stringify({ at: now, ok: !refused, status }));
+  if (refused && env.ALERT_URL) {
+    try {
+      await fetcher(env.ALERT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain; charset=utf-8', Title: 'CIPS website: Brevo key refused', Priority: 'high', Tags: 'warning' },
+        body: 'Brevo refused the drop box\'s API key (' + status + '). Website enquiries are being saved but cannot be emailed until a new key is stored (npx wrangler secret put BREVO_API_KEY).',
+        signal: AbortSignal.timeout(10000) });
+    } catch (e) { /* the daily re-check alerts again */ }
+  }
+  return refused ? 'refused' : 'ok';
 }
 
 // the Desk's view: the newest first, up to 40
