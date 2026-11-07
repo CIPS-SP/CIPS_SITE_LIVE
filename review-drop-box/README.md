@@ -71,4 +71,4 @@ The email goes only to `TO` (dutyagent@cips.agency, fixed in the code); the visi
 Check Cloudflare's current free allowances first (not checked: expected to be far above a few reviews a month).
 
 ## Not built yet
-Bot check beyond the trap field and rate limits (Cloudflare Turnstile is the planned extra); the Desk's half (ask, collect, approve, publish); switching the website's review sections to read `/api/reviews`; replacing the home page's "Rate…" link.
+Bot check beyond the trap field and rate limits (Cloudflare Turnstile is the planned extra); switching the website's review sections to read `/api/reviews`; replacing the home page's "Rate…" link.

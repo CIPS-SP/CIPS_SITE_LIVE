@@ -1,6 +1,6 @@
 # Brief for the Desk session: the Desk's half of Port Call Reviews
 
-Written 5 Nov 2026 by the website session (CIPS SITE LIVE), for Simon to send to the Desk session. Not sent yet.
+Written 5 Nov 2026 by the website session (CIPS SITE LIVE), for Simon to send to the Desk session. Sent; the Desk's half is built and working (Simon, 7 Nov 2026). Kept as the record of what was asked.
 
 ## What this is
 Captains review a port call through a hidden page on the website. Their answers wait in a small public "drop box" (a Cloudflare Worker) until the Desk collects them. **The website's half is built, deployed and tested live.** The Desk's half (make and email the link, collect the answers into Airtable, approve them, publish the approved list) is not started. That half is yours.
