@@ -1040,7 +1040,9 @@
     const backPill = document.getElementById('backToGlobe'), openingEl = document.getElementById('openingAct');
     const mainTop = () => openingEl ? openingEl.getBoundingClientRect().bottom + scrollY - (document.documentElement.classList.contains('has-finale') ? innerHeight : 0) : 0;       // where the opening act ends and the main site begins (with the finale the home page starts one window height early, under the shrinking frame)
     let pillTimer = 0, armed = false, restarting = false, lastY = scrollY, quietUntil = 0;
-    const showPill = (ms = 5000) => { backPill.classList.add('on'); clearTimeout(pillTimer); pillTimer = setTimeout(hidePill, ms); quietUntil = performance.now() + 600; };   // (the scroll that put it there must not hide it again)
+    // 7 Nov 2026, Simon: the pill sat over the nav bar; it now sits just below the header, in the white space, wherever the header is at that moment
+    const placePill = () => { const h = document.getElementById('header'); backPill.style.top = Math.round((h ? h.getBoundingClientRect().bottom : 74) + 10) + 'px'; };
+    const showPill = (ms = 5000) => { placePill(); backPill.classList.add('on'); clearTimeout(pillTimer); pillTimer = setTimeout(hidePill, ms); quietUntil = performance.now() + 600; };   // (the scroll that put it there must not hide it again)
     const hidePill = () => { backPill.classList.remove('on'); clearTimeout(pillTimer); };
     function restartAtGlobe() {
       if (restarting) return; restarting = true; hidePill(); clearTimeout(collapseTimer);
