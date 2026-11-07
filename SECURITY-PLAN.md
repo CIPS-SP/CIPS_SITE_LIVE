@@ -11,6 +11,19 @@ What we already have going for us: the site is static and loads nothing from oth
 - `desk-live-login.html` is a preview log-in page with an email and password box that sends nothing.
 - cips.agency email: Microsoft 365 through GoDaddy, SPF `include:secureserver.net -all`, **no DMARC record**.
 
+## Tests on the live enquiry route (7 Nov 2026, before the site's form uses it)
+All passed against https://cips-review-drop-box.simon-92c.workers.dev:
+- Refused, nothing saved: another website (403; its browser pre-check gets no permission), a body over 16 KB (413), not JSON or not a form (400), a missing name (400), a made-up topic (400), GET on the route (404).
+- Robots: the trap field filled, or the form sent in under 2.5 s, gets a fake thank-you and reference; nothing is kept or emailed.
+- The enquiry list without the Desk password, or with a wrong one: 401. Fake Brevo delivery reports without the password, or with a wrong one: 401.
+- Rate limit: the 6th enquiry in an hour from one address is refused (429); the page then offers the email-app route.
+- Code in a message (`<script>`, links, an image, bold), a fake "Bcc:" line in the name and contact, and a message over 4,000 characters: saved and emailed as plain text, the extra lines folded into one, the message cut at 4,000, and no Reply-To (the contact no longer looks like an address).
+- Real enquiries: two delivered to dutyagent@ and marked delivered by Brevo's reports.
+
+Notes from the tests (for B6):
+- A request with no Origin at all (a script, not a browser) is accepted like the form; only the rate limits and the daily cap stop a script. That is normal for a public form.
+- Each enquiry costs about 8 KV writes (two counters, the item, the pending mark, the send counter, the sent and delivered updates, the message id). At the 150-a-day cap that is about 1,200, above the free plan's 1,000 writes a day: a flood that fills the cap could also stop reviews being saved for the rest of the day. Fix with B6 (a Cloudflare rate-limit rule) or a lower daily cap.
+
 ## The plan
 
 ### A. The website (Claude, on `dev`, checked locally before any release)
