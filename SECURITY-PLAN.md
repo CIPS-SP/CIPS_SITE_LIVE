@@ -22,7 +22,7 @@ What we already have going for us: the site is static and loads nothing from oth
 ### B. The drop box (Claude, tests first; redeploying needs Simon's OK)
 5. **Read-through of `src/worker.js` and `src/enquiry.js`** for anything that can be abused: sizes, field checks, CORS, password and token checks, error messages that say too much.
 6. **Flood resistance.** Cloudflare's free plan allows about 1,000 KV writes a day; a determined flood of fake reviews or enquiries could use them up and stop real ones for the rest of the day. Measure how many writes each request costs, and consider a Cloudflare rate-limiting rule on `/api/*` (one is free) in front of the box.
-7. **Secrets**: where each one lives (Cloudflare, Render, Brevo), who can see them, how to replace one quickly; Wrangler signed out after every deploy.
+7. **Secrets**: where each one lives (Cloudflare, Render, Brevo), who can see them, how to replace one quickly; Wrangler signed out after every deploy (`npx.cmd wrangler logout`) **and** revoked in the Cloudflare dashboard under Profile → Access Management → Connected Applications: logging out alone left Wrangler listed there with 29 permissions (found 7 Nov; Simon revoked it).
 8. **Bot check**: Cloudflare Turnstile would stop more robots but loads a script from Cloudflare, which breaks the site's "nothing from outside" rule. Decide whether to keep relying on the trap field, timing and rate limits.
 9. **Tools**: `npm audit` on the drop box's one tool (Wrangler, used only to deploy).
 
