@@ -14,9 +14,11 @@ ALLOWED_ORIGINS = "https://cipslive.pages.dev,https://cips.agency,https://www.ci
 # Change to https://cips.agency/review/ when the site moves there.
 REVIEW_PAGE = "https://cipslive.pages.dev/review/"
 
-# Website enquiries (7 Nov 2026, sent through Brevo): who the email to dutyagent@cips.agency is from (a domain authenticated in
-# Brevo), and how many minutes an enquiry may go without a "delivered" report from Brevo before the alert goes out.
-MAIL_FROM = "CIPS website <website@cips.agency>"
+# Website enquiries (7 Nov 2026, sent through Brevo): who the email to dutyagent@cips.agency is from, and how many minutes an
+# enquiry may go without a "delivered" report from Brevo before the alert goes out.
+# Simon, 7 Nov: cips.agency is NOT authenticated in Brevo (so Brevo can never send as cips.agency). The sender is an address
+# verified in Brevo with a code; Brevo shows it as an @brevosend.com address. The email only ever goes to dutyagent@.
+MAIL_FROM = "CIPS website <dutyagent@cips.agency>"
 ALERT_AFTER_MIN = "60"
 
 # Every 5 minutes: resend enquiries whose email failed, and raise the alert for any not confirmed delivered.

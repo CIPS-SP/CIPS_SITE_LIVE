@@ -29,7 +29,7 @@ What we already have going for us: the site is static and loads nothing from oth
 ### C. Accounts and email (Simon, with a checklist from Claude): the biggest real-world risks
 10. **Two-step sign-in (2FA)** on every account that can change the site or read its data: GitHub, Cloudflare, GoDaddy, Brevo, Airtable, Render, Microsoft 365. Check who has access to each and remove anyone who no longer needs it.
 11. **GoDaddy domain lock** (transfer lock) on cips.agency, and a check of who can edit its DNS.
-12. **Stopping fake CIPS emails.** Without DMARC, anyone can send email that claims to be from cips.agency; for a port agency the danger is fake invoices or bank details sent to clients. Brevo's set-up adds a DMARC record in report-only mode; after a few weeks of reports, tighten it to quarantine. Check at the same time that the SPF record covers Microsoft 365's outgoing mail.
+12. **Stopping fake CIPS emails.** Without DMARC, anyone can send email that claims to be from cips.agency; for a port agency the danger is fake invoices or bank details sent to clients. Add a DMARC record in GoDaddy on its own (not Brevo's): report-only first (`p=none`, reports to an address of CIPS's), then quarantine after a few weeks of clean reports. Check at the same time that the SPF record covers Microsoft 365's outgoing mail. (Brevo is deliberately not authenticated for cips.agency, Simon 7 Nov, so Brevo can never send as CIPS.)
 
 ### D. When cips.agency goes public
 13. HSTS, the custom domain on the Pages project, removing `noindex` for cips.agency only, the drop box's allowed addresses and `REVIEW_PAGE`.

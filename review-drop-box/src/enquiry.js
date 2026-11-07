@@ -9,7 +9,7 @@
 //   GET /api/enquiries (Desk password) lists them with their state, so nothing depends on the email alone.
 //
 // Settings: BREVO_API_KEY (secret), BREVO_WEBHOOK_TOKEN (secret: the bearer token Brevo's webhook sends), MAIL_FROM (variable,
-// "Name <address>" on a domain authenticated in Brevo), ALERT_URL (secret: an address anyone could post to; channel still to
+// "Name <address>", a sender verified in Brevo; cips.agency is deliberately not authenticated there, Simon 7 Nov), ALERT_URL (secret: an address anyone could post to; channel still to
 // choose), ALERT_AFTER_MIN (variable, default 60). BREVO_API is only changed for local tests.
 
 import { makeCode } from './code.js';
