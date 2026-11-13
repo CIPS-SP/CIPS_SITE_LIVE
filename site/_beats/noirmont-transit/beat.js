@@ -11,6 +11,7 @@
 import * as THREE from 'three';
 import { clamp01, lerp, smooth, cinematicSilk } from '../runtime/stage.js';
 import { scoreAt } from '../_shared/zoom-score.js';
+import { phoneFilm } from '../_shared/phone-film.js';   // 13 Nov 2026: the lighter journey for phones (see o.phone)
 import { mountNavPlotter } from '../_shared/nav-plotter.js';
 import { mountVideoMoment } from '../_shared/video-moment.js';
 import { createWakeSimulation, makeOcean, WAKE_FRAG, BOUNDS, SHIP_LENGTH_WORLD, setWakeParams, PAGE_T0 } from '../_shared/sea-wake.js';
@@ -47,6 +48,10 @@ export const defaults = {
   // part of it, and exit() hands the next beat the wide, un-zoomed pose. yaw/yawFrom/zoomEnd are therefore inert now (kept so a
   // longer endAt still behaves as before). index.html's track is cut from 1600vh to 1280vh (1600*0.8) so scroll speed is unchanged.
   endAt: NOIRMONT_END.endAt,
+  // 13 Nov 2026: the lighter journey for phones (see seaway-wake and _shared/phone-film.js)
+  phone: [
+    { from: 0.00, to: 1.01, file: 'journey-2-bay-and-small-roads', title: 'Small Roads', eyebrow: 'The Small Roads', sub: 'up the Small Road between the Platte and the castle, then onto the leading line for the harbour.' },
+  ],
   copyIn: [0.08, 0.20],
   // p-ranges each landmark label is visible over — see landmarkScreen() for how its on-screen position is worked out
   // 1 Oct 2026, Simon: "the current 'noirmont point' text on the plate moves with the vessel and is in the
@@ -299,11 +304,11 @@ export async function mount(stage, o, ctx){
   const coarse=matchMedia('(pointer: coarse)').matches;
   const smallPhone = coarse && Math.min(innerWidth, innerHeight) <= 480;
   const mobile = smallPhone || o.forceStatic === true;
-  if(mobile){ console.warn('[noirmont-transit] static fallback: viewport ≤767px'); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o); }
+  if(mobile){ console.warn('[noirmont-transit] static fallback: viewport ≤767px'); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o,ctx); }
   if(ctx.reduced){ o=Object.assign({},o,{bob:0, flow:Math.min(o.flow,0.3)}); }
 
   let renderer; try{ renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'}); if(!renderer.capabilities.isWebGL2) throw new Error('WebGL2 required for the wake simulation'); }
-  catch(e){ console.warn('[noirmont-transit] static fallback: WebGL unavailable —', e && e.message); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o); }
+  catch(e){ console.warn('[noirmont-transit] static fallback: WebGL unavailable —', e && e.message); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o,ctx); }
   renderer.setPixelRatio(1); renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.setClearColor(0x02484b,1);
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(35,1,0.1,5000); camera.up.set(EAST?1:0, EAST?0:1, 0);
@@ -594,8 +599,9 @@ export async function mount(stage, o, ctx){
       for(const {el} of markEls){ el.remove(); } signals.destroy(); }
   };
 }
-function staticCtrl(stage,shipEl,copyEl,o){
-  return { update(p){ const e=cinematicSilk(p); shipEl.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,0.9,e)})`;
+function staticCtrl(stage,shipEl,copyEl,o,ctx){
+  const pf=phoneFilm(stage,o,ctx,copyEl);   // 13 Nov 2026: the lighter journey for phones
+  return { update(p){ if(pf) pf.update(p); const e=cinematicSilk(p); shipEl.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,0.9,e)})`;
       if(copyEl){ const c=clamp01((p-o.copyIn[0])/(o.copyIn[1]-o.copyIn[0])); copyEl.style.opacity=c.toFixed(3);} },
-    resize(){}, destroy(){}, exit(){ return {yachtScreenPx: shipEl.offsetWidth*0.9}; } };
+    resize(){}, destroy(){ if(pf) pf.destroy(); }, exit(){ return {yachtScreenPx: shipEl.offsetWidth*0.9}; } };
 }

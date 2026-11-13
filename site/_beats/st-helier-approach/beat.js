@@ -11,6 +11,7 @@
 import * as THREE from 'three';
 import { clamp01, lerp, smooth, cinematicSilk } from '../runtime/stage.js';
 import { scoreAt } from '../_shared/zoom-score.js';
+import { phoneFilm } from '../_shared/phone-film.js';   // 13 Nov 2026: the lighter journey for phones (see o.phone)
 import { mountNavPlotter } from '../_shared/nav-plotter.js';
 import { mountVideoMoment, cutTime } from '../_shared/video-moment.js';
 import { createWakeSimulation, makeOcean, BOUNDS, SHIP_LENGTH_WORLD, setWakeParams, PAGE_T0 } from '../_shared/sea-wake.js';
@@ -76,6 +77,13 @@ export const defaults = {
   // Speed over the ground shown on the plotter, as she slows for each chapter.
   speed: [{ p: 0, k: 12 }, { p: 0.27, k: 8 }, { p: 0.50, k: 6 }, { p: 0.85, k: 2.5 }, { p: 1, k: 0 }],   // 22 Oct 2026: 7 and 5 knots at the chapter joins are now 8 and 6, to go with the gentler slowing
   berthYaw: [0.86, 1.0],   // p over which she squares up to the berth heading (the last leg converges on the quay at an angle)
+  // 13 Nov 2026: the lighter journey for phones (see seaway-wake and _shared/phone-film.js); the departure skips the same stretch of film as on desktop (FILM_CUTS)
+  phone: [
+    { from: 0.00, to: 0.20, file: 'journey-3-pier-heads', title: 'Through the pier heads', eyebrow: 'The entrance', sub: 'past the Albert Pier head, then to port between the piers.' },
+    { from: 0.20, to: 0.42, file: 'journey-4-alongside', title: 'Alongside', eyebrow: 'The berth', sub: 'up the channel to the Albert Pier: port side to, bow north.' },
+    { from: 0.42, to: 0.76, file: 'journey-5-quay-at-work', title: 'The quay at work', eyebrow: 'The quay at work', sub: 'fuel by road tanker, provisions down the pontoon, fresh water on, garbage off: everything alongside, on time.' },
+    { from: 0.76, to: 1.01, file: 'journey-6-departure', title: 'Leaving St Helier', eyebrow: 'Leaving St Helier', sub: '', cuts: [[6.04, 10.30]] },
+  ],
   copyIn: [0.03, 0.10],
   landmarks: { castle: { at: [49.1762, -2.1256], show: [-1, 2] } },   // already showing at p=0: noirmont's last frame has it
   coast: true,
@@ -275,11 +283,11 @@ export async function mount(stage, o, ctx) {
   shipEl.style.width = '48.7rem';   // the hull's on-screen length at the wide hold doesn't depend on this (see calibrate()): same as noirmont
   const coarse = matchMedia('(pointer: coarse)').matches;
   const mobile = (coarse && Math.min(innerWidth, innerHeight) <= 480) || o.forceStatic === true;
-  if (mobile) { console.warn('[st-helier-approach] static fallback: small touch viewport'); stage.classList.add('nogl'); return staticCtrl(stage, shipEl, copyEl, o); }
+  if (mobile) { console.warn('[st-helier-approach] static fallback: small touch viewport'); stage.classList.add('nogl'); return staticCtrl(stage, shipEl, copyEl, o, ctx); }
   if (ctx.reduced) o = Object.assign({}, o, { bob: 0, flow: Math.min(o.flow, 0.3) });
 
   let renderer; try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); if (!renderer.capabilities.isWebGL2) throw new Error('WebGL2 required for the wake simulation'); }
-  catch (e) { console.warn('[st-helier-approach] static fallback: WebGL unavailable —', e && e.message); stage.classList.add('nogl'); return staticCtrl(stage, shipEl, copyEl, o); }
+  catch (e) { console.warn('[st-helier-approach] static fallback: WebGL unavailable —', e && e.message); stage.classList.add('nogl'); return staticCtrl(stage, shipEl, copyEl, o, ctx); }
   renderer.setPixelRatio(1); renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.setClearColor(0x02484b, 1);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 5000); camera.up.set(EAST ? 1 : 0, EAST ? 0 : 1, 0);
@@ -851,8 +859,9 @@ export async function mount(stage, o, ctx) {
   globalThis.__stHelier = api;   // dev aid: __stHelier.debug() in the console (plate streaming, pose, berth)
   return api;
 }
-function staticCtrl(stage, shipEl, copyEl, o) {
-  return { update(p) { const e = cinematicSilk(p); shipEl.style.transform = `translate(-50%,-50%) scale(${lerp(0.6, 0.9, e)})`;
+function staticCtrl(stage, shipEl, copyEl, o, ctx) {
+  const pf = phoneFilm(stage, o, ctx, copyEl);   // 13 Nov 2026: the lighter journey for phones
+  return { update(p) { if (pf) pf.update(p); const e = cinematicSilk(p); shipEl.style.transform = `translate(-50%,-50%) scale(${lerp(0.6, 0.9, e)})`;
       if (copyEl) { const c = clamp01((p - o.copyIn[0]) / (o.copyIn[1] - o.copyIn[0])); copyEl.style.opacity = c.toFixed(3); } },
-    resize() {}, destroy() {}, exit() { return {}; } };
+    resize() {}, destroy() { if (pf) pf.destroy(); }, exit() { return {}; } };
 }

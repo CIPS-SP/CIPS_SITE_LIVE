@@ -1,0 +1,28 @@
+/* phone-film.css — the lighter journey for phones (see phone-film.js). Over the beat's static fallback (z-index 5, under the page header). */
+.phf{position:absolute;inset:0;z-index:5;pointer-events:none;font-family:'Jost',system-ui,sans-serif;color:#fff;opacity:0;transition:opacity .5s ease}
+.phf.phf-on{opacity:1}
+.phf-bgs{position:absolute;inset:0;overflow:hidden}
+.phf-bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(22px) brightness(.42) saturate(1.1);opacity:0;transition:opacity .7s ease}
+.phf-bg.phf-cur{opacity:1}
+/* a stretch with no clip: the fallback yacht shows through; a soft shade at the top keeps the caption readable */
+.phf:not(.phf-film)::before{content:"";position:absolute;inset:0 0 auto 0;height:55%;background:linear-gradient(rgba(6,14,20,.62),rgba(6,14,20,0))}
+.phf-body{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:22px;padding:96px 16px 64px;box-sizing:border-box}
+.phf:not(.phf-film) .phf-body{justify-content:flex-start;padding-top:136px}   /* clear of the header and the Skip to CIPS pill */
+.phf-cap{max-width:34rem;transition:opacity .26s ease,transform .26s ease}
+.phf-cap.phf-out{opacity:0;transform:translateY(8px)}
+.phf-tag{margin:0 0 10px;font:600 11px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#FF8A1E}
+.phf-tag:empty{display:none}
+.phf-eye{margin:0;font:600 30px/1.1 'Jost',system-ui,sans-serif;letter-spacing:-.01em;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.phf-sub{margin:10px 0 0;font:400 17px/1.45 'Jost',system-ui,sans-serif;color:rgba(255,255,255,.88);text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.phf-sub:empty{display:none}
+.phf-frame{position:relative;width:100%;max-width:720px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 14px 40px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.08);display:none;pointer-events:auto}
+.phf.phf-film .phf-frame{display:block}
+.phf-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;background:#000}
+.phf-v.phf-cur{opacity:1}
+.phf-play{position:absolute;inset:0;display:none;align-items:center;justify-content:center;appearance:none;border:0;background:rgba(0,0,0,.25);cursor:pointer;padding:0}
+.phf-play i{width:52px;height:52px;border-radius:50%;background:rgba(255,138,30,.95);position:relative}
+.phf-play i::after{content:"";position:absolute;left:20px;top:15px;border-left:16px solid #1a1408;border-top:11px solid transparent;border-bottom:11px solid transparent}
+.phf.phf-still .phf-play{display:flex}
+@media (min-width:700px){.phf-body{align-items:center;text-align:center}.phf-eye{font-size:40px}}
+@media (orientation:landscape) and (max-height:480px){.phf-body{flex-direction:row;align-items:center;padding:104px 20px 16px}.phf-cap{flex:1 1 40%}.phf-frame{flex:1 1 60%;width:auto;max-height:calc(100% - 8px)}.phf-eye{font-size:24px}.phf-sub{font-size:15px}}
+@media (prefers-reduced-motion:reduce){.phf-cap,.phf-bg,.phf-v{transition:opacity .2s ease}.phf-cap.phf-out{transform:none}}
