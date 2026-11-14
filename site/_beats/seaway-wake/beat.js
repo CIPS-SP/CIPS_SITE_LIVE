@@ -641,7 +641,7 @@ export async function mount(stage, o, ctx){
   }
   const tilt = o.tilt !== false ? mountTiltShift(stage) : null;   // the miniature look: top and bottom of the frame softly blurred (see _shared/tilt-shift.js)
   const plotter=o.nav!==false ? mountNavPlotter(stage,{GEO,shipLatLng:()=>shipLatLngAt(curP),headingDeg:()=>headingAt(curP),speedKts:()=>speedKtsAt(curP),compact:coarse,assetsBase:ctx.base,pilotOffset:()=>pilotPlotterOffset(curP)}) : null;
-  const vm=(o.video!==false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage,{ moments:o.videoMoments.map(m=>Object.assign({src:ctx.base+'../../videos/journey/'+m.file+'.mp4',poster:ctx.base+'../../videos/journey/'+m.file+'.jpg'},m)), plotter, reduced:ctx.reduced }) : null;
+  const vm=(o.video!==false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage,{ moments:o.videoMoments.map(m=>Object.assign({src:ctx.base+'../../videos/journey/'+m.file+'.mp4',poster:ctx.base+'../../videos/journey/'+m.file+'.jpg'},m,(o.phoneGL&&m.hold)?{hold:m.hold*2}:{})), plotter, reduced:ctx.reduced }) : null;
 
   let MIN_DISTANCE=8, END_SCALE=0.2;
   function calibrate(){

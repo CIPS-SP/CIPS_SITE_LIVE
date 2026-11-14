@@ -36,6 +36,12 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   const onKey = e => { if (aheadNow() && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName) && [' ', 'PageDown', 'ArrowDown', 'End'].includes(e.key)) e.preventDefault(); };
   addEventListener('wheel', onWheel, { passive: false }); addEventListener('keydown', onKey);
   playBtn.addEventListener('click', e => { e.stopPropagation(); userPaused = false; pausedUntil = 0; });
+  // 14 Nov 2026, Simon (phone): opening the address bar or a bookmark during the finale was undone every time it scrolled itself, so he could not leave the page.
+  // It now waits while the page is not in front, and carries on a moment after the visitor is back.
+  let away = false;
+  addEventListener('blur', () => { away = true; }); addEventListener('pagehide', () => { away = true; });
+  addEventListener('focus', () => { away = false; pausedUntil = performance.now() + RESUME_MS; });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) away = true; else { away = false; pausedUntil = performance.now() + RESUME_MS; } });
   function tickAuto(r) {
     const now = performance.now(), dt = Math.min(0.5, Math.max(0, (now - lastT) / 1000)); lastT = now;   // (14 Nov 2026: was 0.12; a phone drawing few frames a second crawled through the finale, Simon's did not seem to start)
     { const y1 = scrollY; if (prevY !== null && Math.abs(y1 - prevY) >= 6 && Math.abs(r - prevR) > 1e-5 && r > 0 && r < 1 && prevR > 0 && prevR < 1) { const e = (y1 - prevY) / (r - prevR); if (e > 0 && isFinite(e)) pxPerR = pxPerR ? lerp(pxPerR, e, 0.25) : e; } prevY = y1; prevR = r; }
@@ -50,7 +56,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     else if (y < mine - 3) { pausedUntil = now + RESUME_MS; head = y; }   // the visitor scrolled back (or up): rewinding; playback resumes when they stop
     else if (y > mine + 3) { head = y; pausedUntil = now + RESUME_MS; }   // forwards by hand, behind the playback
     mine = y;
-    if (userPaused || now < pausedUntil) { head = y; return; }
+    if (away || document.hidden || userPaused || now < pausedUntil) { head = y; return; }
     if (!holdDone && r >= HOLD_R - 0.0001) { holdT += dt; if (holdT >= HOLD_S) holdDone = true; else { head = y; return; } }   // the card is closing: the page waits
     head = Math.max(head, y) + (!holdDone && r < HOLD_R ? PREROLL : autoRate(r)) * span * dt; if (head > reach) reach = head;
     scrollTo({ top: head, behavior: 'instant' }); mine = scrollY;

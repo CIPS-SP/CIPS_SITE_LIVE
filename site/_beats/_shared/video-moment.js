@@ -93,7 +93,9 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
 
   // 30 Oct 2026 (performance): the clip is fetched a little before its window, but the video decoder only started up when the picture appeared, a stall of 100-230 ms at the very moment the clip begins. So once the file has
   // loaded, a silent hidden play-and-pause starts the decoder up ahead of time; start() then seeks to 0 and plays as before (a clip that is being shown is never paused by this).
-  const prime = m => { if (still || m.primed || m.bad) return; m.primed = true; const v = m.v; const go = () => { if (active === m) return; const pr = v.play(); if (pr && pr.then) pr.then(() => { if (active !== m) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }).catch(() => {}); }; if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go, { once: true }); };
+  // 14 Nov 2026, Simon (phone: each clip froze the first time round, then played on the second loop): on a phone there is no hidden primer, the clip is not sent back to 0 when
+  // it is already at the start, and a clip that stops moving while it should be playing is nudged on (update(), below)
+  const prime = m => { if (still || m.primed || m.bad || PHONE) return; m.primed = true; const v = m.v; const go = () => { if (active === m) return; const pr = v.play(); if (pr && pr.then) pr.then(() => { if (active !== m) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }).catch(() => {}); }; if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go, { once: true }); };
   const ensure = m => { if (m.loaded || m.bad) return; m.loaded = true; if (!still) { m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); prime(m); } };
   function syncWide() { root.classList.toggle('wide', wideSetting); bigBtn.textContent = wideSetting ? '⤣' : '⤢'; bigBtn.title = wideSetting ? 'Smaller' : 'Enlarge'; bigBtn.setAttribute('aria-label', wideSetting ? 'Make the footage smaller' : 'Enlarge the footage'); }
   function start(m) {
@@ -101,7 +103,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     syncWide();   // 5 Nov 2026, Simon: the next clip opens at the size the visitor left the last one (each beat's box is built at load, before any choice, so it is matched here, when a clip opens)
     M.forEach(x => x.v.classList.toggle('cur', x === m)); titleEl.textContent = m.title || ''; bar.style.width = '0'; root.classList.add('on');
     if (still) { m.v.src || (m.v.src = m.src); root.classList.add('still'); return; }   // poster + play button
-    root.classList.remove('still'); try { m.v.currentTime = 0; } catch (e) {}
+    root.classList.remove('still'); try { if (!PHONE || m.v.currentTime > 0.05) m.v.currentTime = 0; } catch (e) {}
     // 27 Oct 2026, Simon: some clips started paused with the play button showing. play() also fails when it is merely interrupted (a swap or a pause lands while the file is still loading); that is not a refusal, so it is tried again
     // and only a real refusal (NotAllowedError) leaves the poster and play button. Anything that starts playing clears the button.
     const go = n => { const pr = m.v.play(); if (pr && pr.catch) pr.catch(err => { if (active !== m || userPaused) return; if (err && err.name === 'NotAllowedError') root.classList.add('still'); else if (n < 4) setTimeout(() => go(n + 1), 250 * (n + 1)); else root.classList.add('still'); }); };
@@ -154,6 +156,12 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
       // 5 Nov 2026, Simon: a moment with `loops: n` stops after n plays and waits on its last frame with the play button; a click plays it on, looping as before
       if (active.loops && active.plays >= active.loops && !active.onLoop) { userPaused = true; root.classList.add('still'); }
       else { active.plays++; active.ended = false; try { active.v.currentTime = 0; } catch (e) {} active.v.play().catch(() => {}); } } else if (outside) { done.add(active.id); swap(null); } }
+    if (PHONE && active && !userPaused && !still && !active.ended && active.v.readyState >= 2) {   // (see the note at prime)
+      const v = active.v, now = performance.now();
+      if (v.paused) { if (now - (active.kickAt || 0) > 800) { active.kickAt = now; v.play().catch(() => {}); } }
+      else if (Math.abs(v.currentTime - (active.lastCT ?? -1)) > 0.01) { active.lastCT = v.currentTime; active.lastCTAt = now; }
+      else if (now - (active.lastCTAt || now) > 1200) { active.lastCTAt = now; try { v.pause(); v.currentTime = Math.min((v.duration || 1) - 0.1, v.currentTime + 0.05); } catch (e) {} v.play().catch(() => {}); }
+    }
     if (active) { place(); const d = active.v.duration; if (d > 0) bar.style.width = (active.v.currentTime / d * 100).toFixed(1) + '%'; }
   }
   // the runtime stops calling update() while the beat is off screen; stop the footage then too, and let it play afresh when the visitor comes back
