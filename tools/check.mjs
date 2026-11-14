@@ -41,7 +41,7 @@ const PORT = server.address().port, BASE = `http://127.0.0.1:${PORT}/`;
 const apiHost = (() => { try { const m = /REVIEW_API\s*=\s*'([^']*)'/.exec(readFileSync(join(SITE, 'review/config.js'), 'utf8')); return m && m[1] ? new URL(m[1]).host : null; } catch (e) { return null; } })();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const DBG = 9444;
+const DBG = 9500 + Math.floor(Math.random() * 400);   // 14 Nov 2026: a fresh port each run (a headless Chrome left over from an interrupted run kept 9444 and every later check hung waiting on it)
 const chrome = spawn(CHROME, ['--headless=new', '--remote-debugging-port=' + DBG, '--user-data-dir=' + mkdtempSync(join(tmpdir(), 'chk-')), '--no-first-run', '--no-default-browser-check', '--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required', 'about:blank'], { stdio: 'ignore' });
 async function connect() { for (let i = 0; i < 60; i++) { try { return (await (await fetch('http://127.0.0.1:' + DBG + '/json/new?about:blank', { method: 'PUT' })).json()).webSocketDebuggerUrl; } catch (e) { await sleep(500); } } throw new Error('Chrome did not start'); }
 

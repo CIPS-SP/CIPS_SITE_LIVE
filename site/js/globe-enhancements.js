@@ -8,6 +8,9 @@
    - stats: the four practical reasons to call (fuel, pontoons, airport, tidal access) replace the live-traffic figures
    - phones: horizontal swipes turn the globe, vertical gestures scroll the page
    Not brought across: Monaco's own welcome, page ride and contact sections (the site keeps its own ride). */
+// 14 Nov 2026, Simon (dragging the globe on a phone started the journey): is this touch a swipe UP? 1 = yes (at least 24 px up, and clearly more up than sideways),
+// -1 = no, it is a sideways drag (more than 14 px sideways first: the globe is being turned, so the gesture is not a scroll), 0 = not decided yet.
+export function swipeUp(x0, y0, t) { const up = y0 - t.clientY, side = Math.abs(t.clientX - x0); if (side > 14 && side > up) return -1; return up >= 24 && up > side * 1.5 ? 1 : 0; }
 import { installShipPicker } from './ship-picker.mjs';
 import { installVoyagePrompt } from './voyage-prompt.mjs';
 
@@ -125,9 +128,9 @@ export function installGlobeEnhancements(root = '#beats') {
       const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName))) return;
       onScroll();
     }, { capture: true });
-    let ty = null;   // a swipe up is one attempt
-    addEventListener('touchstart', e => { ty = e.touches.length === 1 ? e.touches[0].clientY : null; stage.__newGesture = false; }, { capture: true, passive: true });
-    addEventListener('touchmove', e => { if (ty === null || e.touches.length !== 1 || ty - e.touches[0].clientY < 24) return; ty = null; lastAt = performance.now(); attempt(true); }, { capture: true, passive: true });
+    let ty = null, tx = 0;   // a swipe up is one attempt (14 Nov 2026, Simon: a drag to turn the globe set it off; only a clearly upward swipe counts now, see swipeUp below)
+    addEventListener('touchstart', e => { ty = e.touches.length === 1 ? e.touches[0].clientY : null; tx = e.touches.length === 1 ? e.touches[0].clientX : 0; stage.__newGesture = false; }, { capture: true, passive: true });
+    addEventListener('touchmove', e => { if (ty === null || e.touches.length !== 1) return; const k = swipeUp(tx, ty, e.touches[0]); if (k < 0) { ty = null; return; } if (!k) return; ty = null; lastAt = performance.now(); attempt(true); }, { capture: true, passive: true });
     const st = document.createElement('style');
     st.textContent = `
       ${S} [data-live="panel"].unfold{animation:pickerUnfold 1.8s cubic-bezier(.25,.6,.2,1) backwards, pickerGlow 1.5s ease-out 1.5s 2}   /* backwards: the reveal mask goes once the card is open, so it cannot trim the glow (6 Nov, Simon: the glow was cut off on the right) */
@@ -220,9 +223,9 @@ function arrangeDeparture(stage, S) {
   // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
   const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0
     && (!stage.dataset.autoOpened || (performance.now() - +stage.dataset.autoOpened > 900 && stage.__newGesture));   // 6 Nov 2026: when the picker opened by itself (Scroll the journey), only a new, separate scroll starts the journey, so the picker is seen first
-  let pty = null;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026)
-  window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; }, { passive: true });
-  window.addEventListener('touchmove', e => { if (pty !== null && e.touches.length === 1 && pty - e.touches[0].clientY > 24 && pickerOpen()) { pty = null; start.click(); } }, { passive: true });
+  let pty = null, ptx = 0;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026); a sideways drag on the globe does not (14 Nov 2026)
+  window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; ptx = e.touches.length === 1 ? e.touches[0].clientX : 0; }, { passive: true });
+  window.addEventListener('touchmove', e => { if (pty === null || e.touches.length !== 1) return; const k = swipeUp(ptx, pty, e.touches[0]); if (k < 0) { pty = null; return; } if (k && pickerOpen()) { pty = null; start.click(); } }, { passive: true });
   window.addEventListener('wheel', e => { if (e.deltaY > 0 && pickerOpen()) start.click(); }, { capture: true, passive: true });
   window.addEventListener('keydown', e => {
     if (!['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -312,12 +315,12 @@ function extendNudges(stage, S) {
 
   // A swipe up on a phone is a scroll attempt too: hand it to his wheel listeners while scrolling is held
   // (the voyage lock, or Observe mode's limit). Nothing is dispatched once the page scrolls freely.
-  let startY = null;
-  window.addEventListener('touchstart', e => { startY = e.touches[0]?.clientY ?? null; }, {passive: true});
+  let startY = null, startX = 0;
+  window.addEventListener('touchstart', e => { startY = e.touches[0]?.clientY ?? null; startX = e.touches[0]?.clientX ?? 0; }, {passive: true});
   window.addEventListener('touchmove', e => {
-    if (startY == null) return;
-    const dy = startY - (e.touches[0]?.clientY ?? startY);
-    if (dy < 24) return;
+    if (startY == null || !e.touches[0]) return;
+    const k = swipeUp(startX, startY, e.touches[0]); if (k < 0) { startY = null; return; } if (!k) return;   // (a sideways drag turns the globe and is not a scroll: 14 Nov 2026)
+    const dy = startY - e.touches[0].clientY;
     startY = null;
     const held = document.body.style.overflow === 'hidden' || !!stage.querySelector('[data-g="voyageMonitor"].armed');
     if (held) window.dispatchEvent(new WheelEvent('wheel', {deltaY: dy, cancelable: true}));

@@ -1181,7 +1181,7 @@ export async function mount(stage, o, ctx){
   dom.addEventListener('pointerdown', e => { dragging = true; velYaw = 0; velPitch = 0; lastMoveT = performance.now(); lastPX = e.clientX; lastPY = e.clientY; dom.style.cursor = 'grabbing'; try { dom.setPointerCapture(e.pointerId); } catch (_) {} });
   window.addEventListener('pointermove', e => {
     if (!dragging) return;
-    const nowT = performance.now(), dt = Math.max(4, nowT - lastMoveT), dy = (e.clientX - lastPX) * 0.005, dp = (e.clientY - lastPY) * 0.005;
+    const nowT = performance.now(), dt = Math.max(4, nowT - lastMoveT), dy = (e.clientX - lastPX) * 0.005, dp = e.pointerType === 'touch' ? 0 : (e.clientY - lastPY) * 0.005;   // (14 Nov 2026: on a touch screen the finger turns it sideways only; up and down is the scroll)
     dragYaw += dy;
     dragPitch = Math.max(-0.8, Math.min(0.8, dragPitch + dp));
     velYaw = velYaw * 0.55 + (dy / dt * 16.666) * 0.45;       // the speed of the hand, smoothed, as radians per frame

@@ -424,13 +424,13 @@
 }
 
 /* 14 Nov 2026, Simon (phone opening, upright): the intro block sits just above the four reason cards (--gs-h, their height, measured by globe-enhancements.js), the globe's own
-   Skip to CIPS is not shown so the page's Skip pill takes the top right, and the globe is moved up and a little right while the intro is up, so the Channel Islands sit clear above
+   Skip to CIPS is not shown so the page's Skip pill takes the top right, and the globe is moved a little right (and slightly up) while the intro is up, so the Channel Islands sit clear at the right of
    the text; it slides back when the picker opens (and the scene re-measures). */
 @media (max-width:760px){
   :is(#beats,body) .beat-globe-live > .beat-stage.proof-stats-on .globeCopy:not(.globeCopy2){top:auto !important;bottom:calc(3.5% + var(--gs-h,200px) + 18px) !important}
   :is(#beats,body) .beat-globe-live > .beat-stage .skip-globe{display:none !important}
   :is(#beats,body) .beat-globe-live > .beat-stage :is([data-g="globe"],[data-g="globeglow"],[data-g="islands"]){transition:translate .8s ease}
-  :is(#beats,body) .beat-globe-live > .beat-stage.globe-intro :is([data-g="globe"],[data-g="globeglow"],[data-g="islands"]){translate:6vw -27vh}
+  :is(#beats,body) .beat-globe-live > .beat-stage.globe-intro :is([data-g="globe"],[data-g="globeglow"],[data-g="islands"]){translate:10vw -4vh}   /* (Simon 14 Nov, option C: lower, the rim showing along the top, the Channel Islands at the right of the intro; was 6vw -27vh) */
 }
 
 /* 14 Nov 2026, Simon (phone): the voyage card and its Scroll to continue bar sit at the bottom too, below the globe, like the intro */
