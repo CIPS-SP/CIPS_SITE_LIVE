@@ -37,6 +37,7 @@ footer{padding:18px 40px;border-top:1px solid var(--line);display:flex;justify-c
 footer a{border:0}
 @media (max-width:700px){
   header,nav.legal,main,footer{padding-left:16px;padding-right:16px}
+  nav.legal{gap:0 18px}nav.legal a{display:inline-block;padding:10px 0}   /* 14 Nov 2026 (phone review): taller tabs to tap */
   header .tag{display:none}
   main{padding-top:40px}
   h1{font-size:40px}

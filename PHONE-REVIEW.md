@@ -17,10 +17,10 @@ Every page, the journey's opening, the home sections, the legal pages, the 404 p
    - The video window and the chart plotter stack in the bottom-left and cover a third of the screen.
    - The alongside services panel covers the yacht at the quay.
    - "Take the helm: the berthing" overlaps the plotter.
-4. **Review form: the stars are about 20 px wide** (`review/`, `.stars .s`), fiddly to tap. A captain is likely to answer on a phone. Make them larger and put them under each question on phones.
-5. **Contact block: the email address runs off the screen at 360 px wide** (home and yachting page, "Email dutyagent@cips.agency" beside its label). Put the label above the value on phones.
-6. **"Back to the globe · Play the CIPS journey" pill** wraps to three lines on a phone.
-7. **Smaller points:**
+4. **Fixed 14 Nov: review stars now about 40 px each, under each question on a phone (`review/index.html`).** Was: the stars are about 20 px wide (`review/`, `.stars .s`), fiddly to tap. A captain is likely to answer on a phone. Make them larger and put them under each question on phones.
+5. **Fixed 14 Nov: on a phone the label sits above the value (`home/qr-home.css`).** Was: the email address runs off the screen at 360 px wide (home and yachting page, "Email dutyagent@cips.agency" beside its label). Put the label above the value on phones.
+6. **Fixed 14 Nov: on a phone the pill says only "Play the CIPS journey", on one line (`index.html`, `.btg-lead`).** Was: the "Back to the globe · Play the CIPS journey" pill wraps to three lines on a phone.
+7. **Smaller points** (14 Nov: the four figures now two by two on a phone, and the legal tabs 37 px tall to tap; the rest left as they are):
    - The four figures (24/7, VAT & duty free, …) and the nine services are one per row: a long scroll on a phone.
    - Many 11 px labels.
    - The legal pages' tab links and the inline phone and email links are short to tap (17 to 21 px tall).

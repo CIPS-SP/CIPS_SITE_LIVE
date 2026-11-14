@@ -215,6 +215,7 @@
 .qr .clist span{flex:0 0 130px;font:500 11px 'JetBrains Mono';letter-spacing:.1em;text-transform:uppercase;color:var(--ink2)}
 .qr .clist a, .qr .clist b{font:500 18px 'Inter Tight';color:var(--ink)}
 .qr .clist a:hover{color:var(--accent)}
+@media(max-width:520px){.qr .clist li{flex-direction:column;align-items:flex-start;gap:4px}.qr .clist span{flex:none}.qr .clist a{overflow-wrap:anywhere}}   /* 14 Nov 2026 (phone review): label above the value, so a long address fits */
 .qr button.play{border:1px solid rgba(255,255,255,.25)}
 .qr .desks.tall .im{height:270px}
 .qr .desks.tall h3{font:500 17px 'Inter Tight';letter-spacing:.26em;color:#14303a}
@@ -388,3 +389,4 @@
 .qr .form .chips span:hover{border-color:var(--ink2)}
 .qr .form .chips input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
 .qr .form .chips input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:520px){.qr .stats{grid-template-columns:1fr 1fr}.qr .stats div{padding:20px 16px;border-bottom:1px solid var(--line)}.qr .stats div:nth-child(2n){border-right:0}.qr .stats div:nth-last-child(-n+2){border-bottom:0}.qr .stats b{font-size:26px}}   /* 14 Nov 2026 (phone review): the four figures two by two on a phone (they were one per row; placed last so it wins over the 900px rule above) */

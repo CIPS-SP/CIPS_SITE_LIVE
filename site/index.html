@@ -298,7 +298,7 @@
     #skipToCips:hover, #skipToCips:focus-visible { background:rgba(255,255,255,.1); color:#fff; outline:none; }
     #skipToCips:hover::after, #skipToCips:focus-visible::after { width:100%; }
     @media (max-width:520px) { #skipToCips { right:10px; padding:10px 14px; font-size:11px; } }
-    @media (max-width:520px) { #backToGlobe { font-size:11px; padding:10px 16px 10px 12px; letter-spacing:.05em; } }
+    @media (max-width:520px) { #backToGlobe { font-size:11px; padding:10px 16px 10px 12px; letter-spacing:.05em; white-space:nowrap; } #backToGlobe .btg-lead { display:none; } }   /* 14 Nov 2026 (phone review): it wrapped to three lines; on a phone the arrow and "play the CIPS journey" only */
     @media (prefers-reduced-motion:reduce) { #backToGlobe { transition:none; } }
     #globeTrack { position:relative; height:190vh; }
     #cipsGlobe { position:sticky; top:0; height:100vh; overflow:hidden; background:
@@ -538,7 +538,7 @@
     <div id="openingAct"><div id="globeLoader" role="status" aria-live="polite"><div class="orb" aria-hidden="true"></div><div class="lbl">Loading the globe</div><div class="sub">Preparing your journey<i></i></div></div><div id="beats"></div></div>
     <!-- "Back to the globe": a pill offered from the main site (scroll up, or just after "Skip to CIPS") that returns to the START of the globe journey -->
     <button id="skipToCips" type="button">Skip to CIPS <span class="arr" aria-hidden="true">↓</span></button>
-    <button id="backToGlobe" type="button" aria-label="Go back to the globe and play the CIPS journey"><span class="arr" aria-hidden="true">↑</span><span>Back to the globe &mdash; <b>play the CIPS journey</b></span></button>
+    <button id="backToGlobe" type="button" aria-label="Go back to the globe and play the CIPS journey"><span class="arr" aria-hidden="true">↑</span><span><span class="btg-lead">Back to the globe &mdash; </span><b>play the CIPS journey</b></span></button>
     <!-- Wave divider into the page -->
       <div class="relative -mb-1" id="homeWave">
         <svg class="w-full h-[70px] sm:h-[90px]" viewBox="0 0 1440 90" preserveAspectRatio="none" fill="#FBFAF7">

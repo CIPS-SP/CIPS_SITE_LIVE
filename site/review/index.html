@@ -79,6 +79,8 @@
   .prow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;padding:14px 0;border-top:1px solid var(--line)}
   .prow:first-child{border-top:0}
   .prow .stars{font-size:22px;gap:5px}
+  /* 14 Nov 2026 (phone review): on a phone the stars go under the question, larger, each with room round it to tap (they were about 20 px wide) */
+  @media (max-width:520px){ .rate{grid-template-columns:1fr;gap:8px} .stars,.prow .stars{font-size:32px;gap:2px;margin-left:-6px} .stars .s{padding:4px 6px} }
   .group{margin-top:26px;border:1px solid var(--line);background:#fff;padding:6px 20px}
 
   label.fld{display:block;font-weight:500;color:var(--ink);font-size:16px;margin:30px 0 10px}
