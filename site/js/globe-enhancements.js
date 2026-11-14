@@ -155,6 +155,10 @@ export function installGlobeEnhancements(root = '#beats') {
     stats.classList.add('globe-proof-stats');
     stage.classList.add('proof-stats-on');
   }
+  // 14 Nov 2026, Simon (phone opening): the intro sits just above the four reason cards and the globe is moved up and right while it is up (beat.css, end).
+  // The cards' height varies with the phone's width, so it is measured into --gs-h; and when the globe has slid back (the picker opens) the scene re-measures where it is.
+  if (stats && window.ResizeObserver) new ResizeObserver(() => stage.style.setProperty('--gs-h', stats.offsetHeight + 'px')).observe(stats);
+  { const g = stage.querySelector('[data-g="globe"]'); if (g) g.addEventListener('transitionend', e => { if (e.target === g && e.propertyName === 'translate') dispatchEvent(new Event('resize')); }); }
   const hint = stage.querySelector('[data-g="hint"]');
   if (hint) hint.textContent = 'Swipe to rotate · scroll to move on';
   const invitation = stage.querySelector('.gsub');
