@@ -33,3 +33,6 @@
 /* 14 Nov 2026, Simon: on a phone-sized screen the footage sits bottom right beside the plotter (nav-plotter.css) at the same size: drawn at 250px with a frame as tall as the plotter's
    chart, scaled with it; Enlarge spreads it across the bottom of the screen over the plotter */
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){.vm-box{left:auto !important;right:10px !important;bottom:14px !important;width:250px !important;transform:scale(.64) !important;transform-origin:right bottom !important}.vm-box:not(.wide) .vm-frame{aspect-ratio:auto;height:300px}.vm-box.wide{width:calc((100vw - 20px) / .64) !important;max-width:none;z-index:7}}
+/* 14 Nov 2026, Simon (phone): in the departure film's last shot the yacht is far to the left, outside the middle of the frame a phone shows; from that shot (`fitFrom`) the whole frame is shown,
+   full width, with the film's own sky above and sea below (sampled from the shot), so the yacht and the badge are both in view */
+.vm-full.vm-fit{background:linear-gradient(rgb(219,230,238) 50%,rgb(105,158,160) 50%)}.vm-full.vm-fit .vm-fv{object-fit:contain;background:transparent}

@@ -43,7 +43,7 @@ export const defaults = {
     { id:'pier-heads', file:'journey-3-pier-heads', title:'Through the pier heads', from:0.30, to:0.47 },
     { id:'alongside', file:'journey-4-alongside', title:'Alongside', from:0.50, to:0.90 },
     { id:'quay-at-work', file:'journey-5-quay-at-work', title:'The quay at work', from:1.03, to:1.97, loops:2 },   // 5 Nov 2026, Simon: pauses after two plays; a click plays it on
-    { id:'departure', file:'journey-6-departure', phoneFile:'journey-6-departure-720', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], cuts:[[6.04, 10.30]], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
+    { id:'departure', file:'journey-6-departure', phoneFile:'journey-6-departure-720', fitFrom:12.15, title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], cuts:[[6.04, 10.30]], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
   ],
   calm: 0.6, calmIn: [0.0, 0.10],   // 16 Oct 2026, Simon: "make the sea calmer in the small roads and harbour": 0 = the open-sea look noirmont ends on, 1 = glassy; eased in over the first 10% so there is no step at the seam
   wakeIntensity: 0.55, wakeFade: [0.95, 1.0], wakeRun: 1.8, bob: 0.22, shipSpeed: 40, flow: 0.5, sunElevation: 55, wakeCenterY: 0,
@@ -801,7 +801,7 @@ export async function mount(stage, o, ctx) {
     if (quay) quay.update(q, geoK, t, smooth(0.50, 0.66, p), cardClosed ? 0 : 1);   // (the brow comes in with the pontoon, as soon as the berth can be seen)
     if (plotter) plotter.update();
     if (fin) fin.update(r);
-    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.56; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
+    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.499; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
     if (vm) vm.update(pz, { blocked: holdGame.active || berthGame.active });
     if (copyEl) {
       let ch = null, c = 0;
