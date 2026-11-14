@@ -48,9 +48,9 @@ export const defaults = {
   // part of it, and exit() hands the next beat the wide, un-zoomed pose. yaw/yawFrom/zoomEnd are therefore inert now (kept so a
   // longer endAt still behaves as before). index.html's track is cut from 1600vh to 1280vh (1600*0.8) so scroll speed is unchanged.
   endAt: NOIRMONT_END.endAt,
-  // 13 Nov 2026, phones (see seaway-wake and _shared/phone-sea.js): the Corbiere clip, Noirmont, the turn to bow north for the harbour, then the Small Roads clip
+  // 13 Nov 2026, phones (see seaway-wake and _shared/phone-sea.js): the Corbiere clip, Noirmont, then the Small Roads clip while she turns to bow north for the harbour
   phone: {
-    flow: 2000, turn: [0.46, 0.64],
+    flow: 2000, turn: [0.74, 1.0], turnTo: -68,   // 14 Nov 2026, Simon: no flip at Noirmont; she turns to port (through east) while Special One rounds the breakwater in the Small Roads clip, to heading 022, the Small Road lead, where the harbour scene takes over
     captions: [ { from: 0.40, to: 0.70, eyebrow: 'Round Noirmont Point', sub: 'into St Aubin\'s Bay, for the leading line.' } ],
     clips: [
       { from: 0.03, to: 0.38, file: 'journey-1-noirmont-corbiere', title: 'Corbi\u00e8re to Noirmont' },

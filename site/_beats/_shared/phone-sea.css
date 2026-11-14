@@ -16,18 +16,11 @@
 .phs-eye{margin:0;font:600 30px/1.1 'Jost',system-ui,sans-serif;letter-spacing:-.01em;text-shadow:0 2px 14px rgba(0,0,0,.5)}
 .phs-sub{margin:10px 0 0;font:400 17px/1.45 'Jost',system-ui,sans-serif;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.55)}
 .phs-sub:empty{display:none}
-/* a clip slides up over the scene; the yacht carries on underneath, a little dimmed */
-.phs.phs-film .phs-world{filter:brightness(.6)}
-.phs.phs-film .phs-shade{opacity:0}
-.phs-clip{position:absolute;left:16px;right:16px;top:118px;opacity:0;transform:translateY(40px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
-.phs-clip.phs-on{opacity:1;transform:none;pointer-events:auto}
-.phs-tag{margin:0 0 10px;font:600 11px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#FF8A1E;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-.phs-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.1)}
-.phs-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;background:#000}
-.phs-v.phs-cur{opacity:1}
-.phs-play{position:absolute;inset:0;display:none;align-items:center;justify-content:center;appearance:none;border:0;background:rgba(0,0,0,.25);cursor:pointer;padding:0}
-.phs-play i{width:52px;height:52px;border-radius:50%;background:rgba(255,138,30,.95);position:relative}
-.phs-play i::after{content:"";position:absolute;left:20px;top:15px;border-left:16px solid #1a1408;border-top:11px solid transparent;border-bottom:11px solid transparent}
-.phs-clip.phs-still .phs-play{display:flex}
-@media (orientation:landscape) and (max-height:480px){.phs-cap{top:96px;max-width:46%}.phs-eye{font-size:24px}.phs-sub{font-size:15px}.phs-clip{top:auto;bottom:16px;left:auto;right:16px;width:52%}}
-@media (prefers-reduced-motion:reduce){.phs-wk{animation:none}.phs-cap,.phs-clip{transition:opacity .2s ease;transform:none}}
+@media (orientation:landscape) and (max-height:480px){.phs-cap{top:96px;max-width:46%}.phs-eye{font-size:24px}.phs-sub{font-size:15px}}
+@media (prefers-reduced-motion:reduce){.phs-wk{animation:none}.phs-cap{transition:opacity .2s ease;transform:none}}
+/* 14 Nov 2026, Simon: on phones the chart plotter (bottom left) and the On Scene footage (bottom right) sit side by side at the same size; Enlarge lets the footage grow
+   across the screen over the plotter. Both are drawn at 250px and scaled down together (html.cips-phone-gl: set on phones by this file and by st-helier-approach). */
+html.cips-phone-gl .plotter-box:not(.plotter-full){left:10px !important;bottom:14px !important;transform:scale(.64) !important;transform-origin:left bottom !important}
+html.cips-phone-gl .vm-box{left:auto !important;right:10px !important;bottom:14px !important;width:250px !important;transform:scale(.64) !important;transform-origin:right bottom !important}
+html.cips-phone-gl .vm-box:not(.wide) .vm-frame{aspect-ratio:auto;height:283px}
+html.cips-phone-gl .vm-box.wide{width:calc((100vw - 20px) / .64) !important;max-width:none;z-index:7}
