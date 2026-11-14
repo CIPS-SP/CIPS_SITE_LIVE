@@ -42,7 +42,7 @@ export const defaults = {
     { id:'pier-heads', file:'journey-3-pier-heads', title:'Through the pier heads', from:0.30, to:0.47 },
     { id:'alongside', file:'journey-4-alongside', title:'Alongside', from:0.50, to:0.90 },
     { id:'quay-at-work', file:'journey-5-quay-at-work', title:'The quay at work', from:1.03, to:1.97, loops:2 },   // 5 Nov 2026, Simon: pauses after two plays; a click plays it on
-    { id:'departure', file:'journey-6-departure', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], cuts:[[6.04, 10.30]], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
+    { id:'departure', file:'journey-6-departure', phoneFile:'journey-6-departure-720', title:'Leaving St Helier', full:true, scrub:[2.20, 2.62], cuts:[[6.04, 10.30]], from:2.20, to:3.2, lead:0.8 },   // 31 Oct 2026, Simon: the finale, full screen under the plotter (pz 2 + r through chapter 5, the way out); 22 s, plays once and holds on the roundel   // (the footage windows now run on past 1: 1 + the chapter-4 progress q)
   ],
   calm: 0.6, calmIn: [0.0, 0.10],   // 16 Oct 2026, Simon: "make the sea calmer in the small roads and harbour": 0 = the open-sea look noirmont ends on, 1 = glassy; eased in over the first 10% so there is no step at the seam
   wakeIntensity: 0.55, wakeFade: [0.95, 1.0], wakeRun: 1.8, bob: 0.22, shipSpeed: 40, flow: 0.5, sunElevation: 55, wakeCenterY: 0,
@@ -776,7 +776,7 @@ export async function mount(stage, o, ctx) {
     shipEl.style.transform = EAST ? `translate(calc(-50% + ${bob.y * 0.2}%),calc(-50% + ${bob.x}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})` : `translate(calc(-50% + ${bob.x}%),calc(-50% + ${bob.y}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})`;
     const comp = camera.aspect > 1 ? (1920 / 1080) / camera.aspect : 1;
     // 14 Nov 2026, Simon (phone): from the entrance to the berth a portrait screen sees a little more (x1.4), so both pier heads, the Albert Pier and the New North Quay are in view
-    const wideP = (CS.w || innerWidth) / (CS.h || innerHeight) < 0.8 ? 1 + 0.4 * smooth(0.15, 0.35, pz) * (1 - smooth(0.95, 1.05, pz)) : 1;
+    const wideP = (CS.w || innerWidth) / (CS.h || innerHeight) < 0.8 ? 1 + (0.4 * smooth(0.15, 0.35, pz) + 0.35 * smooth(0.45, 0.7, pz)) * (1 - smooth(0.95, 1.05, pz)) : 1;
     const camH = Math.min(MAX_DISTANCE, MIN_DISTANCE / scale) * comp * wideP;
     const fx = FX0;   // (chapter framing moves come later)
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), visW = 2 * camH * tanH * camera.aspect, visHw = 2 * camH * tanH; let off = (0.5 - fx) * visW;

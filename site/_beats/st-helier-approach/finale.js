@@ -37,7 +37,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   addEventListener('wheel', onWheel, { passive: false }); addEventListener('keydown', onKey);
   playBtn.addEventListener('click', e => { e.stopPropagation(); userPaused = false; pausedUntil = 0; });
   function tickAuto(r) {
-    const now = performance.now(), dt = Math.min(0.12, Math.max(0, (now - lastT) / 1000)); lastT = now;
+    const now = performance.now(), dt = Math.min(0.5, Math.max(0, (now - lastT) / 1000)); lastT = now;   // (14 Nov 2026: was 0.12; a phone drawing few frames a second crawled through the finale, Simon's did not seem to start)
     { const y1 = scrollY; if (prevY !== null && Math.abs(y1 - prevY) >= 6 && Math.abs(r - prevR) > 1e-5 && r > 0 && r < 1 && prevR > 0 && prevR < 1) { const e = (y1 - prevY) / (r - prevR); if (e > 0 && isFinite(e)) pxPerR = pxPerR ? lerp(pxPerR, e, 0.25) : e; } prevY = y1; prevR = r; }
     const on = !reduced && r > 0.0005 && r < 1;
     if (!on) { if (inAuto) { inAuto = false; reach = 0; userPaused = false; holdT = 0; holdDone = false; } hit.classList.remove('on'); playBtn.classList.remove('on'); return; }

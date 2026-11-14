@@ -24,6 +24,8 @@ let wideSetting = false;   // the Expand choice carries from one moment (and one
 // seconds of a film with `cuts` left out -> seconds of the file (cuts: [[from, to], ...] in file seconds, in order)
 export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) t += c[1] - c[0]; else break; } return t; }
 let cssReady = null;
+// 14 Nov 2026 (Simon: the finale did not start on his phone): a phone gets a moment's `phoneFile` (the departure film's 720p copy) and the scrubbed film is primed once it has loaded
+const PHONE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) <= 480;
 function loadCss() {
   if (cssReady) return cssReady;
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = CSS_URL; l.dataset.videoMomentCss = '1';
@@ -66,7 +68,9 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   });
   const fullLoad = m => { if (m.loaded || m.bad) return; m.loaded = true; if (still) return;
     // a scrubbed film is fetched whole and played from memory: a streamed file only seeks where the server supports byte ranges (the local servers do not, and the video then snaps back to 0), a blob always does
-    if (m.scrub) { m.v.preload = 'auto'; fetch(m.src).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(bl => { m.blobUrl = URL.createObjectURL(bl); m.v.src = m.blobUrl; m.v.load(); }).catch(() => { m.v.src = m.src; m.v.load(); }); return; }
+    const url = PHONE && m.phoneFile ? m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4') : m.src;
+    if (m.scrub && PHONE) m.v.addEventListener('loadeddata', () => { const pr = m.v.play(); if (pr && pr.then) pr.then(() => { if (!m.on || m.scrub) m.v.pause(); }).catch(() => {}); }, { once: true });
+    if (m.scrub) { m.v.preload = 'auto'; fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(bl => { m.blobUrl = URL.createObjectURL(bl); m.v.src = m.blobUrl; m.v.load(); }).catch(() => { m.v.src = url; m.v.load(); }); return; }
     m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); };
   const fullOn = m => { m.on = true; m.started = true; m.box.classList.add('on'); if (still) { m.box.classList.add('still'); return; } if (m.scrub) return; try { m.v.currentTime = 0; } catch (e) {} const go = n => { const pr = m.v.play(); if (pr && pr.catch) pr.catch(() => { if (m.on && n < 4) setTimeout(() => go(n + 1), 250 * (n + 1)); }); }; go(0); };
   const fullOff = m => { m.on = false; m.box.classList.remove('on'); try { m.v.pause(); } catch (e) {} };

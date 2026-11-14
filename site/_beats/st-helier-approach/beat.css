@@ -277,8 +277,13 @@
 /* 13 Nov 2026, Simon's phone storyboard: on a phone-sized screen (since 14 Nov keyed to the screen, so Edge's phone mode shows it): the services list as a
    strip across the top (five columns), the plotter and the footage (opening small, as on a computer) bottom left, so the yacht and the quay stay clear in the middle */
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){
-  .beat-st-helier-approach .sq-list { left:10px; right:10px; top:126px; width:auto; padding:7px 9px 5px; }   /* (below the Skip to CIPS pill, 14 Nov 2026) */
-  .beat-st-helier-approach .sq-now { min-height:0; margin-bottom:5px; }
+  .beat-st-helier-approach .sq-list { left:8px; right:8px; top:84px; width:auto; padding:5px 7px 3px; }   /* (14 Nov 2026, Simon: slimmer, right under the header; the Skip pill steps aside while it is up, below) */
+  .beat-st-helier-approach .sq-head { display:none; }
+  .beat-st-helier-approach .sq-row { padding:2px 0 5px !important; row-gap:1px !important; }
+  .beat-st-helier-approach .sq-row span { font-size:9px !important; }
+  .beat-st-helier-approach .sq-row b { font-size:8.5px !important; }
+  .beat-st-helier-approach .sq-tick { width:11px !important; height:11px !important; }
+  .beat-st-helier-approach .sq-now { min-height:0; margin-bottom:3px; padding:3px 7px; font-size:10px; }
   .beat-st-helier-approach .sq-rows { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); column-gap:6px; }
   .beat-st-helier-approach .sq-row { grid-template-columns:1fr; justify-items:center; text-align:center; border-top:0; padding:3px 0 7px; row-gap:2px; }
   .beat-st-helier-approach .sq-tick { grid-row:auto; }
@@ -288,3 +293,5 @@
   .beat-st-helier-approach .slead-hud { top:126px; bottom:auto; right:10px; transform:scale(.8); transform-origin:right top; }   /* the leading lights: top right, clear of the footage window */
   .beat-st-helier-approach .splay{display:none !important}   /* no game doors on a phone (14 Nov 2026, Simon) */
 }
+/* 14 Nov 2026, Simon: on a phone the Skip to CIPS pill steps aside while the quay card is up (the card sits where it was) */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html:has(.beat-st-helier-approach .sq-list.sq-on) #skipToCips{ display:none !important; } }
