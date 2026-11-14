@@ -276,7 +276,6 @@ export async function mount(stage, o, ctx) {
   const coarse = matchMedia('(pointer: coarse)').matches;
   // 13 Nov 2026, Simon's phone storyboard: phones run this scene for real (index.html passes phoneGL with a much shorter track), lighter: no game doors
   const mobile = (coarse && Math.min(innerWidth, innerHeight) <= 480 && !o.phoneGL) || o.forceStatic === true;
-  if (o.phoneGL && coarse) document.documentElement.classList.add('cips-phone-gl');   // the phone layout of this scene's panels (beat.css, end)
   if (mobile) { console.warn('[st-helier-approach] static fallback: small touch viewport'); stage.classList.add('nogl'); return staticCtrl(stage, shipEl, copyEl, o); }
   if (ctx.reduced) o = Object.assign({}, o, { bob: 0, flow: Math.min(o.flow, 0.3) });
 

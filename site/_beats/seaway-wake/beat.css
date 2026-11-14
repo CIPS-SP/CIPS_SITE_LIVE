@@ -119,3 +119,5 @@
    in-iframe elements directly; the game's Arrival notes card sits top-right (right:14px), so moved this to the
    opposite corner instead of trying to thread the two into the same 18px strip. */
 .splay-overlay .splay-close { position:absolute; left:18px; top:max(14px,env(safe-area-inset-top)); z-index:2; appearance:none; border:0; cursor:pointer; padding:9px 14px; border-radius:999px; background:rgba(4,22,26,.7); color:#eaf4f5; font:500 12px/1 'Jost',system-ui,sans-serif; letter-spacing:.14em; text-transform:uppercase; }
+/* 14 Nov 2026, Simon: no game door on a phone-sized screen */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){.beat-seaway-wake .splay{display:none !important}}

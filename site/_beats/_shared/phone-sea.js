@@ -34,7 +34,6 @@ export function phoneSea(stage, o, ctx, copyEl, shipEl, seawayBase, nav) {
   if (!o || !o.phone) return null;
   if (copyEl) copyEl.style.display = 'none';
   if (shipEl) shipEl.style.display = 'none';
-  document.documentElement.classList.add('cips-phone-gl');   // the phone layout of the plotter and the footage (phone-sea.css, end)
   return mountPhoneSea(stage, { assets: seawayBase + 'assets/', dir: ctx.base + '../../videos/journey/', plan: o.phone, reduced: !!ctx.reduced, nav, navAssets: seawayBase });
 }
 

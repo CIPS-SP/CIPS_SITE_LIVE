@@ -308,7 +308,7 @@ export async function mount(stage, o, ctx){
   if(ctx.handoff.yachtScreenPx) shipEl.style.width=ctx.handoff.yachtScreenPx+'px'; else shipEl.style.width='48.7rem';
   const coarse=matchMedia('(pointer: coarse)').matches;
   const smallPhone = coarse && Math.min(innerWidth, innerHeight) <= 480;
-  const mobile = smallPhone || o.forceStatic === true;
+  const mobile = (smallPhone && !o.phoneGL) || o.forceStatic === true;   // 14 Nov 2026, Simon: phones run the real scene (index.html passes phoneGL); the light version (phone-sea.js) only if 3D fails
   if(mobile){ console.warn('[noirmont-transit] static fallback: viewport ≤767px'); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o,ctx); }
   if(ctx.reduced){ o=Object.assign({},o,{bob:0, flow:Math.min(o.flow,0.3)}); }
 

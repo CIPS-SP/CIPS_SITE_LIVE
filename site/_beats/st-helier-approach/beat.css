@@ -274,14 +274,17 @@
 .beat-st-helier-approach .sq-lead.sq-out { animation:sqOutFade .9s 3.8s ease-in forwards; }
 @media (prefers-reduced-motion: reduce) { .beat-st-helier-approach .sq-list.sq-out, .beat-st-helier-approach .sq-lead.sq-out { animation:none !important; opacity:0 !important; } }
 
-/* 13 Nov 2026, Simon's phone storyboard: on phones this scene runs for real but lighter (html.cips-phone-gl, set by beat.js): the services list as a
+/* 13 Nov 2026, Simon's phone storyboard: on a phone-sized screen (since 14 Nov keyed to the screen, so Edge's phone mode shows it): the services list as a
    strip across the top (five columns), the plotter and the footage (opening small, as on a computer) bottom left, so the yacht and the quay stay clear in the middle */
-html.cips-phone-gl .beat-st-helier-approach .sq-list { left:10px; right:10px; top:100px; width:auto; padding:7px 9px 5px; }
-html.cips-phone-gl .beat-st-helier-approach .sq-now { min-height:0; margin-bottom:5px; }
-html.cips-phone-gl .beat-st-helier-approach .sq-rows { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); column-gap:6px; }
-html.cips-phone-gl .beat-st-helier-approach .sq-row { grid-template-columns:1fr; justify-items:center; text-align:center; border-top:0; padding:3px 0 7px; row-gap:2px; }
-html.cips-phone-gl .beat-st-helier-approach .sq-tick { grid-row:auto; }
-html.cips-phone-gl .beat-st-helier-approach .sq-row span { font-size:10px; line-height:1.1; }
-html.cips-phone-gl .beat-st-helier-approach .sq-row b { grid-column:1; grid-row:auto; text-align:center; font-size:9.5px; }
-html.cips-phone-gl .beat-st-helier-approach .sq-row em { left:0; right:0; }
-html.cips-phone-gl .beat-st-helier-approach .slead-hud { top:124px; bottom:auto; right:10px; transform:scale(.8); transform-origin:right top; }   /* the leading lights: top right, clear of the footage window */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){
+  .beat-st-helier-approach .sq-list { left:10px; right:10px; top:126px; width:auto; padding:7px 9px 5px; }   /* (below the Skip to CIPS pill, 14 Nov 2026) */
+  .beat-st-helier-approach .sq-now { min-height:0; margin-bottom:5px; }
+  .beat-st-helier-approach .sq-rows { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); column-gap:6px; }
+  .beat-st-helier-approach .sq-row { grid-template-columns:1fr; justify-items:center; text-align:center; border-top:0; padding:3px 0 7px; row-gap:2px; }
+  .beat-st-helier-approach .sq-tick { grid-row:auto; }
+  .beat-st-helier-approach .sq-row span { font-size:10px; line-height:1.1; }
+  .beat-st-helier-approach .sq-row b { grid-column:1; grid-row:auto; text-align:center; font-size:9.5px; }
+  .beat-st-helier-approach .sq-row em { left:0; right:0; }
+  .beat-st-helier-approach .slead-hud { top:126px; bottom:auto; right:10px; transform:scale(.8); transform-origin:right top; }   /* the leading lights: top right, clear of the footage window */
+  .beat-st-helier-approach .splay{display:none !important}   /* no game doors on a phone (14 Nov 2026, Simon) */
+}

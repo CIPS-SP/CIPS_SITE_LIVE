@@ -196,7 +196,7 @@ export async function mount(stage, o, ctx){
   // Static fallback is for devices that genuinely cannot run the simulation — NOT for narrow windows.
   // (A 700px desktop window, or the beat viewer's panel, must still get the real sea, wake and pilot.)
   const smallPhone = coarse && Math.min(innerWidth, innerHeight) <= 480;
-  const mobile = smallPhone || o.forceStatic === true;
+  const mobile = (smallPhone && !o.phoneGL) || o.forceStatic === true;   // 14 Nov 2026, Simon: phones run the real scene (index.html passes phoneGL); the light version (phone-sea.js) only if 3D fails
   if(mobile){ console.warn('[seaway-wake] static fallback: viewport ≤767px'); stage.classList.add('nogl'); return staticCtrl(stage,shipEl,copyEl,o,ctx); }
   if(ctx.reduced){ o=Object.assign({},o,{bob:0, flow:Math.min(o.flow,0.3)}); }   // reduced motion = calmer, NOT static: the beat is the story
 
