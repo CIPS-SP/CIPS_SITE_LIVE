@@ -22,6 +22,9 @@ let wideSetting = false;   // the Expand choice carries from one moment (and one
 // 5 Nov 2026, Simon: the ON SCENE box flashed up while the page was loading. It was added before its own stylesheet had arrived, so it showed unstyled for a moment.
 // Each box now stays hidden until the stylesheet has loaded (or failed).
 // seconds of a film with `cuts` left out -> seconds of the file (cuts: [[from, to], ...] in file seconds, in order)
+// 15 Nov 2026, Simon (the finale's first shots went by too fast): `warp` on a scrubbed moment gives some shots more of the scroll: [[scroll fraction, seconds of the kept film], ...] in order,
+// straight lines between; without it the film runs evenly. The plotter's sync (st-helier-approach) uses the same.
+export function warpTime(warp, u, kept) { if (!warp || !warp.length) return u * kept; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i]; if (u <= c[0]) { const ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); return ta + (tc - ta) * (c[0] > a[0] ? (u - a[0]) / (c[0] - a[0]) : 1); } } return kept; }
 export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) t += c[1] - c[0]; else break; } return t; }
 let cssReady = null;
 // 14 Nov 2026 (Simon: the finale did not start on his phone): a phone gets a moment's `phoneFile` (the departure film's 720p copy) and the scrubbed film is primed once it has loaded
@@ -78,7 +81,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // last wanted time is applied when the one in flight lands (the film is cut with a keyframe every 4 frames so a seek is cheap).
   // 5 Nov 2026, Simon: `cuts: [[from, to], ...]` (film seconds) are left out of a scrubbed film: the scroll runs through the rest as if they were not there (the file itself is not re-cut). cutTime() turns
   // seconds of the kept film into seconds of the file; beat.js uses the same to keep the plotter in step.
-  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))) * kept); if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
+  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
   F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
   function updateFull(p) {
     for (const m of F) {

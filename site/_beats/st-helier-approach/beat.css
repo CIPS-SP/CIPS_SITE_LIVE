@@ -309,3 +309,4 @@
   html.cips-quay .beat-st-helier-approach .sq-row em{ left:18px !important; right:0 !important; }
 }
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-fin-end .beat-st-helier-approach .plotter-box{ display:none !important; } }   /* 14 Nov 2026, Simon: no plotter over the last shot at sea (the closing line and the badge) */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html:not(.cips-quay) .beat-st-helier-approach .sq-list{ display:none !important; } }   /* 15 Nov 2026, Simon: on a phone the card's closing animation showed it at the top again after the quay */

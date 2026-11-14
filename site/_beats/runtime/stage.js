@@ -33,7 +33,11 @@ export async function run(list, opts = {}) {
   let ver = '';
   try { const cat = await (await fetch(base + 'beats.json', { cache: 'no-cache' })).json(); ver = '?v=' + encodeURIComponent(cat.generated || ''); } catch (e) { ver = '?v=' + Date.now(); }
 
-  const vh = () => innerHeight;
+  // 15 Nov 2026, Simon (phone: scrolling back from the finale threw him into the quay and locked): on a phone the toolbar comes and goes as the scroll changes direction, changing
+  // innerHeight by about 10%, and every track (vh) was re-measured from it, so the whole journey changed length under the thumb. On a touch screen the height is now taken once and
+  // only re-taken when the width changes (turning the phone); a computer still follows its window.
+  const touchScreen = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches; let stableH = innerHeight, stableW = innerWidth;
+  const vh = () => { if (!touchScreen || Math.abs(innerWidth - stableW) > 1) { stableW = innerWidth; stableH = innerHeight; } return stableH; };
   const toPx = v => { if (typeof v === 'number') return v; const m = String(v).match(/^([\d.]+)(vh|px)?$/); return m ? (m[2] === 'px' ? +m[1] : +m[1] / 100 * vh()) : vh(); };
   const groups = {};   // name → { section, stage, members:[] }
   // 5 Nov 2026, Simon ("still getting this empty dark blue page on loading"): the globe was built, but the next scenes were mounted straight after it, and their set-up (models, big chart

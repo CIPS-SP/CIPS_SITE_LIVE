@@ -1033,7 +1033,9 @@
        pill, fixed at the top of the page, offers the way back. Clicking it returns to the START of the globe with its "choose your voyage" scroll lock back (a clean reload of the page at the top: the
        globe's own start-up puts the lock, the CTA and everything else back exactly as a first visit; going through the page's own state to undo a whole voyage would be far more fragile). */
     const backPill = document.getElementById('backToGlobe'), openingEl = document.getElementById('openingAct');
-    const mainTop = () => openingEl ? openingEl.getBoundingClientRect().bottom + scrollY - (document.documentElement.classList.contains('has-finale') ? innerHeight : 0) : 0;       // where the opening act ends and the main site begins (with the finale the home page starts one window height early, under the shrinking frame)
+    // 15 Nov 2026: the home page starts one SMALL-viewport height early (CSS: margin-top -100svh), so that is what is taken off here, not innerHeight, which on a phone grows and shrinks with the toolbar
+    const svhProbe = document.createElement('div'); svhProbe.style.cssText = 'position:fixed;top:0;left:-9px;width:1px;height:100vh;height:100svh;visibility:hidden;pointer-events:none'; document.body.appendChild(svhProbe);
+    const mainTop = () => openingEl ? openingEl.getBoundingClientRect().bottom + scrollY - (document.documentElement.classList.contains('has-finale') ? svhProbe.offsetHeight : 0) : 0;       // where the opening act ends and the main site begins (with the finale the home page starts one window height early, under the shrinking frame)
     let pillTimer = 0, armed = false, restarting = false, lastY = scrollY, quietUntil = 0;
     // 7 Nov 2026, Simon: the pill sat over the nav bar; it now sits just below the header, in the white space, wherever the header is at that moment
     const placePill = () => { const h = document.getElementById('header'); backPill.style.top = Math.round((h ? h.getBoundingClientRect().bottom : 74) + 10) + 'px'; };
