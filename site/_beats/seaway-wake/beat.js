@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { clamp01, lerp, smooth, cinematicSilk } from '../runtime/stage.js';
 import { scoreAt } from '../_shared/zoom-score.js';
-import { phoneFilm } from '../_shared/phone-film.js';   // 13 Nov 2026: the lighter journey for phones (see o.phone)
+import { phoneSea, routeNav } from '../_shared/phone-sea.js';   // 13 Nov 2026: the lighter journey for phones (see o.phone)
 import { buildChannelChart, CHART, GATEWAY, frameAtZoom, screenFraction } from '../_shared/channel-chart.js';
 // 25 Sep 2026, Simon: the Chapter 1 transit's shared plotter (see WORKING-NOW.md, STORYBOARD-chapter-1.md) —
 // retrofitted here first, so it reads as one continuous instrument panel from the very first zoom into the
@@ -119,12 +119,16 @@ export const defaults = {
   heading: 'east',         // 'east' = bow to screen-right, wake trailing left, sun from the bottom (south, north-up view)
                            // 'south' = UC's frame: bow down, wake up, sun from the left
   shipWidthRem: 48.7,      // opening hull length on screen (CSS width of .sship) if no handoff provides yachtScreenPx
-  // 13 Nov 2026, Simon chose a lighter phone version: on a small touch screen (the static fallback) the scroll shows these instead of one still yacht (_shared/phone-film.js).
-  // A stretch without a file leaves the fallback's yacht on the sea showing. Captions are the scenes' own copy.
-  phone: [
-    { from: 0.00, to: 0.50, eyebrow: 'Some places you pull in', sub: 'because you feel at home.' },
-    { from: 0.50, to: 1.01, file: 'journey-1-noirmont-corbiere', title: 'Corbi\u00e8re to Noirmont', eyebrow: 'Pilot aboard, under way', sub: 'round Noirmont Point, into St Aubin\'s Bay, for the leading line.' },
-  ],
+  // 13 Nov 2026, Simon's storyboard for phones: on a small touch screen (the static fallback) the yacht's sprite sails down the page on a flowing sea, the pilot
+  // launch comes alongside and the pilot steps across (_shared/phone-sea.js). Captions are the scenes' own copy.
+  phone: {
+    flow: 2600, pilot: [0.30, 0.86],
+    captions: [
+      { from: 0.03, to: 0.40, eyebrow: 'Some places you pull in', sub: 'because you feel at home.' },
+      { from: 0.62, to: 1.01, eyebrow: 'Pilot aboard, under way', sub: '' },
+    ],
+    clips: [],
+  },
   copyIn: [0.60, 0.70],    // lands exactly as the pilot crosses (o.pilot.alongside), not on arrival
   // 3 Oct 2026: hudIn [a,b] is in RAW scroll progress (not the remapped internal p): the plotter and the play door fade in across it.
   // With cloud-pass now overlapping seaway's first 80vh (index.html), the ship is already sailing under the clearing clouds — the HUD
@@ -922,7 +926,7 @@ export async function mount(stage, o, ctx){
   };
 }
 function staticCtrl(stage,shipEl,copyEl,o,ctx){
-  const pf=phoneFilm(stage,o,ctx,copyEl);   // 13 Nov 2026: the lighter journey for phones
+  const pf=phoneSea(stage,o,ctx,copyEl,shipEl,ctx.base, o.phone ? routeNav(GEO, GEO.route, pp=>{ const w=o.phone.pilot||[2,2]; return pp<w[0]-0.1?12:pp<w[0]?lerp(12,7,(pp-w[0]+0.1)/0.1):pp<w[1]?7:12; }) : null);   // 13 Nov 2026: the lighter journey for phones
   return { update(p){ if(pf) pf.update(p); const e=cinematicSilk(p); const s=o.zoom==='in'? lerp(0.22,0.6,e) : 1+(0.35-1)*e; shipEl.style.transform=`translate(-50%,-50%) scale(${s})`;
       if(copyEl){ const c=clamp01((p-o.copyIn[0])/(o.copyIn[1]-o.copyIn[0])); copyEl.style.opacity=c.toFixed(3);} },
     resize(){}, destroy(){ if(pf) pf.destroy(); }, exit(){ return {yachtScreenPx: shipEl.offsetWidth*0.35}; } };

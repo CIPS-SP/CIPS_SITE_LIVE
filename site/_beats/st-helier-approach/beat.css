@@ -273,3 +273,17 @@
 .beat-st-helier-approach .sq-list.sq-out .sq-now { animation:sqFade .5s 2.3s ease-out backwards, sqBlink .7s .1s ease-in-out 3 both; }   /* 1 Nov 2026, Simon: the message flashes WHILE the rows collapse (3 flashes over the 2.2 s), then holds still for 1.6 s, then the card fades */   /* (the first is the message's own fade-in from the card's opening, listed again so it is the SAME animation: switching this class on and off then only adds or removes the blink; it used to swap the fade-in for the blink and back, restarting the fade-in (message gone for 2.3 s) every time) */
 .beat-st-helier-approach .sq-lead.sq-out { animation:sqOutFade .9s 3.8s ease-in forwards; }
 @media (prefers-reduced-motion: reduce) { .beat-st-helier-approach .sq-list.sq-out, .beat-st-helier-approach .sq-lead.sq-out { animation:none !important; opacity:0 !important; } }
+
+/* 13 Nov 2026, Simon's phone storyboard: on phones this scene runs for real but lighter (html.cips-phone-gl, set by beat.js): no chart plotter, the services list as a
+   strip across the top (five columns), the footage window full width along the bottom, so the yacht and the quay stay clear in the middle */
+html.cips-phone-gl .beat-st-helier-approach .plotter-box { display:none !important; }
+html.cips-phone-gl .beat-st-helier-approach .sq-list { left:10px; right:10px; top:100px; width:auto; padding:7px 9px 5px; }
+html.cips-phone-gl .beat-st-helier-approach .sq-now { min-height:0; margin-bottom:5px; }
+html.cips-phone-gl .beat-st-helier-approach .sq-rows { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); column-gap:6px; }
+html.cips-phone-gl .beat-st-helier-approach .sq-row { grid-template-columns:1fr; justify-items:center; text-align:center; border-top:0; padding:3px 0 7px; row-gap:2px; }
+html.cips-phone-gl .beat-st-helier-approach .sq-tick { grid-row:auto; }
+html.cips-phone-gl .beat-st-helier-approach .sq-row span { font-size:10px; line-height:1.1; }
+html.cips-phone-gl .beat-st-helier-approach .sq-row b { grid-column:1; grid-row:auto; text-align:center; font-size:9.5px; }
+html.cips-phone-gl .beat-st-helier-approach .sq-row em { left:0; right:0; }
+html.cips-phone-gl .beat-st-helier-approach .slead-hud { top:100px; bottom:auto; right:10px; transform:scale(.8); transform-origin:right top; }   /* the leading lights: top right, clear of the footage window */
+html.cips-phone-gl .vm-box { left:10px !important; bottom:14px !important; width:62vw !important; transform:none !important; }

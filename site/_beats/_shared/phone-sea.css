@@ -1,0 +1,33 @@
+/* phone-sea.css — the lighter journey at sea for phones (see phone-sea.js). Over the beat's static fallback, under the page header. */
+.phs{position:absolute;inset:0;z-index:5;overflow:hidden;pointer-events:none;font-family:'Jost',system-ui,sans-serif;color:#fff;background:#02484b;opacity:0;transition:opacity .4s ease}
+.phs.phs-on{opacity:1}
+.phs-sea{position:absolute;inset:0;background-color:#02484b;background-repeat:repeat;background-size:512px 512px;will-change:background-position}
+.phs-world{position:absolute;inset:0}
+.phs-ship,.phs-boat{position:absolute;left:0;top:0;transform-origin:center;will-change:transform}
+.phs-img,.phs-bimg{position:relative;display:block;width:100%;height:100%;filter:drop-shadow(0 6px 10px rgba(0,20,22,.45))}
+/* the wake: the main site's own, a picture laid under the hull (phone-sea.js places it); it breathes a little so the water looks alive */
+.phs-wk{position:absolute;max-width:none;pointer-events:none;animation:phs-wk 3.2s ease-in-out infinite}
+@keyframes phs-wk{0%,100%{opacity:1}50%{opacity:.82}}
+.phs-man{position:absolute;left:0;top:0;display:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+/* a soft shade at the top keeps the caption readable on the sea */
+.phs-shade{position:absolute;inset:0 0 auto 0;height:50%;background:linear-gradient(rgba(4,16,22,.55),rgba(4,16,22,0));transition:opacity .4s ease}
+.phs-cap{position:absolute;left:16px;right:16px;top:132px;max-width:34rem;transition:opacity .24s ease,transform .24s ease}
+.phs-cap.phs-out{opacity:0;transform:translateY(8px)}
+.phs-eye{margin:0;font:600 30px/1.1 'Jost',system-ui,sans-serif;letter-spacing:-.01em;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.phs-sub{margin:10px 0 0;font:400 17px/1.45 'Jost',system-ui,sans-serif;color:rgba(255,255,255,.9);text-shadow:0 1px 10px rgba(0,0,0,.55)}
+.phs-sub:empty{display:none}
+/* a clip slides up over the scene; the yacht carries on underneath, a little dimmed */
+.phs.phs-film .phs-world{filter:brightness(.6)}
+.phs.phs-film .phs-shade{opacity:0}
+.phs-clip{position:absolute;left:16px;right:16px;top:118px;opacity:0;transform:translateY(40px);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
+.phs-clip.phs-on{opacity:1;transform:none;pointer-events:auto}
+.phs-tag{margin:0 0 10px;font:600 11px/1.3 'Jost',system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#FF8A1E;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.phs-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.1)}
+.phs-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;background:#000}
+.phs-v.phs-cur{opacity:1}
+.phs-play{position:absolute;inset:0;display:none;align-items:center;justify-content:center;appearance:none;border:0;background:rgba(0,0,0,.25);cursor:pointer;padding:0}
+.phs-play i{width:52px;height:52px;border-radius:50%;background:rgba(255,138,30,.95);position:relative}
+.phs-play i::after{content:"";position:absolute;left:20px;top:15px;border-left:16px solid #1a1408;border-top:11px solid transparent;border-bottom:11px solid transparent}
+.phs-clip.phs-still .phs-play{display:flex}
+@media (orientation:landscape) and (max-height:480px){.phs-cap{top:96px;max-width:46%}.phs-eye{font-size:24px}.phs-sub{font-size:15px}.phs-clip{top:auto;bottom:16px;left:auto;right:16px;width:52%}}
+@media (prefers-reduced-motion:reduce){.phs-wk{animation:none}.phs-cap,.phs-clip{transition:opacity .2s ease;transform:none}}
