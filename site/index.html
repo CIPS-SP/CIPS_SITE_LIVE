@@ -217,7 +217,7 @@
        again), its globe and words fade in after 0.35 s (a quick load never shows them), and it fades out when the globe is drawn (cips:globe-ready).
        Design "Horizon" (Simon's pick of four, 5 Nov): the globe's own glow, orange above and blue below as on the real globe (the inset shadows follow globe-live/beat.css),
        gently breathing, with the dots shimmering through; the real globe then comes up in the same place. */
-    #globeLoader { position:absolute; top:0; left:0; right:0; height:100vh; height:100svh; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+    #globeLoader { position:absolute; top:0; left:0; right:0; height:100vh; height:100dvh; z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
       background:radial-gradient(ellipse at 50% 46%, #0b1a2c 0%, #06101d 45%, #04070e 100%); pointer-events:none; transition:opacity .6s ease; }
     #globeLoader > * { opacity:0; animation:glIn .5s ease .35s forwards; }
     #globeLoader.gone { opacity:0 !important; }

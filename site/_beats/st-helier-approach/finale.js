@@ -22,7 +22,7 @@ const HOLD_R = CLOSE_R + 0.0006, HOLD_S = 3.8, PREROLL = 0.05;   // (HOLD_R: jus
 const AUTO = [[CLOSE_R, 0.20, 5.5], [0.20, 0.62, 11.1], [0.62, 0.74, 3.0], [0.74, 1.0, 3.6]], RESUME_MS = 1300;
 const autoRate = r => { if (r < CLOSE_R) return PREROLL; for (const [a, b, sec] of AUTO) if (r >= a && r < b) return (b - a) / sec; return 0; };   // r per second
 
-export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false }) {
+export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false, auto = true }) {
   const root = document.documentElement; root.classList.add('has-finale');
   const group = host.parentElement;   // the .beat-group section the pinned stage lives in
   const el = document.createElement('div'); el.className = 'sfin-line'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = '<span></span>'; el.firstChild.textContent = line; stage.appendChild(el);
@@ -66,7 +66,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   const findHero = () => hero && hero.isConnected ? hero : (hero = document.getElementById('about'));
 
   function update(r) {
-    tickAuto(r);
+    if (auto) tickAuto(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
     // the closing line, over the open sea
     const a = smooth(0.56, 0.62, r) * (1 - smooth(0.70, 0.74, r));
     el.style.opacity = a.toFixed(3); el.style.transform = `translate(-50%, ${(14 * (1 - smooth(0.56, 0.62, r))).toFixed(1)}px)`;
