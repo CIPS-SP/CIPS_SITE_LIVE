@@ -20,7 +20,7 @@ import { createWakeSimulation, makeOcean, WAKE_FRAG, BOUNDS, SHIP_LENGTH_WORLD, 
 // already used for the sea/wake extraction. Not duplicated here on purpose: one source of truth for the chart.
 import { GEO } from '../seaway-wake/game/geography-data.js';
 import { CFG } from '../seaway-wake/game/config.js';
-import { createCoastPlate, placeCoastPlateNorthUp, SW_PLATE_FEATHER } from '../_shared/coast-plate.js';
+import { createCoastPlate, placeCoastPlateNorthUp, SW_PLATE_FEATHER, liteSrc } from '../_shared/coast-plate.js';
 import { mountTiltShift } from '../_shared/tilt-shift.js';
 import { lightPhase } from '../_shared/nav-light.js';
 import { registerSea } from '../_shared/sea-advect.js';
@@ -362,9 +362,10 @@ export async function mount(stage, o, ctx){
   let streamAlive=true; const streamed=[];
   const mercY=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));
   async function wideWithout(url, mt, rects){
-    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
-    const cv=document.createElement('canvas'); cv.width=mt.w; cv.height=mt.h; const g=cv.getContext('2d'); g.drawImage(img,0,0,mt.w,mt.h);
-    const b=mt.bounds, y0=mercY(b.north), y1=mercY(b.south), X=l=>(l-b.west)/(b.east-b.west)*mt.w, Y=l=>(y0-mercY(l))/(y0-y1)*mt.h;
+    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=liteSrc(url); });   // (14 Nov 2026: at the picture's own size, half on a phone)
+    const W=img.naturalWidth||mt.w, H=img.naturalHeight||mt.h;
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const g=cv.getContext('2d'); g.drawImage(img,0,0,W,H);
+    const b=mt.bounds, y0=mercY(b.north), y1=mercY(b.south), X=l=>(l-b.west)/(b.east-b.west)*W, Y=l=>(y0-mercY(l))/(y0-y1)*H;
     for(const r of rects){ const x=X(r.west), y=Y(r.north); g.clearRect(x,y,X(r.east)-x,Y(r.south)-y); }
     return URL.createObjectURL(await new Promise(res=>cv.toBlob(res,'image/png')));
   }
@@ -388,6 +389,7 @@ export async function mount(stage, o, ctx){
   // (0.2 m/px, just the last few hundred metres into the harbour mouth) from ~0.55; at the wide framing they
   // would add nothing the z16 tier doesn't already show.
   const TIER_MPP={ 'harbour-z18':[2.2,3.5], 'harbour-z19':[0.55,0.9] };
+  if(liteSrc('x/sw-plate.webp')!=='x/sw-plate.webp') TIER_MPP['harbour-z19']=[0,0];   // 14 Nov 2026: not on a phone (see st-helier-approach)
   function updatePlates(pp, visH_u, off_u){
     if(!streamed.length) return;
     const unitM=M_PER_UNIT/o.coastScale, H=CS.h||innerHeight, visH=visH_u*unitM, visW=visH*camera.aspect, mpp=visH/H;

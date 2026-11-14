@@ -16,7 +16,7 @@ import { mountVideoMoment, cutTime } from '../_shared/video-moment.js';
 import { createWakeSimulation, makeOcean, BOUNDS, SHIP_LENGTH_WORLD, setWakeParams, PAGE_T0 } from '../_shared/sea-wake.js';
 import { GEO } from '../seaway-wake/game/geography-data.js';
 import { CFG } from '../seaway-wake/game/config.js';
-import { createCoastPlate, placeCoastPlateNorthUp, SW_PLATE_FEATHER } from '../_shared/coast-plate.js';
+import { createCoastPlate, placeCoastPlateNorthUp, SW_PLATE_FEATHER, liteSrc } from '../_shared/coast-plate.js';
 import { mountTiltShift } from '../_shared/tilt-shift.js';
 import { lightPhase } from '../_shared/nav-light.js';
 import { registerSea } from '../_shared/sea-advect.js';
@@ -312,9 +312,10 @@ export async function mount(stage, o, ctx) {
   const coastMeshes = []; let streamAlive = true; const streamed = []; let fallbackWide = null;   // fallbackWide: the whole wide plate, harbour included, lying under the erased one and shown only while sharper tiles that the view needs have not arrived (31 Oct 2026: otherwise the erased hole shows bare sea, the land missing, until they load)
   const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
   async function wideWithout(url, mt, rects) {
-    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
-    const cv = document.createElement('canvas'); cv.width = mt.w; cv.height = mt.h; const g = cv.getContext('2d'); g.drawImage(img, 0, 0, mt.w, mt.h);
-    const b = mt.bounds, y0 = mercY(b.north), y1 = mercY(b.south), X = l => (l - b.west) / (b.east - b.west) * mt.w, Y = l => (y0 - mercY(l)) / (y0 - y1) * mt.h;
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = liteSrc(url); });   // (14 Nov 2026: at the picture's own size, half on a phone)
+    const W = img.naturalWidth || mt.w, H = img.naturalHeight || mt.h;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); g.drawImage(img, 0, 0, W, H);
+    const b = mt.bounds, y0 = mercY(b.north), y1 = mercY(b.south), X = l => (l - b.west) / (b.east - b.west) * W, Y = l => (y0 - mercY(l)) / (y0 - y1) * H;
     for (const r of rects) { const x = X(r.west), y = Y(r.north); g.clearRect(x, y, X(r.east) - x, Y(r.south) - y); }
     return URL.createObjectURL(await new Promise(res => cv.toBlob(res, 'image/png')));
   }
@@ -342,6 +343,7 @@ export async function mount(stage, o, ctx) {
   function drawCoast() { for (const c of coastMeshes) { placeCoastPlateNorthUp(c, 0, worldOffsetTo); c.m.scale.set(geoK, geoK, 1); } }   // the plates grow with geoK about their own centres, as their positions do
   // finer tiers only wake once the view is close enough to show their detail: [load below, keep below] in metres of ground per screen pixel
   const TIER_MPP = { 'harbour-z18': [2.2, 3.5], 'harbour-z19': [0.55, 0.9], 'marina-z19': [0.55, 0.9] };
+  if (liteSrc('x/sw-plate.webp') !== 'x/sw-plate.webp') { TIER_MPP['harbour-z19'] = [0, 0]; TIER_MPP['marina-z19'] = [0, 0]; }   // 14 Nov 2026: on a phone the z18 tier (0.39 m/px) is already sharper than the screen; the z19 tiles were 100 MB+ of 3D memory and the phone crashed in the harbour
   function makeStreamPlate(s) {
     const plate = createCoastPlate(scene, renderer, { src: s.base + s.m.file + (s.ver ? "?v=" + s.ver : ""), wPx: s.m.w, hPx: s.m.h, mPerPx: s.m.mPerPx, mPerUnit: M_PER_UNIT, bounds: s.m.bounds, order: s.order, scale: 1, feather: s.m.feather });
     plate.m.rotation.set(-Math.PI / 2, -Math.PI / 2, 0, 'YXZ'); plate.m.visible = false; plate.m.material.opacity = 0.97; s.plate = plate;
@@ -773,7 +775,9 @@ export async function mount(stage, o, ctx) {
     const turn = hdg - BASE_HEADING;
     shipEl.style.transform = EAST ? `translate(calc(-50% + ${bob.y * 0.2}%),calc(-50% + ${bob.x}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})` : `translate(calc(-50% + ${bob.x}%),calc(-50% + ${bob.y}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})`;
     const comp = camera.aspect > 1 ? (1920 / 1080) / camera.aspect : 1;
-    const camH = Math.min(MAX_DISTANCE, MIN_DISTANCE / scale) * comp;
+    // 14 Nov 2026, Simon (phone): from the entrance to the berth a portrait screen sees a little more (x1.4), so both pier heads, the Albert Pier and the New North Quay are in view
+    const wideP = (CS.w || innerWidth) / (CS.h || innerHeight) < 0.8 ? 1 + 0.4 * smooth(0.15, 0.35, pz) * (1 - smooth(0.95, 1.05, pz)) : 1;
+    const camH = Math.min(MAX_DISTANCE, MIN_DISTANCE / scale) * comp * wideP;
     const fx = FX0;   // (chapter framing moves come later)
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), visW = 2 * camH * tanH * camera.aspect, visHw = 2 * camH * tanH; let off = (0.5 - fx) * visW;
     /* the end frame (10 Oct, Simon: show both vessels from above, plotter out of the way): over the last stretch the camera drifts from Kinship to the middle of the two berths and a touch east and north, so all three yachts (the two berths and the NNQ yacht across the channel) show, clear of the plotter */

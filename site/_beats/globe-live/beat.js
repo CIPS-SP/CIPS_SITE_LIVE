@@ -466,7 +466,10 @@ export async function mount(stage, o, ctx){
   const START = { lat: 49.45, lng: -2.5 };       // *** STARTING VIEW: point that faces you at load *** (the Channel Islands, upper-left — no Africa reveal)
   const CI_CENTER = { lat: 49.45, lng: -2.5 };   // frame the whole archipelago on approach
   const FAR_Z = 2.35, NEAR_Z = 1.16;             // FAR = world-view size (smaller = bigger globe); NEAR keeps London in frame
-  const CLOSE_DEPTH = 0.0062;                    // HLC lab: the deep zoom ends this far above the surface (≈ the night map's 42 m/px at Jersey)
+  const CLOSE_DEPTH = 0.0062;
+  // 14 Nov 2026, Simon (phone): on a tall narrow screen the yacht ended on Jersey's west coast (her end point is a fraction of the screen WIDTH, Jersey is centred, so on a phone
+  // they were only ~90 px apart) and sat there through the clouds. On a portrait screen the deep zoom stops higher (x1.8), she ends nearer the left edge and is drawn smaller.
+  const portrait = () => (host.clientWidth || 1440) / (host.clientHeight || 900) < 0.8, END_X_PORTRAIT = 0.15, PX_PORTRAIT = 0.55, DEPTH_PORTRAIT = 1.8;                    // HLC lab: the deep zoom ends this far above the surface (≈ the night map's 42 m/px at Jersey)
   let jerseyQuat = null;                         // the deep zoom settles Jersey to the centre, north up
   const startQuat = new THREE.Quaternion();
   const ciFacingQuat = new THREE.Quaternion();   // both computed once lonLatToVec3 is available
@@ -534,7 +537,8 @@ export async function mount(stage, o, ctx){
     try {
       const base = new URL('../channel-night/', import.meta.url).href;
       const meta = await (await fetch(base + 'assets/plate-islands.json', { cache: 'force-cache' })).json(); const b = meta.bounds;
-      const tex = await new Promise((res, rej) => new THREE.TextureLoader().load(base + 'assets/' + meta.file, res, undefined, rej));
+      const phone = matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) <= 480;   // 14 Nov 2026: on a phone the half-size copy (106 MB of 3D memory at full size)
+      const tex = await new Promise((res, rej) => new THREE.TextureLoader().load(base + 'assets/' + (phone ? meta.file.replace(/\.jpg$/, '-half.jpg') : meta.file), res, undefined, rej));
       tex.minFilter = THREE.LinearMipmapLinearFilter; tex.anisotropy = 8; if ('colorSpace' in tex) tex.colorSpace = THREE.SRGBColorSpace;
       const { tx, ty } = mercUV(), n = 1; const u0 = tx(b.west, n), u1 = tx(b.east, n), v0 = ty(b.north, n), v1 = ty(b.south, n);
       const geo = patchGeometry(b.west, b.east, b.south, b.north, (lon, lat) => [(tx(lon, n) - u0) / (u1 - u0), 1 - (ty(lat, n) - v0) / (v1 - v0)], CFG.radius * 1.0017, 64, 64);
@@ -799,7 +803,7 @@ export async function mount(stage, o, ctx){
     const w = smooth(KIN.endBlend[0], KIN.endBlend[1], p);
     if (w > 0) {
       const Hh = host.clientHeight || 900, Ww = host.clientWidth || 1440, tanH = Math.tan(CFG.fov / 2 * Math.PI / 180);
-      const xw = ((KIN.endScreen.x - 0.02) * 2 - 1) * depth * tanH * (Ww / Hh), yw = (1 - KIN.endScreen.y * 2) * depth * tanH;   // world offsets at the surface (the host is shifted right by 2 vw)
+      const xw = (((portrait() ? END_X_PORTRAIT : KIN.endScreen.x) - 0.02) * 2 - 1) * depth * tanH * (Ww / Hh), yw = (1 - KIN.endScreen.y * 2) * depth * tanH;   // world offsets at the surface (the host is shifted right by 2 vw)
       const Rl = CFG.radius * KIN.lift, zw = Math.sqrt(Math.max(0, Rl * Rl - xw * xw - yw * yw));
       { const hit = new THREE.Vector3(xw, yw, zw);
         const inv = globe.quaternion.clone().invert(); const nEnd = hit.applyQuaternion(inv).normalize();
@@ -822,7 +826,7 @@ export async function mount(stage, o, ctx){
     const aisPx = lerp(ais.px[0], ais.px[1], smooth(0, 1, uK)) * lerp(PING_PX / ais.px[0], 1, kinGrow);
     // the plan-view sprite starts at exactly the AIS marker's size at the moment it takes over — no pop — then keeps growing
     const pxAtHandoff = lerp(ais.px[0], ais.px[1], smooth(0, 1, cf[0]));
-    const px = lerp(pxAtHandoff, KIN.px[1], smooth(cf[0], 1, uK));
+    const px = lerp(pxAtHandoff, KIN.px[1] * (portrait() ? PX_PORTRAIT : 1), smooth(cf[0], 1, uK));
     const HH = host.clientHeight || 900, worldPerPx = 2 * depth * Math.tan(CFG.fov / 2 * Math.PI / 180) / HH;
     const len = px * worldPerPx; kin.mesh.scale.set(len, len, 1);
     kin.mat.opacity = planFade;
@@ -1062,7 +1066,7 @@ export async function mount(stage, o, ctx){
     const w = smooth(VOYAGE_ROUTE.endBlend[0], VOYAGE_ROUTE.endBlend[1], p);
     if (w > 0) {
       const Hh = host.clientHeight || 900, Ww = host.clientWidth || 1440, tanH = Math.tan(CFG.fov / 2 * Math.PI / 180);
-      const xw = ((VOYAGE_ROUTE.endScreen.x - 0.02) * 2 - 1) * depth * tanH * (Ww / Hh), yw = (1 - VOYAGE_ROUTE.endScreen.y * 2) * depth * tanH;
+      const xw = (((portrait() ? END_X_PORTRAIT : VOYAGE_ROUTE.endScreen.x) - 0.02) * 2 - 1) * depth * tanH * (Ww / Hh), yw = (1 - VOYAGE_ROUTE.endScreen.y * 2) * depth * tanH;
       const Rl = CFG.radius * VOYAGE_ROUTE.lift, zw = Math.sqrt(Math.max(0, Rl * Rl - xw * xw - yw * yw));
       const hit = new THREE.Vector3(xw, yw, zw);
       const inv = globe.quaternion.clone().invert(); const nEnd = hit.applyQuaternion(inv).normalize();
@@ -1078,7 +1082,7 @@ export async function mount(stage, o, ctx){
     const ais = KIN_AIS, cf = ais.crossfade, planFade = smooth(cf[0], cf[1], uK), aisFade = 1 - planFade;
     const aisPx = lerp(ais.px[0], ais.px[1], smooth(0, 1, uK));
     const pxAtHandoff = lerp(ais.px[0], ais.px[1], smooth(0, 1, cf[0]));
-    const px = lerp(pxAtHandoff, VOYAGE_ROUTE.px[1], smooth(cf[0], 1, uK));
+    const px = lerp(pxAtHandoff, VOYAGE_ROUTE.px[1] * (portrait() ? PX_PORTRAIT : 1), smooth(cf[0], 1, uK));
     const HH = host.clientHeight || 900, worldPerPx = 2 * depth * Math.tan(CFG.fov / 2 * Math.PI / 180) / HH;
     const len = px * worldPerPx; routeShip.mesh.scale.set(len, len, 1);
     routeShip.mat.opacity = planFade;
@@ -2284,7 +2288,7 @@ export async function mount(stage, o, ctx){
     // HLC lab — the deep zoom: from 70% the camera keeps coming, exponentially (constant perceived rate), down to CLOSE_DEPTH above
     // Jersey, while the globe eases from the archipelago-centred frame to Jersey-centred, north up
     const z2 = smooth(0.70, 1.0, p);
-    const depth = (NEAR_Z - CFG.radius) * Math.pow(CLOSE_DEPTH / (NEAR_Z - CFG.radius), z2);
+    const depth = (NEAR_Z - CFG.radius) * Math.pow(CLOSE_DEPTH * (portrait() ? DEPTH_PORTRAIT : 1) / (NEAR_Z - CFG.radius), z2);
     if (!jerseyQuat) jerseyQuat = faceQuat(-2.11, 49.19);
     if (z2 > 0) globe.quaternion.slerp(jerseyQuat, smooth(0, 0.5, z2));
     const hold = live ? live.focusDepth(p, f) : 1;                                      // the picker's Show / Back to the Gateway zoom, while the globe is in its hold

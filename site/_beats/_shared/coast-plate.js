@@ -10,6 +10,10 @@
    drift — this file gives each its own small placement function, both operating on the same plate object this
    file's own builder returns. */
 import * as THREE from 'three';
+// 14 Nov 2026 (Simon's phone kept crashing: about 580 MB of pictures in 3D memory at load, 780 MB in the harbour): on a phone the big coast plates load at half size
+// (sw-plate-half.webp, wide-plate-half.webp: a quarter of the memory each, and still sharper than a phone screen needs). The same test as the scenes' own.
+export const PHONE_LITE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) <= 480;
+export const liteSrc = s => PHONE_LITE && /(sw-plate|wide-plate)\.webp$/.test(s) ? s.replace(/\.webp$/, '-half.webp') : s;
 
 /* Land grade (16-20 Oct 2026, Simon: the tilt-shift look; "bring the greens back ever so slightly", "add the shoreline glow we had in papercut relief", "make the browns a bit richer and more
    visible, especially around the cliffs, coasts"): the satellite land is graded in the plate's own fragment shader.
@@ -62,7 +66,7 @@ export const SW_PLATE_FEATHER = [0, 230, 230, 0];   // sw-plate.webp fades out o
 export function createCoastPlate(scene, renderer, { src, wPx, hPx, mPerPx, mPerUnit, bounds, order, scale = 1, grade = true, feather = null }) {
   // 3 Oct 2026: initTexture uploads to the GPU as soon as the image arrives, instead of at the first frame the plate is visible
   // (a multi-MB upload landing mid-scroll is a visible hitch when a beat first reveals a plate)
-  const tex = new THREE.TextureLoader().load(src, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); try { renderer.initTexture?.(t); } catch (_) {} });
+  const tex = new THREE.TextureLoader().load(liteSrc(src), t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); try { renderer.initTexture?.(t); } catch (_) {} });
   const geo = new THREE.PlaneGeometry(wPx * mPerPx / mPerUnit * scale, hPx * mPerPx / mPerUnit * scale);
   const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false, opacity: 0.97 });   // always over the sea: no z-fight at range
   if (grade) { mat.onBeforeCompile = shader => { shader.uniforms.uGradeMPP = { value: mPerPx }; const f = feather || [0, 0, 0, 0]; shader.uniforms.uFeather = { value: new THREE.Vector4(f[0] / wPx, f[1] / wPx, f[2] / hPx, f[3] / hPx) }; const nl = String.fromCharCode(10); shader.fragmentShader = shader.fragmentShader.replace('void main() {', GRADE_HEAD + 'void main() {').replace('#include <map_fragment>', '#include <map_fragment>' + nl + GRADE_GLSL); }; mat.customProgramCacheKey = () => 'coast-grade-5'; }

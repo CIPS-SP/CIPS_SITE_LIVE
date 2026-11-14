@@ -39,3 +39,7 @@ Every page, the journey's opening, the home sections, the legal pages, the 404 p
 - The games' phone controls, once finding 1 is decided.
 - Tablets.
 - Loading on mobile data. The journey's clips are 2 to 4 MB each, and the departure film is 18 MB.
+
+## Simon on his phone, 14 Nov (after the real scenes went live)
+- **It crashed** ("a problem repeatedly occurred") by the turn into the main harbour: the phone ran out of memory. Fixed as far as can be measured here: about 330 MB of 3D pictures at the peak instead of 780 MB (see HANDOVER.md). Still to confirm on his phone.
+- No vessel name on a phone; the yacht no longer ends on Jersey's west coast at the end of the globe; the plotter's Expand fills to the right (it went full screen, blank, and could not be closed); the plotter and the footage are the same height; Noirmont and the bay are slower to scroll; the harbour is a little wider from the entrance to the berth.
