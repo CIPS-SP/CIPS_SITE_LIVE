@@ -586,7 +586,7 @@ export async function mount(stage, o, ctx) {
   }
   const plotter = o.nav !== false ? mountNavPlotter(stage, { GEO: plotGEO, route: plotRoute, shipLatLng: () => exitFix ? exitFix.pos : curPos, headingDeg: () => exitFix ? exitFix.hdg : curHdg, speedKts: () => exitFix ? exitFix.kn : curSpeed, zoomTarget: () => plotZoom, hiChart: [{ src: ctx.base + 'assets/chart-mid.webp', meta: ctx.base + 'assets/chart-mid.json', from: 0.25, span: 0.10 }, { src: ctx.base + 'assets/chart-hi.webp', meta: ctx.base + 'assets/chart-hi.json', from: 0.8, span: 0.4 }]   /* the wide z16 chart over the whole approach from a quarter of the main chart's scale, the sharp z18 harbour chart over it for the closest zooms (23 Oct 2026, Simon: the sharp chart showed as a rectangle) */, compact: coarse, assetsBase: seaway, markNames: NAVAID_UNNAMED }) : null;
   const vm = (o.video !== false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage, { moments: o.videoMoments.map(m => Object.assign({ src: ctx.base + '../../videos/journey/' + m.file + '.mp4', poster: ctx.base + '../../videos/journey/' + m.file + '.jpg' }, m)), plotter, reduced: ctx.reduced }) : null;
-  let cardClosed = false, quayMark = false;
+  let cardClosed = false, quayMark = false, endMark = false;
   const finHost = ctx && ctx.layer ? ctx.layer.parentElement : null, fin = (o.finaleTail > 0 && finHost) ? createFinale({ stage, host: finHost, reduced: ctx.reduced, tail: o.finaleTail, auto: o.finaleAuto === true }) : null;   // the closing line and the shrink into the home page (finale.js); only in the pinned page, not in a stand-alone demo
 
   // ---- hull sizing: identical to noirmont, so the wide hold looks exactly the same ----
@@ -773,11 +773,12 @@ export async function mount(stage, o, ctx) {
       hdg = h0 + dh * smooth(0.0, 0.14, r); curHdg = hdg; curSpeed = 7 * smooth(0.04, 0.16, r);
       finDisp = [(curPos[0] - bp[0]) * 111320, (curPos[1] - bp[1]) * 111320 * Math.cos(bp[0] * Math.PI / 180)];
     }
+    // 14 Nov 2026, Simon (phone): from the entrance to the berth a portrait screen sees more (up to x2.1), so both pier heads, the Albert Pier and the New North Quay are in view;
+    // the yacht is drawn smaller by the same amount (it is not part of the 3D picture), or it came out bigger than the yacht on the New North Quay
+    const wideP = (CS.w || innerWidth) / (CS.h || innerHeight) < 0.8 ? 1 + (0.5 * smooth(0.15, 0.35, pz) + 0.6 * smooth(0.45, 0.7, pz)) * (1 - smooth(0.95, 1.05, pz)) : 1;
     const turn = hdg - BASE_HEADING;
-    shipEl.style.transform = EAST ? `translate(calc(-50% + ${bob.y * 0.2}%),calc(-50% + ${bob.x}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})` : `translate(calc(-50% + ${bob.x}%),calc(-50% + ${bob.y}%)) rotate(${turn.toFixed(2)}deg) scale(${scale})`;
+    shipEl.style.transform = EAST ? `translate(calc(-50% + ${bob.y * 0.2}%),calc(-50% + ${bob.x}%)) rotate(${turn.toFixed(2)}deg) scale(${scale / wideP})` : `translate(calc(-50% + ${bob.x}%),calc(-50% + ${bob.y}%)) rotate(${turn.toFixed(2)}deg) scale(${scale / wideP})`;
     const comp = camera.aspect > 1 ? (1920 / 1080) / camera.aspect : 1;
-    // 14 Nov 2026, Simon (phone): from the entrance to the berth a portrait screen sees a little more (x1.4), so both pier heads, the Albert Pier and the New North Quay are in view
-    const wideP = (CS.w || innerWidth) / (CS.h || innerHeight) < 0.8 ? 1 + (0.4 * smooth(0.15, 0.35, pz) + 0.35 * smooth(0.45, 0.7, pz)) * (1 - smooth(0.95, 1.05, pz)) : 1;
     const camH = Math.min(MAX_DISTANCE, MIN_DISTANCE / scale) * comp * wideP;
     const fx = FX0;   // (chapter framing moves come later)
     const tanH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), visW = 2 * camH * tanH * camera.aspect, visHw = 2 * camH * tanH; let off = (0.5 - fx) * visW;
@@ -800,7 +801,7 @@ export async function mount(stage, o, ctx) {
     if (quay) quay.update(q, geoK, t, smooth(0.50, 0.66, p), cardClosed ? 0 : 1);   // (the brow comes in with the pontoon, as soon as the berth can be seen)
     if (plotter) plotter.update();
     if (fin) fin.update(r);
-    { const inQ = pz > 1.0 && pz < 2.0; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } }   // 14 Nov 2026 (beat.css: on a phone no plotter at the quay)
+    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.56; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
     if (vm) vm.update(pz, { blocked: holdGame.active || berthGame.active });
     if (copyEl) {
       let ch = null, c = 0;

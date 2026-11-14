@@ -297,3 +297,15 @@
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){ html:has(.beat-st-helier-approach .sq-list.sq-on) #skipToCips{ display:none !important; } }
 /* 14 Nov 2026, Simon: on a phone no plotter at the quay, and the On Scene footage moves to the left; the plotter comes back for the finale (html.cips-quay, set by beat.js) */
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-quay .beat-st-helier-approach .plotter-box{ display:none !important; } html.cips-quay .vm-box{ right:auto !important; left:10px !important; transform-origin:left bottom !important; } }
+/* 14 Nov 2026, Simon: on a phone the quay card covered the top of the brow, where the provisions crew walk; at the quay the bottom right is free (no plotter, the footage is
+   bottom left), so the card sits there as a narrow list the size of the footage window */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){
+  html.cips-quay .beat-st-helier-approach .sq-list{ top:auto !important; left:auto !important; right:10px !important; bottom:14px !important; width:160px !important; padding:6px 8px 4px !important; }
+  html.cips-quay .beat-st-helier-approach .sq-now{ font-size:9.5px !important; padding:3px 6px !important; margin-bottom:3px !important; }
+  html.cips-quay .beat-st-helier-approach .sq-rows{ display:block !important; }
+  html.cips-quay .beat-st-helier-approach .sq-row{ display:grid !important; grid-template-columns:12px 1fr auto !important; justify-items:start !important; align-items:center; column-gap:6px !important; text-align:left !important; padding:3px 0 4px !important; border-top:1px solid rgba(255,255,255,.07) !important; }
+  html.cips-quay .beat-st-helier-approach .sq-row span{ font-size:9.5px !important; }
+  html.cips-quay .beat-st-helier-approach .sq-row b{ grid-column:3 !important; grid-row:1 !important; text-align:right !important; font-size:9px !important; justify-self:end; }
+  html.cips-quay .beat-st-helier-approach .sq-row em{ left:18px !important; right:0 !important; }
+}
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-fin-end .beat-st-helier-approach .plotter-box{ display:none !important; } }   /* 14 Nov 2026, Simon: no plotter over the last shot at sea (the closing line and the badge) */
