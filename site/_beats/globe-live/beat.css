@@ -432,3 +432,8 @@
   :is(#beats,body) .beat-globe-live > .beat-stage :is([data-g="globe"],[data-g="globeglow"],[data-g="islands"]){transition:translate .8s ease}
   :is(#beats,body) .beat-globe-live > .beat-stage.globe-intro :is([data-g="globe"],[data-g="globeglow"],[data-g="islands"]){translate:6vw -27vh}
 }
+
+/* 14 Nov 2026, Simon (phone): the voyage card and its Scroll to continue bar sit at the bottom too, below the globe, like the intro */
+@media (max-width:760px){
+  :is(#beats,body) .beat-globe-live > .beat-stage.vcard-panel.voyage-mode:not(.globe-intro):not(.following) [data-live="panel"]{top:auto !important;bottom:calc(14px + 64px) !important}   /* (as specific as globe-enhancements.js's top:160px rule, plus one, so this wins) */
+}
