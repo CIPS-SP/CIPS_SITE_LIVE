@@ -71,14 +71,19 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // 17 Nov 2026, evening (Simon: "the video autoplayed but was super laggy and jerky"): the page used to be moved along with the film every frame, which an iPhone cannot do smoothly while it plays a film.
   // Now the page stays STILL while the film plays: the scene's r is taken from the film's own clock (filmR, called by beat.js before everything else), and the page is put where that r is only when it has to be:
   // the moment a finger touches the screen (before it moves, so nothing is seen to jump: the stage is pinned), when anything else scrolls it, and at the end of the hold.
-  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0;
+  // 18 Nov 2026, Simon: on a phone the pull-back from the quay plays by itself as well (film.pullS, film.holdIn): from the moment the services card starts to fold (CLOSE_R) the page waits holdIn
+  // seconds (the card folds, then its completion message flashes), then the camera pulls back by itself over pullS seconds and cuts to the film, which plays on as above. Same rules: still page, the scene
+  // follows its own clock, a finger stops it and can rewind, it carries on 0.7 s after the finger lifts. On arriving, a glide is braked (as at the top of the main site) so it cannot carry the visitor past it.
+  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0, fPull = false, fHoldAt = 0, fHoldDone = false;
+  const fStart = () => film.pullS ? CLOSE_R : film.from;
+  const brake = () => { if (root.style.overflow) return; root.style.overflow = 'hidden'; setTimeout(() => { if (root.style.overflow === 'hidden') root.style.overflow = ''; }, 700); };
   const syncPage = () => { if (vr === null) return; const y = scrollY; if (pxR) scrollTo({ top: y + (vr - lastReal) * pxR, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
   const stopFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } syncPage(); };
   if (film && !reduced) {
     addEventListener('touchstart', e => { fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; if (fZone) stopFilm(); }, { passive: true });
     const lift = () => { fTouch = false; fUserAt = performance.now(); }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
-    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && film.vm.filmReady()) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards: stopped)
-    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && film.vm.filmReady()) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
+    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && (fPull || film.vm.filmReady())) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards: stopped)
+    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && (fPull || film.vm.filmReady())) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
   }
   function filmR(r) {   // r from the scroll -> the r the scene shows
     if (!film || reduced) return r;
@@ -87,9 +92,17 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     if (fMine !== null && Math.abs(y - fMine) > 3) { fUserAt = now; if (vr !== null) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } vr = null; } }   // scrolled by something else (a glide, a link): the scroll is the truth again
     fMine = y; lastReal = r;
     const cur = vr !== null ? vr : r;
-    fZone = cur >= film.from && cur < film.holdTo;
+    fZone = cur >= fStart() && cur < film.holdTo; fPull = fZone && cur < film.from;
+    if (cur < CLOSE_R) { fHoldAt = 0; fHoldDone = false; }   // back at the quay: the wait happens again next time
     if (!fZone) { stopFilm(); return r; }
+    if (fPull && !fHoldDone && !fHoldAt) { fHoldAt = now; brake(); }   // the card has started to fold: the wait starts, and a glide stops here
     if (fTouch || now - fUserAt < FILM_RESUME_MS || away || document.hidden) { stopFilm(); return r; }   // by hand: video-moment.js scrubs the film to the scroll
+    if (fPull) {   // the pull-back, by itself, after the wait
+      if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
+      if (!fHoldDone) { if (now - fHoldAt < film.holdIn * 1000) return cur; fHoldDone = true; }
+      vr = Math.min(film.from, cur + (film.from - CLOSE_R) / film.pullS * dt);
+      return vr;
+    }
     if (cur < film.to) {
       if (!fPlaying) { if (!film.vm.filmPlay(film.rate)) return cur; fPlaying = true; }
       const fr = film.vm.filmFrac(); if (fr == null) return cur;

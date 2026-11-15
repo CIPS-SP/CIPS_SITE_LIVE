@@ -268,9 +268,11 @@
 @keyframes sqRowsOut { from { max-height:var(--rows-h, 220px); } to { max-height:0; } }
 @keyframes sqBlink { 0%, 100% { opacity:1; } 45% { opacity:.12; } }
 @keyframes sqOutFade { to { opacity:0; } }
+/* 18 Nov 2026, Simon: as the card starts to fold the message fades to nothing (0.3 s), stays away while the rows fold (to 2.2 s), then the completion message appears and flashes three times (to 4.3 s) */
+@keyframes sqDoneIn { 0% { opacity:1; } 6.98% { opacity:0; } 51.16% { opacity:0; } 54.65% { opacity:1; } 60.47% { opacity:.12; } 67.44% { opacity:1; } 75.58% { opacity:.12; } 83.72% { opacity:1; } 91.86% { opacity:.12; } 100% { opacity:1; } }
 .beat-st-helier-approach .sq-list.sq-out { animation:sqOutFade .9s 4.7s ease-in forwards; }   /* 17 Nov 2026, Simon: the message pulses three times AFTER the card has folded (2.2 s to 4.3 s), holds a moment, then the card fades */
 .beat-st-helier-approach .sq-list.sq-out .sq-rows { overflow:hidden; animation:sqRowsOut 2.2s cubic-bezier(.45,.05,.3,1) forwards; }   /* the rows shrink up from the bottom; the card's own glass (rounded, bordered) follows its height, so the bottom corners stay round */
-.beat-st-helier-approach .sq-list.sq-out .sq-now { animation:sqFade .5s 2.3s ease-out backwards, sqBlink .7s 2.2s ease-in-out 3 both; }   /* 1 Nov 2026, Simon: the message flashes WHILE the rows collapse (3 flashes over the 2.2 s), then holds still for 1.6 s, then the card fades */   /* (the first is the message's own fade-in from the card's opening, listed again so it is the SAME animation: switching this class on and off then only adds or removes the blink; it used to swap the fade-in for the blink and back, restarting the fade-in (message gone for 2.3 s) every time) */
+.beat-st-helier-approach .sq-list.sq-out .sq-now { animation:sqFade .5s 2.3s ease-out backwards, sqDoneIn 4.3s ease-in-out both; }   /* 1 Nov 2026, Simon: the message flashes WHILE the rows collapse (3 flashes over the 2.2 s), then holds still for 1.6 s, then the card fades */   /* (the first is the message's own fade-in from the card's opening, listed again so it is the SAME animation: switching this class on and off then only adds or removes the blink; it used to swap the fade-in for the blink and back, restarting the fade-in (message gone for 2.3 s) every time) */
 .beat-st-helier-approach .sq-lead.sq-out { animation:sqOutFade .9s 4.7s ease-in forwards; }
 @media (prefers-reduced-motion: reduce) { .beat-st-helier-approach .sq-list.sq-out, .beat-st-helier-approach .sq-lead.sq-out { animation:none !important; opacity:0 !important; } }
 
@@ -317,7 +319,7 @@
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){
   .beat-st-helier-approach .sq-list{ display:flex !important; flex-direction:column; }
   .beat-st-helier-approach .sq-now{ order:3; margin:4px 0 2px !important; }
-  .beat-st-helier-approach .sq-list.sq-out .sq-now{ animation:sqBlink .7s 2.2s ease-in-out 3 both !important; }
+  .beat-st-helier-approach .sq-list.sq-out .sq-now{ animation:sqDoneIn 4.3s ease-in-out both !important; }
 }
 /* 16 Nov 2026: the phone card rules above no longer depend on html.cips-quay: the card only exists at the quay, and switching it off between the end of the quay and its close restarted its animations (it vanished instead of folding) */
 /* 16 Nov 2026, Simon: the moored yachts drawn as pictures over the scene (beat.js, placeDressHtml), sharp at any screen resolution; under Kinship (z-index 2) */

@@ -380,7 +380,7 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
   lead.innerHTML = '<polyline class="sq-ln" pathLength="1" fill="none"/><g class="sq-xh"><circle class="sq-ring" r="7" fill="none"/><circle class="sq-pt" r="2.6"/><path d="M-13 0H-7M7 0H13M0 -13V-7M0 7V13" fill="none"/></g>'; stage.appendChild(lead);
   const leadLine = lead.querySelector('.sq-ln'), leadX = lead.querySelector('.sq-xh'), HULL_MID = faceAt(KIN_S - 2, 5.2), HULL_EDGE = faceAt(KIN_S - 2, 10.3);   // the middle of the yacht (she lies port side to the wall; starboard is the water side)
   let cardW = 0, cardH = 0, cardMeasure = 0;
-  let cardOut = false;   // 1 Nov 2026, Simon: when the way out begins the card closes as a timed animation: the five rows (.sq-rows) shrink up from the bottom, so the card itself gets shorter and keeps its rounded corners and border; the 'All services complete' line holds and blinks, then the rest goes (sq-out; --rows-h is the rows' full height)
+  let cardOut = false, outAt = 0;   // (outAt: when the card started to fold)   // 1 Nov 2026, Simon: when the way out begins the card closes as a timed animation: the five rows (.sq-rows) shrink up from the bottom, so the card itself gets shorter and keeps its rounded corners and border; the 'All services complete' line holds and blinks, then the rest goes (sq-out; --rows-h is the rows' full height)
   let cardOn = false;   // (31 Oct 2026, Simon: the call-out and the card fold out as a timed animation again, not scrubbed by the scroll: the sq-on class starts the CSS animations when the card first appears, and again if the visitor scrolls back and forward)
   function placeCard(a) {
     const narrow = innerWidth <= 520 || !project, on = a > 0.02;
@@ -598,7 +598,8 @@ export function createQuayWork({ scene, stage, faceAt, worldOffsetTo, M_PER_UNIT
     let now = ''; let best = -1; for (const [t0, t1, txt] of STEPS) if (T >= t0 && T < t1 && t0 > best) { best = t0; now = txt; }
     if (!now) now = T < TL.pump[0] ? 'Bunker connection in progress' : T < TL.pump[1] ? (T >= TL.g0 && T < TL.gEnd ? 'Garbage runs in progress' : 'Fuelling in progress') : 'Fuelling complete';
     else if (T >= TL.g0 && T < TL.gEnd && best < TL.g0) now = 'Garbage runs in progress';
-    if (best === TL.aOut[1] && !(outK < 0.995)) now = 'Bunkers departing';   // 17 Nov 2026, Simon: the completion message only comes up once the card has started to fold (the last step holds until then)
+    { const fold = outK < 0.995; if (!fold) outAt = 0; else if (!outAt) outAt = performance.now();
+      if (best === TL.aOut[1] && (!fold || performance.now() - outAt < 350)) now = 'Bunkers departing'; }   // 17 Nov 2026, Simon: the completion message only comes up once the card folds; 18 Nov 2026, Simon: 'Bunkers departing' fades to nothing as the card starts to fold, and the completion message appears once it has folded (beat.css, sqDoneIn; the text changes while it is hidden)
     if (now !== nowText) { nowEl.textContent = now; nowText = now; }
     putTag('D', w3pos || [0, 0], w3pos && T < TL.wdEnd ? 0.95 * (1 - seg(TL.wdS1[0] + 3.5, TL.wdS1[0] + 4.1, T)) : 0, 'Washdown');   // (29 Oct 2026, Simon: the call-out is on him from the moment he steps off the yacht ...; 4 Nov 2026, Simon: ... until a second after he starts spraying (the spray is full at wdS1[0] + 3.3), when it fades away)
     putTag('P', wp1 ? wp1.en : [0, 0], wp1 && carry >= 1 ? 0.95 : 0, 'Provisions');   // (his name card shows while he carries the load down to the yacht)
