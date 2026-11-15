@@ -100,7 +100,7 @@ export function installGlobeEnhancements(root = '#beats') {
   document.head.appendChild(style);
 
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
-  if (voyageButton) { voyageButton.textContent = 'Scroll the journey'; voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
+  if (voyageButton) { voyageButton.setAttribute('aria-label', 'Scroll the journey'); voyageButton.innerHTML = '<i class="gcta-arr" aria-hidden="true">\u2193</i>Scroll the journey<i class="gcta-arr" aria-hidden="true">\u2193</i>'; /* 18 Nov 2026, Simon: a down arrow at either end */ voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
   /* 6 Nov 2026, Simon: "Scroll the journey" (was "Play the journey"), so a visitor who just scrolls never has to click. Each separate scroll attempt
      (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first pulses the button three times; the second opens (Simon 6 Nov,
      was the third) the departure picker by itself, which unfolds slowly (1.8 s) with an orange glow (.unfold) to draw the eye. A further, separate scroll then starts the journey (arrangeDeparture).

@@ -76,14 +76,22 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // follows its own clock, a finger stops it and can rewind, it carries on 0.7 s after the finger lifts. On arriving, a glide is braked (as at the top of the main site) so it cannot carry the visitor past it.
   const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0, fPull = false, fHoldAt = 0, fHoldDone = false;
   const fStart = () => film.pullS ? CLOSE_R : film.from;
+  // 18 Nov 2026, Simon (it seemed to hang on the roundel and the line instead of going on to the main page): when the hold is over the page glides by itself (1.8 s) to the top of the main site,
+  // where index.html folds the journey away as for any arrival; a touch or a wheel stops the glide and leaves the visitor where they are
+  let glide = 0;
+  const stopGlide = () => { if (glide) { cancelAnimationFrame(glide); glide = 0; } };
+  const glideHome = () => { const oa = document.getElementById('openingAct'); if (!oa || glide) return; const y0 = scrollY, y1 = oa.getBoundingClientRect().bottom + scrollY; if (y1 <= y0 + 2) return; const t0 = performance.now(), D = 1800;
+    const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(2 - 2 * k, 3) / 2;
+      scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; };
+    glide = requestAnimationFrame(step); };
   const brake = () => { if (root.style.overflow) return; root.style.overflow = 'hidden'; setTimeout(() => { if (root.style.overflow === 'hidden') root.style.overflow = ''; }, 700); };
   const syncPage = () => { if (vr === null) return; const y = scrollY; if (pxR) scrollTo({ top: y + (vr - lastReal) * pxR, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
   const stopFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } syncPage(); };
   if (film && !reduced) {
-    addEventListener('touchstart', e => { fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; if (fZone) stopFilm(); }, { passive: true });
+    addEventListener('touchstart', e => { stopGlide(); fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; if (fZone) stopFilm(); }, { passive: true });
     const lift = () => { fTouch = false; fUserAt = performance.now(); }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
     addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && (fPull || film.vm.filmReady())) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards: stopped)
-    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && (fPull || film.vm.filmReady())) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
+    addEventListener('wheel', e => { stopGlide(); if (fZone && e.deltaY > 0 && !e.ctrlKey && (fPull || film.vm.filmReady())) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
   }
   function filmR(r) {   // r from the scroll -> the r the scene shows
     if (!film || reduced) return r;
@@ -110,7 +118,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     } else {
       if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
       vr = cur + (film.holdTo - film.to) / film.holdS * dt;
-      if (vr >= film.holdTo) { vr = film.holdTo + 1e-4; syncPage(); return lastReal; }   // the hold is over: the page goes to its end, and from there it is scrolled by hand
+      if (vr >= film.holdTo) { vr = film.holdTo + 1e-4; syncPage(); glideHome(); return lastReal; }   // the hold is over: the page goes to its end and glides on into the main site (18 Nov 2026; it used to wait to be scrolled by hand)
     }
     return vr;
   }

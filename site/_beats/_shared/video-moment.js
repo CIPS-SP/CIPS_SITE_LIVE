@@ -27,6 +27,11 @@ let wideSetting = false;   // the Expand choice carries from one moment (and one
 export function warpTime(warp, u, kept) { if (!warp || !warp.length) return u * kept; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i]; if (u <= c[0]) { const ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); return ta + (tc - ta) * (c[0] > a[0] ? (u - a[0]) / (c[0] - a[0]) : 1); } } return kept; }
 export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) t += c[1] - c[0]; else break; } return t; }
 // the way back (17 Nov 2026, the self-playing phone film): seconds of the file -> seconds of the kept film (a time inside a cut counts as its start), and kept seconds -> the 0..1 of the scrub window
+// 18 Nov 2026, Simon (the yacht's swoop up to the pier heads was too quick): a film file can have stretches played slower than the film they stand for (`tallStretch`: [[from, to, factor]] in film seconds,
+// the file made with in-between pictures, so it stays smooth); these turn film seconds into file seconds and back
+export function stretchFile(st, k) { let add = 0; for (const [a, b, f] of st || []) { if (k <= a) break; if (k < b) return k + add + (k - a) * (f - 1); add += (b - a) * (f - 1); } return k + add; }
+export function stretchKept(st, t) { let add = 0; for (const [a, b, f] of st || []) { const fa = a + add, fb = fa + (b - a) * f; if (t <= fa) break; if (t < fb) return a + (t - fa) / f; add += (b - a) * (f - 1); } return t - add; }
+const stretchExtra = st => (st || []).reduce((s, x) => s + (x[1] - x[0]) * (x[2] - 1), 0);
 export function uncutTime(cuts, t) { let k = t; for (const c of cuts || []) { if (t >= c[1]) k -= c[1] - c[0]; else if (t > c[0]) { k -= t - c[0]; break; } else break; } return k; }
 export function unwarpTime(warp, k, kept) { if (!warp || !warp.length) return kept > 0 ? Math.max(0, Math.min(1, k / kept)) : 0; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i], ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); if (k <= tc) return a[0] + (c[0] - a[0]) * (tc > ta ? Math.max(0, (k - ta) / (tc - ta)) : 1); } return 1; }
 let cssReady = null;
@@ -78,7 +83,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     // every frame is a whole picture (smooth to scrub), ending on the open sea centred on the yacht (`tallCuts` replaces `cuts`), with the CIPS roundel (`tallBadge`, images/brand) coming in above the yacht as it does in the wide film
     const tall = PHONE && m.phoneTall && innerHeight > innerWidth;
     const cuts0 = m.cuts;
-    if (tall) { m.cuts = m.tallCuts || []; m.box.classList.add('vm-tall'); const bd = document.createElement('div'); bd.className = 'vm-badge'; bd.setAttribute('aria-hidden', 'true');
+    if (tall) { m.cuts = m.tallCuts || []; m.stretch = m.tallStretch || null; m.box.classList.add('vm-tall'); const bd = document.createElement('div'); bd.className = 'vm-badge'; bd.setAttribute('aria-hidden', 'true');
       const im = new Image(); im.alt = ''; im.decoding = 'async'; im.onerror = () => bd.remove(); im.src = m.src.replace(/videos\/journey\/[^/]+$/, 'images/brand/' + (m.tallBadge || 'cips-roundel.png')); bd.appendChild(im);
       m.box.appendChild(bd); }
     const url = tall ? m.src.replace(/[^/]+\.mp4$/, m.phoneTall + '.mp4') : PHONE && m.phoneFile ? m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4') : m.src;
@@ -86,7 +91,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     if (m.scrub && PHONE) primeOnce();
     const loadScrub = u => { m.v.preload = 'auto'; fetch(u).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(bl => { if (m.blobUrl) URL.revokeObjectURL(m.blobUrl); m.blobUrl = URL.createObjectURL(bl); m.v.src = m.blobUrl; m.v.load(); if (tall) watchTall(); }).catch(() => { m.v.src = u; m.v.load(); if (tall) watchTall(); }); };
     // 16 Nov 2026, Simon (iPhone: the finale stuck on its first picture): should the phone not show the tall film (an error, or no picture 12 s after it arrives), it falls back to the wide 720p copy, cuts and all
-    let fellBack = false; const fallBack = () => { if (fellBack || !m.phoneFile) return; fellBack = true; m.cuts = cuts0; m.box.classList.remove('vm-tall', 'vm-badge-on'); m.tallOn = undefined; m.box.querySelector('.vm-badge')?.remove(); primeOnce(); loadScrub(m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4')); };
+    let fellBack = false; const fallBack = () => { if (fellBack || !m.phoneFile) return; fellBack = true; m.cuts = cuts0; m.stretch = null; m.box.classList.remove('vm-tall', 'vm-badge-on'); m.tallOn = undefined; m.box.querySelector('.vm-badge')?.remove(); primeOnce(); loadScrub(m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4')); };
     const watchTall = () => { if (fellBack) return; m.v.addEventListener('error', fallBack, { once: true }); setTimeout(() => { if (!fellBack && m.v.readyState < 2) fallBack(); }, 12000); };
     if (m.scrub) { loadScrub(url); return; }
     m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); };
@@ -96,7 +101,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // last wanted time is applied when the one in flight lands (the film is cut with a keyframe every 4 frames so a seek is cheap).
   // 5 Nov 2026, Simon: `cuts: [[from, to], ...]` (film seconds) are left out of a scrubbed film: the scroll runs through the rest as if they were not there (the file itself is not re-cut). cutTime() turns
   // seconds of the kept film into seconds of the file; beat.js uses the same to keep the plotter in step.
-  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = m.playing ? m.v.currentTime : cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (m.box.classList.contains('vm-tall')) { const on = m.want > 6.9; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.playing && !m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
+  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0) - stretchExtra(m.stretch); m.want = m.playing ? m.v.currentTime : stretchFile(m.stretch, cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept))); if (m.box.classList.contains('vm-tall')) { const on = stretchKept(m.stretch, m.want) > 6.9; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.playing && !m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
   F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && !m.playing && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
   function updateFull(p) {
     for (const m of F) {
@@ -193,5 +198,5 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     filmPause: () => { F.forEach(m => { if (m.playing) { m.playing = false; try { m.v.pause(); } catch (e) {} } }); },
     filmFrac: () => { const m = F.find(x => x.scrub && x.on && !x.bad); if (!m || !m.v.duration) return null; if (m.v.ended) return 1; const cuts = m.cuts || []; let t = m.v.currentTime;
       for (const c of cuts) if (t >= c[0] - 0.02 && t < c[1]) { try { m.v.currentTime = c[1]; } catch (e) {} t = c[1]; }   // a cut is jumped over as it is reached
-      const kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); return unwarpTime(m.warp, uncutTime(cuts, t), kept); } };   // (covered: a full screen film is up (its box is opaque from the moment it is on), so the scene under it need not be drawn: 17 Nov 2026, see st-helier-approach beat.js)   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
+      const kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0) - stretchExtra(m.stretch); return unwarpTime(m.warp, uncutTime(cuts, stretchKept(m.stretch, t)), kept); } };   // (covered: a full screen film is up (its box is opaque from the moment it is on), so the scene under it need not be drawn: 17 Nov 2026, see st-helier-approach beat.js)   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
 }
