@@ -182,5 +182,5 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // the runtime stops calling update() while the beat is off screen; stop the footage then too, and let it play afresh when the visitor comes back
   const watch = setInterval(() => { if (performance.now() - lastSeen > 2000) { if (active) swap(null); for (const m of F) if (m.on) fullOff(m); dismissed.clear(); done.clear(); } }, 400);   // (also forgets what the visitor closed, so scrolling away and back shows it again)
   function destroy() { clearInterval(watch); swap(null); for (const m of F) { fullOff(m); m.box.remove(); if (m.blobUrl) URL.revokeObjectURL(m.blobUrl); } root.remove(); }
-  return { update, destroy, root, isActive: () => !!active || F.some(m => m.on) };   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
+  return { update, destroy, root, isActive: () => !!active || F.some(m => m.on), covered: () => F.some(m => m.on && !m.bad) };   // (covered: a full screen film is up (its box is opaque from the moment it is on), so the scene under it need not be drawn: 17 Nov 2026, see st-helier-approach beat.js)   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
 }

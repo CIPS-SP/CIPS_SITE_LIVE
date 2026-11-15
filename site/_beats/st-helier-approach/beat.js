@@ -850,6 +850,8 @@ export async function mount(stage, o, ctx) {
     const shipRotDeltaFull = prevShipRotRad == null ? 0 : shipRotRad - prevShipRotRad; prevShipRotRad = shipRotRad;
     wake.uniforms.uWakeIntensity.value = (o.wakeIntensity + bob.force * .045) * (gm ? Math.max(0.45, Math.min(1.25, gm.u / 7)) : bgs ? Math.max(0.15, Math.min(1.25, bgs.groundKn() / 7)) : 1); uni.uWakeIntensity.value = wake.uniforms.uWakeIntensity.value;   // flown: the wake follows her speed
     const willRun = Math.min(3, Math.floor(acc / STEP)); wake.uniforms.uShipRotDelta.value = willRun > 0 ? shipRotDeltaFull / willRun : 0;
+    // 17 Nov 2026, Simon (the finale film jerky as he scrolled it on his phone): while the film is up full screen it hides the whole scene, so the sea, the wake and the harbour are not drawn under it (they were, every frame, unseen, and took the phone's graphics away from the film)
+    if (vm && vm.covered && vm.covered()) { acc = 0; return; }
     let n = 0; while (acc >= STEP && n < 3) { simT += STEP; wake.update(new THREE.Vector3(0, 0, o.wakeCenterY), STEP, simT); acc -= STEP; n++; }
     if (n === 3) acc = Math.min(acc, STEP); if (n > 0) uni.uHeightmap.value = wake.texture();
     placeDressHtml(); renderer.render(scene, camera);
