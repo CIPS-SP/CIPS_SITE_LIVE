@@ -74,7 +74,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // 18 Nov 2026, Simon: on a phone the pull-back from the quay plays by itself as well (film.pullS, film.holdIn): from the moment the services card starts to fold (CLOSE_R) the page waits holdIn
   // seconds (the card folds, then its completion message flashes), then the camera pulls back by itself over pullS seconds and cuts to the film, which plays on as above. Same rules: still page, the scene
   // follows its own clock, a finger stops it and can rewind, it carries on 0.7 s after the finger lifts. On arriving, a glide is braked (as at the top of the main site) so it cannot carry the visitor past it.
-  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0, fPull = false, fHoldAt = 0, fHoldDone = false;
+  const FILM_RESUME_MS = 700; let fPlaying = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0, fPull = false, fHoldAt = 0, fHoldDone = false;
   const fStart = () => film.pullS ? CLOSE_R : film.from;
   // 18 Nov 2026, Simon (it seemed to hang on the roundel and the line instead of going on to the main page): when the hold is over the page glides by itself (1.8 s) to the top of the main site,
   // where index.html folds the journey away as for any arrival; a touch or a wheel stops the glide and leaves the visitor where they are
@@ -84,27 +84,42 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(2 - 2 * k, 3) / 2;
       scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; };
     glide = requestAnimationFrame(step); };
-  const brake = () => { if (root.style.overflow) return; root.style.overflow = 'hidden'; setTimeout(() => { if (root.style.overflow === 'hidden') root.style.overflow = ''; }, 700); };
-  const syncPage = () => { if (vr === null) return; const y = scrollY; if (pxR) scrollTo({ top: y + (vr - lastReal) * pxR, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
+  /* 18 Nov 2026, later, Simon (a fast flick at the end of the quay flew through the finale with the card still up, and trying to scroll on while the film played paused it for a moment, so it juddered):
+     from the moment the card starts to fold the page is LOCKED: it cannot be scrolled on at all (overflow hidden stops a glide, every touch move is taken over), and a flick that has already
+     carried past the fold is put back to it. Going back still works, by hand: a finger dragged DOWN (decided once it has gone 10 px down) pauses the film and the page follows the finger back,
+     never further on than where the playback was; a finger pushing up, or a tap, does nothing to the film. Unlocked again back at the quay, while the film is still loading, and at the end. */
+  let fLock = false, fBack = false, fGest = false, fT0 = 0, fMax = 0, fPrev = -1, fCalled = 0;
+  if (film && !reduced) setInterval(() => { if (fLock && performance.now() - fCalled > 600) setLock(false); }, 300);   // never left locked when the scene is no longer being drawn (Skip to CIPS, a link, the page in the background)
+  const pxOf = () => (film.pxPerR && film.pxPerR()) || pxR;
+  const setLock = on => { if (on === fLock) return; fLock = on; if (on) root.style.overflow = 'hidden'; else if (root.style.overflow === 'hidden') root.style.overflow = ''; };
+  const syncPage = () => { if (vr === null) return; const px = pxOf(); if (px) scrollTo({ top: scrollY + (vr - lastReal) * px, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
   const stopFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } syncPage(); };
+  const handNow = () => performance.now() - fUserAt < FILM_RESUME_MS;
+  const backStart = () => { if (!handNow()) { stopFilm(); fMax = scrollY; } };
+  const backBy = dy => { if (!dy) return; scrollTo({ top: Math.min(fMax, Math.max(0, scrollY - 6 * dy)), behavior: 'instant' }); fUserAt = performance.now(); };   // the page follows the finger back, 6 px to each px of the finger (one screen's drag is about a second of film), never on past where the playback was
   if (film && !reduced) {
-    addEventListener('touchstart', e => { stopGlide(); fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; if (fZone) stopFilm(); }, { passive: true });
-    const lift = () => { fTouch = false; fUserAt = performance.now(); }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
-    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && (fPull || film.vm.filmReady())) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards: stopped)
-    addEventListener('wheel', e => { stopGlide(); if (fZone && e.deltaY > 0 && !e.ctrlKey && (fPull || film.vm.filmReady())) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
+    addEventListener('touchstart', e => { stopGlide(); fTouchY = fT0 = e.touches[0] ? e.touches[0].clientY : 0; fGest = fLock; fBack = false; }, { passive: true });
+    const lift = () => { if (fBack) fUserAt = performance.now(); fBack = false; fGest = false; }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
+    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY;
+      if (fGest) { if (e.cancelable) e.preventDefault(); if (!fBack && y - fT0 > 10) { fBack = true; backStart(); backBy(y - fT0 - 10); } else if (fBack) backBy(y - fTouchY); }
+      fTouchY = y; }, { passive: false });
+    addEventListener('wheel', e => { stopGlide(); if (!fLock || e.ctrlKey) return; e.preventDefault(); if (e.deltaY < 0) { backStart(); backBy(-e.deltaY / 6); } }, { passive: false });
   }
   function filmR(r) {   // r from the scroll -> the r the scene shows
     if (!film || reduced) return r;
-    const now = performance.now(), dt = Math.min(0.25, Math.max(0, (now - fLastT) / 1000)); fLastT = now; const y = scrollY;
+    const now = performance.now(), dt = Math.min(0.25, Math.max(0, (now - fLastT) / 1000)); fLastT = now; fCalled = now; let y = scrollY;
     if (r > 0 && r < 1) { if (calY === null) { calY = y; calR = r; } else if (Math.abs(y - calY) >= 300 && Math.abs(r - calR) > 1e-4) { const e = (y - calY) / (r - calR); if (e > 0 && isFinite(e)) pxR = e; calY = y; calR = r; } } else calY = null;   // pixels of scroll per unit of r, measured over at least 300 px (only while the page itself moves)
     if (fMine !== null && Math.abs(y - fMine) > 3) { fUserAt = now; if (vr !== null) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } vr = null; } }   // scrolled by something else (a glide, a link): the scroll is the truth again
+    // a flick that has carried past the fold in one go is put back to it (the card folds, the message flashes, then it all plays from there)
+    if (vr === null && fPrev < CLOSE_R && r > CLOSE_R + 0.002 && r < film.holdTo && fStart() === CLOSE_R) { const px = pxOf(); if (px) { const back = CLOSE_R + 0.0006; setLock(true); scrollTo({ top: y - (r - back) * px, behavior: 'instant' }); y = scrollY; r = back; } }
     fMine = y; lastReal = r;
-    const cur = vr !== null ? vr : r;
+    const cur = vr !== null ? vr : r; fPrev = cur;
     fZone = cur >= fStart() && cur < film.holdTo; fPull = fZone && cur < film.from;
     if (cur < CLOSE_R) { fHoldAt = 0; fHoldDone = false; }   // back at the quay: the wait happens again next time
+    setLock(fZone && (fPull || cur >= film.to || film.vm.filmReady()));   // (not while the film is still loading: it is then scrolled by hand)
     if (!fZone) { stopFilm(); return r; }
-    if (fPull && !fHoldDone && !fHoldAt) { fHoldAt = now; brake(); }   // the card has started to fold: the wait starts, and a glide stops here
-    if (fTouch || now - fUserAt < FILM_RESUME_MS || away || document.hidden) { stopFilm(); return r; }   // by hand: video-moment.js scrubs the film to the scroll
+    if (fPull && !fHoldDone && !fHoldAt) fHoldAt = now;   // the card has started to fold: the wait starts
+    if (fBack || handNow() || away || document.hidden) { stopFilm(); return r; }   // by hand (going back): video-moment.js scrubs the film to the scroll
     if (fPull) {   // the pull-back, by itself, after the wait
       if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
       if (!fHoldDone) { if (now - fHoldAt < film.holdIn * 1000) return cur; fHoldDone = true; }
@@ -118,7 +133,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     } else {
       if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
       vr = cur + (film.holdTo - film.to) / film.holdS * dt;
-      if (vr >= film.holdTo) { vr = film.holdTo + 1e-4; syncPage(); glideHome(); return lastReal; }   // the hold is over: the page goes to its end and glides on into the main site (18 Nov 2026; it used to wait to be scrolled by hand)
+      if (vr >= film.holdTo) { vr = film.holdTo + 1e-4; syncPage(); setLock(false); glideHome(); return lastReal; }   // the hold is over: the page goes to its end and glides on into the main site (18 Nov 2026; it used to wait to be scrolled by hand)
     }
     return vr;
   }

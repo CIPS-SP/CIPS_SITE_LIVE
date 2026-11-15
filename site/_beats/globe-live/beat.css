@@ -163,6 +163,7 @@
     border:1px dashed rgba(255,255,255,.24);border-radius:9px;padding:8px 11px;font:500 11.5px 'Jost',sans-serif;letter-spacing:.04em;
     cursor:pointer;text-align:center;transition:border-color .15s,color .15s}
 .beat-globe-live .lexample:hover{border-color:#FF8A1E;color:#FF8A1E}
+.beat-globe-live .lexample:has(.gcta-arr){white-space:nowrap}.beat-globe-live .lexample .gcta-arr{font-style:normal;display:inline-block;margin:0 .4em}   /* 18 Nov 2026, Simon: Scroll to start the journey (the picker's pill) with a down arrow at either end, like Scroll the journey (globe-enhancements.js) */
 .beat-globe-live .lexample:disabled{opacity:.5;cursor:default}
 /* 18 Sep 2026, Simon: a scroll attempt before either path is picked (voyagePulse(), beat.js) — both buttons pulse
    toward their own :hover look (outline only, not a solid fill — they're not armed yet, so reusing .armed's solid

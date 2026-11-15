@@ -101,6 +101,10 @@ export function installGlobeEnhancements(root = '#beats') {
 
   const voyageButton = stage.querySelector('[data-g="voyageCtaBtn"]');
   if (voyageButton) { voyageButton.setAttribute('aria-label', 'Scroll the journey'); voyageButton.innerHTML = '<i class="gcta-arr" aria-hidden="true">\u2193</i>Scroll the journey<i class="gcta-arr" aria-hidden="true">\u2193</i>'; /* 18 Nov 2026, Simon: a down arrow at either end */ voyageButton.addEventListener('click', () => stage.classList.remove('globe-intro')); }
+  { const ex = stage.querySelector('[data-g="voyageExample"]');   // 18 Nov 2026, Simon: the picker's pill (Scroll to start the journey) gets the arrows too, on one line; put back whenever the wording comes back (not on its longer later wording, which would not fit)
+    if (ex) { const arrows = () => { if (ex.querySelector('.gcta-arr')) return; const t = ex.textContent.trim(); if (!/^Scroll to start/i.test(t)) return; const a = () => { const i = document.createElement('i'); i.className = 'gcta-arr'; i.setAttribute('aria-hidden', 'true'); i.textContent = '↓'; return i; };
+        ex.replaceChildren(a(), document.createTextNode(t), a()); };
+      arrows(); new MutationObserver(arrows).observe(ex, { childList: true }); } }
   /* 6 Nov 2026, Simon: "Scroll the journey" (was "Play the journey"), so a visitor who just scrolls never has to click. Each separate scroll attempt
      (wheel, scroll keys or a finger swipe, after a pause of 0.7 s since the last scroll) counts: the first pulses the button three times; the second opens (Simon 6 Nov,
      was the third) the departure picker by itself, which unfolds slowly (1.8 s) with an orange glow (.unfold) to draw the eye. A further, separate scroll then starts the journey (arrangeDeparture).
