@@ -207,7 +207,7 @@ export async function run(list, opts = {}) {
   function frame(t) {
     requestAnimationFrame(frame); mainLoop = true;
     adaptQuality(t); frameId++;
-    for (const gname in groups) { const g = groups[gname]; const sc = -g.section.getBoundingClientRect().top; if (Math.abs(sc - (g._prevSc ?? sc)) > 0.5) g._moveAt = performance.now(); g._prevSc = sc; g._scrolled = sc; g._fid = frameId; }
+    for (const gname in groups) { const g = groups[gname]; const sc = -g.section.getBoundingClientRect().top; if (Math.abs(sc - (g._prevSc ?? sc)) > 0.5) g._moveAt = performance.now(); g._prevSc = sc; g._scrolled = sc; g._fid = frameId; g._gone = g.section.offsetHeight < 1; }
     if (hud) { let label = '';
       for (const b of beats) { const r = b.section.getBoundingClientRect(); if (!(r.top <= 0 && r.bottom > 0)) continue;
         if (b.group) { const g = groups[b.group]; const scrolled = -r.top; const m = g.members.find(m => scrolled >= m.start && scrolled < m.start + m.len) || g.members[g.members.length - 1];
@@ -217,6 +217,9 @@ export async function run(list, opts = {}) {
       hud.textContent = label || 'page top'; }
     for (const b of beats) {
       if (!b.ctrl || !b.visible) continue;
+      // 16 Nov 2026, Simon (phone: stuck and juddering at the top of the main site for 10-20 s after the finale): once the home page has folded the journey away (its group is 0 high),
+      // the group read as 'before its start' near the top of the page, so the globe was drawn again, unseen, behind the main site. A folded group is not drawn at all.
+      if (b.group && groups[b.group] && groups[b.group]._gone) continue;
       const p = progressOf(b); let carry = 0, footOnly = false;
       if (b.layer) {
         // a layer is live while its slice is active or it is the immediate neighbour of the active one; otherwise hidden (saves GPU)

@@ -248,6 +248,7 @@
     /* 1 Nov 2026, Simon: once the visitor is settled on the main site the journey above it can no longer be reached (the hold stops it), so it is collapsed: the document then really starts at the main site and a scrollbar drag or a touch fling cannot carry the page above it (they are scrolled by the browser's own thread, which no script can stop in time). The beats are clipped away (not removed), so they stop being seen by the runtime. */
     html.main-collapsed { overflow-anchor:none; }
     html.main-collapsed #openingAct { height:0 !important; min-height:0 !important; overflow:hidden !important; }
+    html.main-collapsed #openingAct > * { display:none !important; }   /* 16 Nov 2026, Simon (phone: stuck and juddering at the top of the main site for 10-20 s after the finale): the folded journey is taken out of the layout, so no scene in it (the globe was) is drawn unseen near the top of the page */
     html.main-collapsed .qr { margin-top:var(--hdr, 74px) !important; }   /* the space between the banner and the hero (1 Nov 2026, Simon) */
     /* 31 Oct 2026, Simon: the Replay the journey button (and every other button in the hero) did nothing: with the finale the home page starts a window early, under the end of the opening act, and that section catches the clicks. Once the page is on the main site, nothing in the opening act takes clicks. */
     html.on-cips-main #openingAct, html.on-cips-main #openingAct * { pointer-events:none !important; }
