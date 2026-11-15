@@ -300,15 +300,27 @@
 /* 14 Nov 2026, Simon: on a phone the quay card covered the top of the brow, where the provisions crew walk; at the quay the bottom right is free (no plotter, the footage is
    bottom left), so the card sits there as a narrow list the size of the footage window */
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){
-  html.cips-quay .beat-st-helier-approach .sq-list, .beat-st-helier-approach .sq-list.sq-out{ top:auto !important; left:auto !important; right:10px !important; bottom:14px !important; width:160px !important; padding:6px 8px 4px !important; }
-  html.cips-quay .beat-st-helier-approach .sq-now, .beat-st-helier-approach .sq-list.sq-out .sq-now{ font-size:9.5px !important; padding:3px 6px !important; margin-bottom:3px !important; }
-  html.cips-quay .beat-st-helier-approach .sq-rows, .beat-st-helier-approach .sq-list.sq-out .sq-rows{ display:block !important; }
-  html.cips-quay .beat-st-helier-approach .sq-row, .beat-st-helier-approach .sq-list.sq-out .sq-row{ display:grid !important; grid-template-columns:12px 1fr auto !important; justify-items:start !important; align-items:center; column-gap:6px !important; text-align:left !important; padding:3px 0 4px !important; border-top:1px solid rgba(255,255,255,.07) !important; }
-  html.cips-quay .beat-st-helier-approach .sq-row span, .beat-st-helier-approach .sq-list.sq-out .sq-row span{ font-size:9.5px !important; }
-  html.cips-quay .beat-st-helier-approach .sq-row b, .beat-st-helier-approach .sq-list.sq-out .sq-row b{ grid-column:3 !important; grid-row:1 !important; text-align:right !important; font-size:9px !important; justify-self:end; }
-  html.cips-quay .beat-st-helier-approach .sq-row em, .beat-st-helier-approach .sq-list.sq-out .sq-row em{ left:18px !important; right:0 !important; }
+  .beat-st-helier-approach .sq-list{ top:auto !important; left:auto !important; right:10px !important; bottom:14px !important; width:160px !important; padding:6px 8px 4px !important; }
+  .beat-st-helier-approach .sq-now{ font-size:9.5px !important; padding:3px 6px !important; margin-bottom:3px !important; }
+  .beat-st-helier-approach .sq-rows{ display:block !important; }
+  .beat-st-helier-approach .sq-row{ display:grid !important; grid-template-columns:12px 1fr auto !important; justify-items:start !important; align-items:center; column-gap:6px !important; text-align:left !important; padding:3px 0 4px !important; border-top:1px solid rgba(255,255,255,.07) !important; }
+  .beat-st-helier-approach .sq-row span{ font-size:9.5px !important; }
+  .beat-st-helier-approach .sq-row b{ grid-column:3 !important; grid-row:1 !important; text-align:right !important; font-size:9px !important; justify-self:end; }
+  .beat-st-helier-approach .sq-row em{ left:18px !important; right:0 !important; }
 }
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-fin-end .beat-st-helier-approach .plotter-box{ display:none !important; } }   /* 14 Nov 2026, Simon: no plotter over the last shot at sea (the closing line and the badge) */
-@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html:not(.cips-quay) .beat-st-helier-approach .sq-list:not(.sq-out){ display:none !important; } }   /* 15 Nov 2026, Simon: on a phone the card's closing animation showed it at the top again after the quay */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){ /* (16 Nov 2026: no longer hidden outside the quay; see the next note) */ }   /* 15 Nov 2026, Simon: on a phone the card's closing animation showed it at the top again after the quay */
 /* 16 Nov 2026, Simon: the card's closing animation (the rows fold up, the message flashes, the card fades) is back on a phone; it plays where the card sat at the quay, bottom right (.sq-out keeps that place) */
 @media (max-width:760px) and (orientation:portrait){ .beat-st-helier-approach .sfin-line{ bottom:7vh !important; } }   /* 16 Nov 2026, Simon: on a phone the closing line goes under the yacht (the tall film's last shot, centred on the yacht) */
+/* 16 Nov 2026, Simon: on a phone the card sits at the bottom, so its message goes under the rows: at the close the rows fold away above it and the message stays where it is,
+   showing throughout (it used to vanish from the top and come back at the bottom) */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){
+  .beat-st-helier-approach .sq-list{ display:flex !important; flex-direction:column; }
+  .beat-st-helier-approach .sq-now{ order:3; margin:4px 0 2px !important; }
+  .beat-st-helier-approach .sq-list.sq-out .sq-now{ animation:sqBlink .7s .1s ease-in-out 3 both !important; }
+}
+/* 16 Nov 2026: the phone card rules above no longer depend on html.cips-quay: the card only exists at the quay, and switching it off between the end of the quay and its close restarted its animations (it vanished instead of folding) */
+/* 16 Nov 2026, Simon: the moored yachts drawn as pictures over the scene (beat.js, placeDressHtml), sharp at any screen resolution; under Kinship (z-index 2) */
+.beat-st-helier-approach .sdress { position:absolute; left:0; top:0; z-index:1; transform-origin:0 0; opacity:0; pointer-events:none; max-width:none; will-change:transform; }
+/* 16 Nov 2026, Simon: at the quay the On Scene window is the card's height (about 150 px on screen, was 205): a wider look at the landscape footage, the two boxes a pair along the bottom */
+@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-quay .vm-box:not(.wide) .vm-frame{ height:214px !important; } }

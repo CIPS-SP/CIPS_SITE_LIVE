@@ -34,7 +34,7 @@ export const needs = [];   // nothing handed over: the start pose is derived fro
 const HULL_M = 50;   // Kinship's length against the land, in metres (the berth prototype used 50 m too) — declared up here because defaults uses it
 const CH = { x: 0.27, c1: 0.50 };   // p at the end of chapter 1 (Small Roads) and chapter 2 (the entrance); chapter 3 (the berth) runs to 1
 let U_X = 0.61, U_C1 = 0.865;   // those joins as fractions of the path's length; recomputed from the real path below
-const FILM_WARP = [[0, 0], [0.8, 6.04], [1, 9.19]];   // 15 Nov 2026 (see FILM_CUTS): the first three shots, 6.04 s of film, over 80% of the film's scroll; the open sea over the rest
+const FILM_WARP = [[0, 0], [0.7, 6.04], [1, 9.19]];   // 15 Nov 2026 (see FILM_CUTS): the first three shots, 6.04 s of film, over 70% of the film's scroll (80% until 16 Nov: Simon, the open sea, the roundel and the tagline went by too fast); the open sea over the rest
 export const defaults = {
   finaleTail: 0.13684,   // 5 Nov 2026 (quay shortened to one provisions run, story 2842 s -> 2216 s): 2400vh of the 17539vh track; chapters 1-3 2000vh, the quay 13139vh (was 0.11294 of 21250vh).   // 31 Oct 2026 (scrolled film): 2400vh of the 21250vh track (was 0.0737, 1500vh of 20350vh); the quay is still 16850vh and chapters 1-3 2000vh. (Older note:)   // 31 Oct 2026, Simon: chapter 5, the way out (the yacht casts off and the camera lifts, the Savannah departure full screen, the closing line, the shrink into the home page): 1500vh of the 20350vh track (finale.js). 0 = no finale (the beat then ends on the quay).
   finaleAuto: false,   // 14 Nov 2026, Simon: the finale is scrolled like the rest of the journey (true = the old self-playing finale, 1 Nov 2026)
@@ -498,7 +498,7 @@ export async function mount(stage, o, ctx) {
     // the yacht already berthed (south box, bow south): a greyer hull so it isn't a twin of the one under way
     const s = NEIGH.s;
     const m = new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false, opacity: 0, color: 0xcfd6dc });
-    addFlat(NEIGH.lenM, NEIGH.lenM * asp, m, faceAt(s, NEIGH_OFFSET_M), NEIGH.hdg, [0.50, 0.66]);
+    addFlat(NEIGH.lenM, NEIGH.lenM * asp, m, faceAt(s, NEIGH_OFFSET_M), NEIGH.hdg, [0.50, 0.66]); dressHtml(nm + 'assets/ship-plan.png', 'brightness(.84) saturate(.9)');   // (the greyer tint: was the material colour 0xcfd6dc)
   });
   new THREE.TextureLoader().load(ctx.base + 'assets/nnq-yacht.png', t => {
     t.colorSpace = THREE.SRGBColorSpace; const asp = t.image ? t.image.naturalHeight / t.image.naturalWidth : 0.18, lenM = NNQ_LEN_M;
@@ -508,7 +508,7 @@ export async function mount(stage, o, ctx) {
     const mid = offsetM(a, u[0] * s, u[1] * s);
     const brg = (Math.atan2(u[0], u[1]) * 180 / Math.PI + 360) % 360, west = (brg - 90) * Math.PI / 180;
     const m = new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, depthTest: false, opacity: 0 });
-    addFlat(lenM, lenM * asp * NNQ_BEAM, m, offsetM(mid, NNQ_OFF * Math.sin(west), NNQ_OFF * Math.cos(west)), brg, [0.46, 0.62]);   // NNQ_OFF m off the quay line: her side (half beam ~9 m) clear of the edge, as Kinship's is of the pontoon
+    addFlat(lenM, lenM * asp * NNQ_BEAM, m, offsetM(mid, NNQ_OFF * Math.sin(west), NNQ_OFF * Math.cos(west)), brg, [0.46, 0.62]); dressHtml(ctx.base + 'assets/nnq-yacht.png');   // NNQ_OFF m off the quay line: her side (half beam ~9 m) clear of the edge, as Kinship's is of the pontoon
   });
   {
     // 29 Oct 2026, Simon (from the Admiralty chart): the Small Road lead's front light (Oc.G.5s) stands on a dolphin, a small round platform of piles out in the water west of the Albert Pier root. The satellite plate
@@ -522,6 +522,22 @@ export async function mount(stage, o, ctx) {
     g.fillStyle = '#3f464a'; g.beginPath(); g.arc(0, 0, 0.42, 0, 7); g.fill(); g.fillStyle = '#7f898d'; g.beginPath(); g.arc(-0.06, -0.06, 0.26, 0, 7); g.fill();   // the light's pole and its base
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     addFlat(9.6, 9.6, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false, opacity: 0, side: THREE.DoubleSide }), LEADS[0].front.at, 0, [-1, -0.5]);   // (always on: the plate has the sea there from the first frame)
+  }
+  // 16 Nov 2026, Simon (the yachts on the Albert Pier and the New North Quay were blurry): the 3D scene is drawn at one pixel per CSS pixel (a third of a phone screen's sharpness), so like
+  // Kinship these two are now pictures laid over the scene at the screen's own resolution. Their flats stay in the scene, undrawn, and each frame the picture is fitted to the
+  // three corners of its flat as projected on the screen (placeDressHtml, just before the scene is drawn), so it sits, turns and grows exactly where the flat would.
+  function dressHtml(src, filter) { const d = dress[dress.length - 1]; d.mesh.visible = false; const im = document.createElement('img'); im.className = 'sdress'; im.alt = ''; im.decoding = 'async'; if (filter) im.style.filter = filter;
+    im.onload = () => { d.iw = im.naturalWidth; d.ih = im.naturalHeight; im.style.width = d.iw + 'px'; im.style.height = d.ih + 'px'; }; im.src = src; canvas.insertAdjacentElement('afterend', im); d.img = im; }
+  const _dv = new THREE.Vector3();
+  function placeDressHtml() {
+    const W = CS.w || innerWidth, H = CS.h || innerHeight; let camOk = false;
+    for (const d of dress) { if (!d.img) continue;
+      if (!d.group.visible || !d.iw) { if (d.img.style.opacity !== '0') d.img.style.opacity = '0'; continue; }
+      if (!camOk) { camera.updateMatrixWorld(); camOk = true; } d.group.updateMatrixWorld(true);
+      const pa = d.mesh.geometry.attributes.position, P = [0, 1, 2].map(i => { _dv.fromBufferAttribute(pa, i).applyMatrix4(d.mesh.matrixWorld).project(camera); return [(_dv.x + 1) / 2 * W, (1 - _dv.y) / 2 * H]; });   // top-left, top-right, bottom-left of the picture
+      const a = (P[1][0] - P[0][0]) / d.iw, bb = (P[1][1] - P[0][1]) / d.iw, c = (P[2][0] - P[0][0]) / d.ih, dd = (P[2][1] - P[0][1]) / d.ih;
+      d.img.style.transform = `matrix(${a.toFixed(5)},${bb.toFixed(5)},${c.toFixed(5)},${dd.toFixed(5)},${P[0][0].toFixed(1)},${P[0][1].toFixed(1)})`; d.img.style.opacity = d.material.opacity.toFixed(3);
+    }
   }
   function placeDressing(p) {
     for (const d of dress) {
@@ -803,7 +819,7 @@ export async function mount(stage, o, ctx) {
     if (quay) quay.update(q, geoK, t, smooth(0.50, 0.66, p), cardClosed ? 0 : 1);   // (the brow comes in with the pontoon, as soon as the berth can be seen)
     if (plotter) plotter.update();
     if (fin) fin.update(r);
-    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.20 + 0.8 * 0.42; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
+    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.20 + 0.7 * 0.42; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
     if (vm) vm.update(pz, { blocked: holdGame.active || berthGame.active });
     if (copyEl) {
       let ch = null, c = 0;
@@ -835,7 +851,7 @@ export async function mount(stage, o, ctx) {
     const willRun = Math.min(3, Math.floor(acc / STEP)); wake.uniforms.uShipRotDelta.value = willRun > 0 ? shipRotDeltaFull / willRun : 0;
     let n = 0; while (acc >= STEP && n < 3) { simT += STEP; wake.update(new THREE.Vector3(0, 0, o.wakeCenterY), STEP, simT); acc -= STEP; n++; }
     if (n === 3) acc = Math.min(acc, STEP); if (n > 0) uni.uHeightmap.value = wake.texture();
-    renderer.render(scene, camera);
+    placeDressHtml(); renderer.render(scene, camera);
   }
   const api = {
     update, resize,

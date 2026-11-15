@@ -1075,7 +1075,12 @@
       if (collapsed || restarting || !armed) return; const about = document.getElementById('about'); if (!about) return;
       const v0 = about.getBoundingClientRect().top; about.style.transform = ''; collapsed = true;   // v0: where the hero is on screen now (the finale holds it a header's height down)
       document.documentElement.style.setProperty('--hdr', ((document.querySelector('header') || {}).offsetHeight || 0) + 'px'); document.documentElement.classList.add('main-collapsed');
-      const v1 = about.getBoundingClientRect().top; scrollTo({ top: Math.max(0, scrollY + (v1 - v0)), behavior: 'instant' }); lastY = scrollY; };
+      const v1 = about.getBoundingClientRect().top; scrollTo({ top: Math.max(0, scrollY + (v1 - v0)), behavior: 'instant' }); lastY = scrollY; setTimeout(releaseJourney, 400); };
+    // 16 Nov 2026, Simon (iPhone: the main site still stuck and juddered for a while after the finale): once folded away the journey can only come back by reloading the page (the pill, Replay, the logo),
+    // so its scenes stop for good and give back what they hold: the frame loop ends, every 3D canvas lets go of its graphics memory and every film its decoder and data (several hundred MB on a phone)
+    const releaseJourney = () => { if (!collapsed || restarting || !openingEl) return; window.__journeyGone = true;
+      openingEl.querySelectorAll('canvas').forEach(c => { try { const gl = c.getContext('webgl2') || c.getContext('webgl'); const x = gl && gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); } catch (e) {} });
+      openingEl.querySelectorAll('video').forEach(v => { try { v.pause(); const s = v.src; v.removeAttribute('src'); v.load(); if (s && s.startsWith('blob:')) URL.revokeObjectURL(s); } catch (e) {} }); };
     // 1 Nov 2026, Simon: the collapse is INSTANT: the moment the page reaches the main site (the finale landing, a scroll, Skip to CIPS) the journey is taken out, so there is no moment in which the visitor can scroll back up into it (it used to wait 0.4 s after the scrolling stopped, and he got back into the quay).
     let prevScrollY = scrollY;
     addEventListener('scroll', () => { const wasY = prevScrollY; prevScrollY = scrollY; if (collapsed && !restarting && armed && scrollY <= 0.5 && wasY > 0.5 && !backPill.classList.contains('on')) showPill(); if (collapsed || restarting) return; const mt = mainTop(); if (mt > innerHeight * 3 && scrollY >= mt - 0.5) { armed = true; collapseJourney(); } }, { passive: true });   // (mt > 3 windows: not while the page is still sizing itself at load)

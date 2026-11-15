@@ -205,6 +205,7 @@ export async function run(list, opts = {}) {
     (window.__warmLog || (window.__warmLog = [])).push([b.name, b.warmN, +(performance.now() - w0).toFixed(0), +ap.toFixed(2), calm ? 'calm' : 'moving']);   // (dev aid: how long each step took)
   }
   function frame(t) {
+    if (window.__journeyGone) return;   // 16 Nov 2026: the home page has folded the journey away for good (index.html, releaseJourney): no more frames
     requestAnimationFrame(frame); mainLoop = true;
     adaptQuality(t); frameId++;
     for (const gname in groups) { const g = groups[gname]; const sc = -g.section.getBoundingClientRect().top; if (Math.abs(sc - (g._prevSc ?? sc)) > 0.5) g._moveAt = performance.now(); g._prevSc = sc; g._scrolled = sc; g._fid = frameId; g._gone = g.section.offsetHeight < 1; }

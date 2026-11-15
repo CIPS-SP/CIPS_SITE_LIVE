@@ -74,12 +74,18 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     // 16 Nov 2026, Simon (the finale looked soft and jerky on his phone; the bow poked into its last shot): a phone held upright gets `phoneTall`, a tall crop of the full HD film in which
     // every frame is a whole picture (smooth to scrub), ending on the open sea centred on the yacht (`tallCuts` replaces `cuts`), with the CIPS roundel (`tallBadge`, images/brand) coming in above the yacht as it does in the wide film
     const tall = PHONE && m.phoneTall && innerHeight > innerWidth;
+    const cuts0 = m.cuts;
     if (tall) { m.cuts = m.tallCuts || []; m.box.classList.add('vm-tall'); const bd = document.createElement('div'); bd.className = 'vm-badge'; bd.setAttribute('aria-hidden', 'true');
       const im = new Image(); im.alt = ''; im.decoding = 'async'; im.onerror = () => bd.remove(); im.src = m.src.replace(/videos\/journey\/[^/]+$/, 'images/brand/' + (m.tallBadge || 'cips-roundel.png')); bd.appendChild(im);
       m.box.appendChild(bd); }
     const url = tall ? m.src.replace(/[^/]+\.mp4$/, m.phoneTall + '.mp4') : PHONE && m.phoneFile ? m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4') : m.src;
-    if (m.scrub && PHONE) m.v.addEventListener('loadeddata', () => { const pr = m.v.play(); if (pr && pr.then) pr.then(() => { if (!m.on || m.scrub) m.v.pause(); }).catch(() => {}); }, { once: true });
-    if (m.scrub) { m.v.preload = 'auto'; fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(bl => { m.blobUrl = URL.createObjectURL(bl); m.v.src = m.blobUrl; m.v.load(); }).catch(() => { m.v.src = url; m.v.load(); }); return; }
+    const primeOnce = () => m.v.addEventListener('loadeddata', () => { const pr = m.v.play(); if (pr && pr.then) pr.then(() => { if (!m.on || m.scrub) m.v.pause(); }).catch(() => {}); }, { once: true });
+    if (m.scrub && PHONE) primeOnce();
+    const loadScrub = u => { m.v.preload = 'auto'; fetch(u).then(r => { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(bl => { if (m.blobUrl) URL.revokeObjectURL(m.blobUrl); m.blobUrl = URL.createObjectURL(bl); m.v.src = m.blobUrl; m.v.load(); if (tall) watchTall(); }).catch(() => { m.v.src = u; m.v.load(); if (tall) watchTall(); }); };
+    // 16 Nov 2026, Simon (iPhone: the finale stuck on its first picture): should the phone not show the tall film (an error, or no picture 12 s after it arrives), it falls back to the wide 720p copy, cuts and all
+    let fellBack = false; const fallBack = () => { if (fellBack || !m.phoneFile) return; fellBack = true; m.cuts = cuts0; m.box.classList.remove('vm-tall', 'vm-badge-on'); m.tallOn = undefined; m.box.querySelector('.vm-badge')?.remove(); primeOnce(); loadScrub(m.src.replace(/[^/]+\.mp4$/, m.phoneFile + '.mp4')); };
+    const watchTall = () => { if (fellBack) return; m.v.addEventListener('error', fallBack, { once: true }); setTimeout(() => { if (!fellBack && m.v.readyState < 2) fallBack(); }, 12000); };
+    if (m.scrub) { loadScrub(url); return; }
     m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); };
   const fullOn = m => { m.on = true; m.started = true; m.box.classList.add('on'); if (still) { m.box.classList.add('still'); return; } if (m.scrub) return; try { m.v.currentTime = 0; } catch (e) {} const go = n => { const pr = m.v.play(); if (pr && pr.catch) pr.catch(() => { if (m.on && n < 4) setTimeout(() => go(n + 1), 250 * (n + 1)); }); }; go(0); };
   const fullOff = m => { m.on = false; m.box.classList.remove('on'); try { m.v.pause(); } catch (e) {} };
@@ -87,7 +93,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // last wanted time is applied when the one in flight lands (the film is cut with a keyframe every 4 frames so a seek is cheap).
   // 5 Nov 2026, Simon: `cuts: [[from, to], ...]` (film seconds) are left out of a scrubbed film: the scroll runs through the rest as if they were not there (the file itself is not re-cut). cutTime() turns
   // seconds of the kept film into seconds of the file; beat.js uses the same to keep the plotter in step.
-  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (m.tallOn !== undefined || m.box.classList.contains('vm-tall')) { const on = m.want > 7.5; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
+  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (m.box.classList.contains('vm-tall')) { const on = m.want > 6.9; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
   F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
   function updateFull(p) {
     for (const m of F) {
