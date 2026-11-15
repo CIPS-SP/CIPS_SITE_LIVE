@@ -158,6 +158,8 @@
 .qr .logos{flex-wrap:wrap}
 .qr .form{grid-template-columns:1fr}
 .qr .gal{grid-template-columns:1fr;grid-template-rows:none}}
+/* 17 Nov 2026, Simon: on a phone the space at the top of the main site, under Back to the journey and above the 24/7 line, closed up (the pill sits 10 px below the banner and is 37 px tall) */
+@media(max-width:760px){.qr .hero{padding-top:58px}}
 .qr .sigstrip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);background:#fff}
 .qr .sigstrip a{display:block;text-align:center;padding:34px 22px 30px;color:inherit;text-decoration:none;border-right:1px solid var(--line);transition:background .2s}
 .qr .sigstrip a:last-child{border-right:0}

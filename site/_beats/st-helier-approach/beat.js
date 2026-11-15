@@ -748,7 +748,7 @@ export async function mount(stage, o, ctx) {
   }
   function update(pRaw0) {
     if (!alive) return;
-    const KB = 1 - o.quayTail - o.finaleTail, pRaw = Math.min(1, pRaw0 / KB), q = o.quayTail > 0 ? clamp01((pRaw0 - KB) / o.quayTail) : 0, r = o.finaleTail > 0 ? clamp01((pRaw0 - KB - o.quayTail) / o.finaleTail) : 0;   // (r: chapter 5, the way out, the last finaleTail of the track)   // chapter 4 (the quay at work) takes the last quayTail of the track; chapters 1 to 3 see the same 0..1 as before
+    const KB = 1 - o.quayTail - o.finaleTail, pRaw = Math.min(1, pRaw0 / KB), q = o.quayTail > 0 ? clamp01((pRaw0 - KB) / o.quayTail) : 0, r0 = o.finaleTail > 0 ? clamp01((pRaw0 - KB - o.quayTail) / o.finaleTail) : 0, r = fin && fin.filmR ? fin.filmR(r0) : r0;   // (17 Nov 2026: on a phone, while the film plays, r is the film's (finale.js, filmR), not the scroll's)   // (r: chapter 5, the way out, the last finaleTail of the track)   // chapter 4 (the quay at work) takes the last quayTail of the track; chapters 1 to 3 see the same 0..1 as before
     let p = pRaw, gm = null, bgs = null;
     if (berthGame.active) {   // the berthing game: its own pose and a virtual p
       const nowG = performance.now(), dtG = Math.min(0.1, (nowG - G.lastT) / 1000); G.lastT = nowG; berthGame.advance(dtG); bgs = berthGame.model;

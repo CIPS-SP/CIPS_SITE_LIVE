@@ -68,35 +68,45 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
      scroll (the plotter's ship, the closing line, the roundel) stays in step. A finger dragging the page back pauses it and scrubs it by hand (rewinding); 0.7 s after the finger is lifted and the page is
      still it plays on from there. The page cannot be dragged ahead of it (a forward drag is stopped). Then [to, holdTo] holds the last picture with the line for holdS seconds, moved on by itself, and from
      holdTo the page scrolls by hand into the home page as before. Nothing is held while the film cannot play yet (not loaded): it is then scrubbed as before. */
-  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false;
+  // 17 Nov 2026, evening (Simon: "the video autoplayed but was super laggy and jerky"): the page used to be moved along with the film every frame, which an iPhone cannot do smoothly while it plays a film.
+  // Now the page stays STILL while the film plays: the scene's r is taken from the film's own clock (filmR, called by beat.js before everything else), and the page is put where that r is only when it has to be:
+  // the moment a finger touches the screen (before it moves, so nothing is seen to jump: the stage is pinned), when anything else scrolls it, and at the end of the hold.
+  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false, vr = null, lastReal = 0;
+  const syncPage = () => { if (vr === null) return; const y = scrollY; if (pxR) scrollTo({ top: y + (vr - lastReal) * pxR, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
+  const stopFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } syncPage(); };
   if (film && !reduced) {
-    addEventListener('touchstart', e => { fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; }, { passive: true });
+    addEventListener('touchstart', e => { fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; if (fZone) stopFilm(); }, { passive: true });
     const lift = () => { fTouch = false; fUserAt = performance.now(); }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
-    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && film.vm.filmReady()) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards)
-    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && film.vm.filmReady()) e.preventDefault(); }, { passive: false });
+    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && film.vm.filmReady()) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards: stopped)
+    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && film.vm.filmReady()) e.preventDefault(); if (fZone) stopFilm(); }, { passive: false });
   }
-  function tickFilm(r) {
+  function filmR(r) {   // r from the scroll -> the r the scene shows
+    if (!film || reduced) return r;
     const now = performance.now(), dt = Math.min(0.25, Math.max(0, (now - fLastT) / 1000)); fLastT = now; const y = scrollY;
-    if (r > 0 && r < 1) { if (calY === null) { calY = y; calR = r; } else if (Math.abs(y - calY) >= 300 && Math.abs(r - calR) > 1e-4) { const e = (y - calY) / (r - calR); if (e > 0 && isFinite(e)) pxR = e; calY = y; calR = r; } } else calY = null;   // pixels of scroll per unit of r, measured over at least 300 px
-    fZone = r >= film.from && r < film.holdTo;
-    if (!fZone) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } fMine = null; return; }
-    if (fTouch || (fMine !== null && Math.abs(y - fMine) > 3)) fUserAt = now;   // the visitor's own scroll (a finger, or the glide after it)
-    fMine = y;
-    if (fTouch || now - fUserAt < FILM_RESUME_MS || away || document.hidden) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } return; }   // by hand: video-moment.js scrubs the film to the scroll
-    let want;
-    if (r < film.to) {
-      if (!fPlaying) { if (!film.vm.filmPlay(film.rate)) return; fPlaying = true; }
-      const fr = film.vm.filmFrac(); if (fr == null) return;
-      want = fr >= 0.999 ? film.to + 1e-4 : film.from + fr * (film.to - film.from);
-    } else { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } want = Math.min(film.holdTo + 1e-4, r + (film.holdTo - film.to) / film.holdS * dt); }
-    if (pxR && want > r + 1e-6) { scrollTo({ top: y + (want - r) * pxR, behavior: 'instant' }); fMine = scrollY; }
+    if (r > 0 && r < 1) { if (calY === null) { calY = y; calR = r; } else if (Math.abs(y - calY) >= 300 && Math.abs(r - calR) > 1e-4) { const e = (y - calY) / (r - calR); if (e > 0 && isFinite(e)) pxR = e; calY = y; calR = r; } } else calY = null;   // pixels of scroll per unit of r, measured over at least 300 px (only while the page itself moves)
+    if (fMine !== null && Math.abs(y - fMine) > 3) { fUserAt = now; if (vr !== null) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } vr = null; } }   // scrolled by something else (a glide, a link): the scroll is the truth again
+    fMine = y; lastReal = r;
+    const cur = vr !== null ? vr : r;
+    fZone = cur >= film.from && cur < film.holdTo;
+    if (!fZone) { stopFilm(); return r; }
+    if (fTouch || now - fUserAt < FILM_RESUME_MS || away || document.hidden) { stopFilm(); return r; }   // by hand: video-moment.js scrubs the film to the scroll
+    if (cur < film.to) {
+      if (!fPlaying) { if (!film.vm.filmPlay(film.rate)) return cur; fPlaying = true; }
+      const fr = film.vm.filmFrac(); if (fr == null) return cur;
+      vr = fr >= 0.999 ? film.to + 1e-4 : Math.max(cur, film.from + fr * (film.to - film.from));
+    } else {
+      if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
+      vr = cur + (film.holdTo - film.to) / film.holdS * dt;
+      if (vr >= film.holdTo) { vr = film.holdTo + 1e-4; syncPage(); return lastReal; }   // the hold is over: the page goes to its end, and from there it is scrolled by hand
+    }
+    return vr;
   }
   let panel = null, hero = null, lastKey = '', held = false;
   const findPanel = () => panel && panel.isConnected ? panel : (panel = document.querySelector('#about .panel .mont'));
   const findHero = () => hero && hero.isConnected ? hero : (hero = document.getElementById('about'));
 
   function update(r) {
-    if (auto) tickAuto(r); else if (film && !reduced) tickFilm(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
+    if (auto) tickAuto(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
     // the closing line, over the open sea
     const a = smooth(lineIn[0], lineIn[1], r) * (land ? 1 - smooth(0.70, 0.74, r) : 1);
     el.style.opacity = a.toFixed(3); el.style.transform = `translate(-50%, ${(14 * (1 - smooth(lineIn[0], lineIn[1], r))).toFixed(1)}px)`;
@@ -117,5 +127,5 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     host.style.opacity = fade.toFixed(3); host.style.pointerEvents = u > 0.02 ? 'none' : ''; lastKey = 's';
   }
   function destroy() { removeEventListener('wheel', onWheel); removeEventListener('keydown', onKey); root.classList.remove('has-finale'); if (findHero()) hero.style.transform = ''; host.style.transform = host.style.clipPath = host.style.opacity = host.style.pointerEvents = ''; el.remove(); hit.remove(); playBtn.remove(); }
-  return { update, destroy };
+  return { update, destroy, filmR };
 }

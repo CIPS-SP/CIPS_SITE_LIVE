@@ -1082,8 +1082,17 @@
       openingEl.querySelectorAll('canvas').forEach(c => { try { const gl = c.getContext('webgl2') || c.getContext('webgl'); const x = gl && gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); } catch (e) {} });
       openingEl.querySelectorAll('video').forEach(v => { try { v.pause(); const s = v.src; v.removeAttribute('src'); v.load(); if (s && s.startsWith('blob:')) URL.revokeObjectURL(s); } catch (e) {} }); };
     // 1 Nov 2026, Simon: the collapse is INSTANT: the moment the page reaches the main site (the finale landing, a scroll, Skip to CIPS) the journey is taken out, so there is no moment in which the visitor can scroll back up into it (it used to wait 0.4 s after the scrolling stopped, and he got back into the quay).
+    /* 17 Nov 2026, Simon ("make sure it's not too easy to scroll past the header by accident when you first enter the site": someone still scrolling as the finale ends could sail on past the top of the page):
+       arriving at the main site by scrolling, the page stops at its top and stays there for a moment: the glide is stopped (the page cannot scroll for 0.7 s and is put back at the top),
+       and for 1.2 s a scroll or a swipe further down does nothing. Not for Skip to CIPS or a link (those land where they mean to). */
+    let brakeUntil = 0, brakeY = 0;
+    const arriveBrake = () => { if (!collapsed) return; brakeY = scrollY; brakeUntil = performance.now() + 1200; const de = document.documentElement; de.style.overflow = 'hidden';
+      setTimeout(() => { if (!restarting && de.style.overflow === 'hidden') de.style.overflow = ''; }, 700); };
+    addEventListener('scroll', () => { if (performance.now() < brakeUntil && scrollY > brakeY + 2) scrollTo({ top: brakeY, behavior: 'instant' }); }, { passive: true });
+    addEventListener('wheel', e => { if (e.deltaY > 0 && performance.now() < brakeUntil) e.preventDefault(); }, { passive: false });
+    addEventListener('touchmove', e => { if (performance.now() < brakeUntil && e.cancelable) e.preventDefault(); }, { passive: false });
     let prevScrollY = scrollY;
-    addEventListener('scroll', () => { const wasY = prevScrollY; prevScrollY = scrollY; if (collapsed && !restarting && armed && scrollY <= 0.5 && wasY > 0.5 && !backPill.classList.contains('on')) showPill(); if (collapsed || restarting) return; const mt = mainTop(); if (mt > innerHeight * 3 && scrollY >= mt - 0.5) { armed = true; collapseJourney(); } }, { passive: true });   // (mt > 3 windows: not while the page is still sizing itself at load)
+    addEventListener('scroll', () => { const wasY = prevScrollY; prevScrollY = scrollY; if (collapsed && !restarting && armed && scrollY <= 0.5 && wasY > 0.5 && !backPill.classList.contains('on')) showPill(); if (collapsed || restarting) return; const mt = mainTop(); if (mt > innerHeight * 3 && scrollY >= mt - 0.5) { armed = true; collapseJourney(); arriveBrake(); } }, { passive: true });   // (mt > 3 windows: not while the page is still sizing itself at load)
     window.__cipsCollapse = () => collapsed;   // dev aid
     window.__cipsArrive = () => { armed = true; lastY = scrollY; collapseJourney(); };   // called by the globe's own Skip link right after it jumps: the journey goes at once
     let touchY = 0; addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
