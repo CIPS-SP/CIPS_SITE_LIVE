@@ -585,7 +585,8 @@ export async function mount(stage, o, ctx) {
   })();
   // 5 Nov 2026, Simon: shot 4 (just outside the pier heads) and the speed burst at the start of shot 5 (the Small Roads) are left out: film 6.04 to 10.30 s (FILM_CUTS, the same as the moment's `cuts`); 15.4 s -> 11.1 s.
   // 15 Nov 2026, Simon: the overhead shot on the water is left out as well (cut 6.04 to 12.20, was to 10.30), and the first three shots (to 6.04 s) take 80% of the scroll (FILM_WARP)
-  const FILM_CUTS = [[6.04, 12.20]], FILM_S = 15.35 - 6.16, FILM_PZ = [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
+  // 16 Nov 2026, Simon (phone: each shot still too short): on a phone the film is scrolled over pz 2.20 to 2.83 (half as long again; the moment's scrub follows, below), and the finale does not shrink into the home page
+  const FILM_CUTS = [[6.04, 12.20]], FILM_S = 15.35 - 6.16, FILM_PZ = o.phoneGL ? [2.20, 2.83] : [2.20, 2.62];   // the film's length (less the 0.05 s the scrub keeps clear of the end) and the pz window it is scrubbed over: keep in step with videoMoments 'departure'
   // 5 Nov 2026, Simon: the ship no longer runs along the line between the shots (it rushed); it waits where each shot is taken and only creeps a little while the shot lasts, jumping to the next spot at each cut.
   // SOG 3.0 kn in the harbour, 5.0 kn from the Small Roads on. FILM_SHOTS: [film seconds from, to, nm along EXIT at the start and end of the shot, knots]; the cuts (1.80, 2.84, 6.04, 7.96, 12.20 s) were read off the film.
   const FILM_SHOTS = (() => { const dK = EXIT.dOf(K_TURN), dGap = EXIT.dOf(GAP_MID), dX = EXIT.dOf(X_TURN), dS = EXIT.dStart, H = 3.0, SEA = 5.0;
@@ -603,9 +604,9 @@ export async function mount(stage, o, ctx) {
     return { pos: EXIT.pos(d), hdg: hdg0 + (((out - hdg0 + 540) % 360) - 180) * smooth(0, 1.8, tf), kn: s[4] };   // the ship starts on the berth's heading and swings onto the way out during the first shot
   }
   const plotter = o.nav !== false ? mountNavPlotter(stage, { GEO: plotGEO, route: plotRoute, shipLatLng: () => exitFix ? exitFix.pos : curPos, headingDeg: () => exitFix ? exitFix.hdg : curHdg, speedKts: () => exitFix ? exitFix.kn : curSpeed, zoomTarget: () => plotZoom, hiChart: [{ src: ctx.base + 'assets/chart-mid.webp', meta: ctx.base + 'assets/chart-mid.json', from: 0.25, span: 0.10 }, { src: ctx.base + 'assets/chart-hi.webp', meta: ctx.base + 'assets/chart-hi.json', from: 0.8, span: 0.4 }]   /* the wide z16 chart over the whole approach from a quarter of the main chart's scale, the sharp z18 harbour chart over it for the closest zooms (23 Oct 2026, Simon: the sharp chart showed as a rectangle) */, compact: coarse, assetsBase: seaway, markNames: NAVAID_UNNAMED }) : null;
-  const vm = (o.video !== false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage, { moments: o.videoMoments.map(m => Object.assign({ src: ctx.base + '../../videos/journey/' + m.file + '.mp4', poster: ctx.base + '../../videos/journey/' + m.file + '.jpg' }, m)), plotter, reduced: ctx.reduced }) : null;
+  const vm = (o.video !== false && o.videoMoments && o.videoMoments.length) ? mountVideoMoment(stage, { moments: o.videoMoments.map(m => (o.phoneGL && m.id === 'departure') ? Object.assign({}, m, { scrub: [2.20, 2.83] }) : m).map(m => Object.assign({ src: ctx.base + '../../videos/journey/' + m.file + '.mp4', poster: ctx.base + '../../videos/journey/' + m.file + '.jpg' }, m)), plotter, reduced: ctx.reduced }) : null;
   let cardClosed = false, quayMark = false, endMark = false;
-  const finHost = ctx && ctx.layer ? ctx.layer.parentElement : null, fin = (o.finaleTail > 0 && finHost) ? createFinale({ stage, host: finHost, reduced: ctx.reduced, tail: o.finaleTail, auto: o.finaleAuto === true }) : null;   // the closing line and the shrink into the home page (finale.js); only in the pinned page, not in a stand-alone demo
+  const finHost = ctx && ctx.layer ? ctx.layer.parentElement : null, fin = (o.finaleTail > 0 && finHost) ? createFinale({ stage, host: finHost, reduced: ctx.reduced, tail: o.finaleTail, auto: o.finaleAuto === true, land: !o.phoneGL, lineIn: o.phoneGL ? [0.72, 0.77] : [0.56, 0.62] }) : null;   // the closing line and the shrink into the home page (finale.js); only in the pinned page, not in a stand-alone demo
 
   // ---- hull sizing: identical to noirmont, so the wide hold looks exactly the same ----
   let MIN_DISTANCE = 8, END_SCALE = 0.2;
@@ -819,7 +820,7 @@ export async function mount(stage, o, ctx) {
     if (quay) quay.update(q, geoK, t, smooth(0.50, 0.66, p), cardClosed ? 0 : 1);   // (the brow comes in with the pontoon, as soon as the berth can be seen)
     if (plotter) plotter.update();
     if (fin) fin.update(r);
-    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= 2.20 + 0.7 * 0.42; if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
+    { const inQ = pz > 1.0 && pz < 2.0, atEnd = pz >= FILM_PZ[0] + 0.7 * (FILM_PZ[1] - FILM_PZ[0]); if (inQ !== quayMark) { quayMark = inQ; document.documentElement.classList.toggle('cips-quay', inQ); } if (atEnd !== endMark) { endMark = atEnd; document.documentElement.classList.toggle('cips-fin-end', atEnd); } }   // 14 Nov 2026 (beat.css): on a phone no plotter at the quay, back for the way out, gone again for the last shot at sea (the closing line and the badge)
     if (vm) vm.update(pz, { blocked: holdGame.active || berthGame.active });
     if (copyEl) {
       let ch = null, c = 0;

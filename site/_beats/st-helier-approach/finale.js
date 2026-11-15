@@ -22,8 +22,10 @@ const HOLD_R = CLOSE_R + 0.0006, HOLD_S = 3.8, PREROLL = 0.05;   // (HOLD_R: jus
 const AUTO = [[CLOSE_R, 0.20, 5.5], [0.20, 0.62, 11.1], [0.62, 0.74, 3.0], [0.74, 1.0, 3.6]], RESUME_MS = 1300;
 const autoRate = r => { if (r < CLOSE_R) return PREROLL; for (const [a, b, sec] of AUTO) if (r >= a && r < b) return (b - a) / sec; return 0; };   // r per second
 
-export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false, auto = true }) {
-  const root = document.documentElement; root.classList.add('has-finale');
+export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false, auto = true, land = true, lineIn = [0.56, 0.62] }) {
+  // 16 Nov 2026, Simon (phone: the page juddered as the frame shrank into the home page's picture): land:false (phones) = no shrink and no held hero: the closing line stays, the last
+  // picture holds, and when the journey ends the home page simply scrolls up beneath it like any page (no has-finale, so the home page starts after the journey)
+  const root = document.documentElement; if (land) root.classList.add('has-finale');
   const group = host.parentElement;   // the .beat-group section the pinned stage lives in
   const el = document.createElement('div'); el.className = 'sfin-line'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = '<span></span>'; el.firstChild.textContent = line; stage.appendChild(el);
   const hit = document.createElement('div'); hit.className = 'sfin-hit'; stage.appendChild(hit);
@@ -68,8 +70,9 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   function update(r) {
     if (auto) tickAuto(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
     // the closing line, over the open sea
-    const a = smooth(0.56, 0.62, r) * (1 - smooth(0.70, 0.74, r));
-    el.style.opacity = a.toFixed(3); el.style.transform = `translate(-50%, ${(14 * (1 - smooth(0.56, 0.62, r))).toFixed(1)}px)`;
+    const a = smooth(lineIn[0], lineIn[1], r) * (land ? 1 - smooth(0.70, 0.74, r) : 1);
+    el.style.opacity = a.toFixed(3); el.style.transform = `translate(-50%, ${(14 * (1 - smooth(lineIn[0], lineIn[1], r))).toFixed(1)}px)`;
+    if (!land) return;
     // the hero, held where it will come to rest (see above), from r 0.8
     const Hh = findHero();
     if (Hh) { if (r >= 0.68) { const gr0 = group.getBoundingClientRect(), slide0 = Math.max(0, gr0.height - innerHeight + gr0.top); const hd = (document.querySelector('header') || {}).offsetHeight || 0; Hh.style.transform = `translateY(${(hd - slide0).toFixed(1)}px)`; held = true; } else if (held) { Hh.style.transform = ''; held = false; } }   // 1 Nov 2026, Simon: held a header's height down, so the main site rests with space between the banner and the hero (it was flush under it)
