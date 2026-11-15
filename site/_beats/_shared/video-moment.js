@@ -26,6 +26,9 @@ let wideSetting = false;   // the Expand choice carries from one moment (and one
 // straight lines between; without it the film runs evenly. The plotter's sync (st-helier-approach) uses the same.
 export function warpTime(warp, u, kept) { if (!warp || !warp.length) return u * kept; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i]; if (u <= c[0]) { const ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); return ta + (tc - ta) * (c[0] > a[0] ? (u - a[0]) / (c[0] - a[0]) : 1); } } return kept; }
 export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) t += c[1] - c[0]; else break; } return t; }
+// the way back (17 Nov 2026, the self-playing phone film): seconds of the file -> seconds of the kept film (a time inside a cut counts as its start), and kept seconds -> the 0..1 of the scrub window
+export function uncutTime(cuts, t) { let k = t; for (const c of cuts || []) { if (t >= c[1]) k -= c[1] - c[0]; else if (t > c[0]) { k -= t - c[0]; break; } else break; } return k; }
+export function unwarpTime(warp, k, kept) { if (!warp || !warp.length) return kept > 0 ? Math.max(0, Math.min(1, k / kept)) : 0; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i], ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); if (k <= tc) return a[0] + (c[0] - a[0]) * (tc > ta ? Math.max(0, (k - ta) / (tc - ta)) : 1); } return 1; }
 let cssReady = null;
 // 14 Nov 2026 (Simon: the finale did not start on his phone): a phone gets a moment's `phoneFile` (the departure film's 720p copy) and the scrubbed film is primed once it has loaded
 const PHONE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) <= 480;
@@ -88,13 +91,13 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
     if (m.scrub) { loadScrub(url); return; }
     m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); };
   const fullOn = m => { m.on = true; m.started = true; m.box.classList.add('on'); if (still) { m.box.classList.add('still'); return; } if (m.scrub) return; try { m.v.currentTime = 0; } catch (e) {} const go = n => { const pr = m.v.play(); if (pr && pr.catch) pr.catch(() => { if (m.on && n < 4) setTimeout(() => go(n + 1), 250 * (n + 1)); }); }; go(0); };
-  const fullOff = m => { m.on = false; m.box.classList.remove('on'); try { m.v.pause(); } catch (e) {} };
+  const fullOff = m => { m.on = false; m.playing = false; m.box.classList.remove('on'); try { m.v.pause(); } catch (e) {} };
   // 31 Oct 2026, Simon: the film and the shrink that follows it must both be scrolled (or both timed); a `scrub: [a, b]` moment is scrolled: the picture is the film at (p - a) / (b - a) of its length, paused, going backwards as well. Seeks are one at a time and the
   // last wanted time is applied when the one in flight lands (the film is cut with a keyframe every 4 frames so a seek is cheap).
   // 5 Nov 2026, Simon: `cuts: [[from, to], ...]` (film seconds) are left out of a scrubbed film: the scroll runs through the rest as if they were not there (the file itself is not re-cut). cutTime() turns
   // seconds of the kept film into seconds of the file; beat.js uses the same to keep the plotter in step.
-  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (m.box.classList.contains('vm-tall')) { const on = m.want > 6.9; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
-  F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
+  const scrubTo = (m, p) => { if (still || !m.v.duration) return; const cuts = m.cuts || [], kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); m.want = m.playing ? m.v.currentTime : cutTime(cuts, warpTime(m.warp, Math.max(0, Math.min(1, (p - m.scrub[0]) / (m.scrub[1] - m.scrub[0]))), kept)); if (m.box.classList.contains('vm-tall')) { const on = m.want > 6.9; if (on !== m.tallOn) { m.tallOn = on; m.box.classList.toggle('vm-badge-on', on); } } if (PHONE && m.fitFrom) m.box.classList.toggle('vm-fit', m.want >= m.fitFrom); if (!m.playing && !m.seeking && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } };
+  F.forEach(m => { if (m.scrub) m.v.addEventListener('seeked', () => { m.seeking = false; if (m.on && !m.playing && Math.abs(m.want - m.v.currentTime) > 0.03) { m.seeking = true; try { m.v.currentTime = m.want; } catch (e) { m.seeking = false; } } }); });
   function updateFull(p) {
     for (const m of F) {
       if (m.bad) continue;
@@ -182,5 +185,13 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // the runtime stops calling update() while the beat is off screen; stop the footage then too, and let it play afresh when the visitor comes back
   const watch = setInterval(() => { if (performance.now() - lastSeen > 2000) { if (active) swap(null); for (const m of F) if (m.on) fullOff(m); dismissed.clear(); done.clear(); } }, 400);   // (also forgets what the visitor closed, so scrolling away and back shows it again)
   function destroy() { clearInterval(watch); swap(null); for (const m of F) { fullOff(m); m.box.remove(); if (m.blobUrl) URL.revokeObjectURL(m.blobUrl); } root.remove(); }
-  return { update, destroy, root, isActive: () => !!active || F.some(m => m.on), covered: () => F.some(m => m.on && !m.bad) };   // (covered: a full screen film is up (its box is opaque from the moment it is on), so the scene under it need not be drawn: 17 Nov 2026, see st-helier-approach beat.js)   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
+  return { update, destroy, root, isActive: () => !!active || F.some(m => m.on), covered: () => F.some(m => m.on && !m.bad),
+    // 17 Nov 2026, Simon (the scrolled film was jerky on his iPhone): the phone's finale PLAYS the scrubbed film (finale.js, `film`) and moves the page along with it; these let it start, stop and read the film.
+    // While it plays the film is not seeked to the scroll (the scroll follows the film instead); when the visitor drags it is paused and scrubbed as before.
+    filmReady: () => F.some(m => m.scrub && m.on && !m.bad && m.v.readyState >= 2 && m.v.duration > 0),
+    filmPlay: rate => { const m = F.find(x => x.scrub && x.on && !x.bad); if (!m || m.v.readyState < 2 || !m.v.duration) return false; if (m.playing) return true; m.playing = true; try { m.v.playbackRate = rate || 1; } catch (e) {} const pr = m.v.play(); if (pr && pr.catch) pr.catch(() => { m.playing = false; }); return true; },
+    filmPause: () => { F.forEach(m => { if (m.playing) { m.playing = false; try { m.v.pause(); } catch (e) {} } }); },
+    filmFrac: () => { const m = F.find(x => x.scrub && x.on && !x.bad); if (!m || !m.v.duration) return null; if (m.v.ended) return 1; const cuts = m.cuts || []; let t = m.v.currentTime;
+      for (const c of cuts) if (t >= c[0] - 0.02 && t < c[1]) { try { m.v.currentTime = c[1]; } catch (e) {} t = c[1]; }   // a cut is jumped over as it is reached
+      const kept = Math.max(0, m.v.duration - 0.05) - cuts.reduce((a, c) => a + c[1] - c[0], 0); return unwarpTime(m.warp, uncutTime(cuts, t), kept); } };   // (covered: a full screen film is up (its box is opaque from the moment it is on), so the scene under it need not be drawn: 17 Nov 2026, see st-helier-approach beat.js)   // (isActive: the runtime keeps the beat updating while a clip is still on screen after the beat has been left: see stage.js)
 }

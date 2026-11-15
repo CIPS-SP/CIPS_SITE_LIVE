@@ -22,7 +22,7 @@ const HOLD_R = CLOSE_R + 0.0006, HOLD_S = 3.8, PREROLL = 0.05;   // (HOLD_R: jus
 const AUTO = [[CLOSE_R, 0.20, 5.5], [0.20, 0.62, 11.1], [0.62, 0.74, 3.0], [0.74, 1.0, 3.6]], RESUME_MS = 1300;
 const autoRate = r => { if (r < CLOSE_R) return PREROLL; for (const [a, b, sec] of AUTO) if (r >= a && r < b) return (b - a) / sec; return 0; };   // r per second
 
-export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false, auto = true, land = true, lineIn = [0.56, 0.62] }) {
+export function createFinale({ stage, host, line = 'The Channel Islands – Your Atlantic Gateway', tail = 0.11294, reduced = false, auto = true, land = true, lineIn = [0.56, 0.62], film = null }) {
   // 16 Nov 2026, Simon (phone: the page juddered as the frame shrank into the home page's picture): land:false (phones) = no shrink and no held hero: the closing line stays, the last
   // picture holds, and when the journey ends the home page simply scrolls up beneath it like any page (no has-finale, so the home page starts after the journey)
   const root = document.documentElement; if (land) root.classList.add('has-finale');
@@ -63,12 +63,40 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     head = Math.max(head, y) + (!holdDone && r < HOLD_R ? PREROLL : autoRate(r)) * span * dt; if (head > reach) reach = head;
     scrollTo({ top: head, behavior: 'instant' }); mine = scrollY;
   }
+  /* 17 Nov 2026, Simon (phone: the scrolled film was still jerky, "switch the phone finale to a self-playing video ... keep it scroll backable like it was before"): `film` = { vm, from, to, holdTo, holdS, rate } (r).
+     Over [from, to] the film PLAYS (an ordinary video playing is smooth on a phone, a video seeked to the scroll every frame is not) and the page is moved along with it, so everything that follows the
+     scroll (the plotter's ship, the closing line, the roundel) stays in step. A finger dragging the page back pauses it and scrubs it by hand (rewinding); 0.7 s after the finger is lifted and the page is
+     still it plays on from there. The page cannot be dragged ahead of it (a forward drag is stopped). Then [to, holdTo] holds the last picture with the line for holdS seconds, moved on by itself, and from
+     holdTo the page scrolls by hand into the home page as before. Nothing is held while the film cannot play yet (not loaded): it is then scrubbed as before. */
+  const FILM_RESUME_MS = 700; let fPlaying = false, fTouch = false, fUserAt = 0, fMine = null, fLastT = 0, fTouchY = 0, calY = null, calR = 0, pxR = 0, fZone = false;
+  if (film && !reduced) {
+    addEventListener('touchstart', e => { fTouch = true; fUserAt = performance.now(); fTouchY = e.touches[0] ? e.touches[0].clientY : 0; }, { passive: true });
+    const lift = () => { fTouch = false; fUserAt = performance.now(); }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
+    addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY; if (fZone && y < fTouchY - 0.5 && e.cancelable && film.vm.filmReady()) e.preventDefault(); fTouchY = y; }, { passive: false });   // (a finger moving UP scrolls the page forwards)
+    addEventListener('wheel', e => { if (fZone && e.deltaY > 0 && !e.ctrlKey && film.vm.filmReady()) e.preventDefault(); }, { passive: false });
+  }
+  function tickFilm(r) {
+    const now = performance.now(), dt = Math.min(0.25, Math.max(0, (now - fLastT) / 1000)); fLastT = now; const y = scrollY;
+    if (r > 0 && r < 1) { if (calY === null) { calY = y; calR = r; } else if (Math.abs(y - calY) >= 300 && Math.abs(r - calR) > 1e-4) { const e = (y - calY) / (r - calR); if (e > 0 && isFinite(e)) pxR = e; calY = y; calR = r; } } else calY = null;   // pixels of scroll per unit of r, measured over at least 300 px
+    fZone = r >= film.from && r < film.holdTo;
+    if (!fZone) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } fMine = null; return; }
+    if (fTouch || (fMine !== null && Math.abs(y - fMine) > 3)) fUserAt = now;   // the visitor's own scroll (a finger, or the glide after it)
+    fMine = y;
+    if (fTouch || now - fUserAt < FILM_RESUME_MS || away || document.hidden) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } return; }   // by hand: video-moment.js scrubs the film to the scroll
+    let want;
+    if (r < film.to) {
+      if (!fPlaying) { if (!film.vm.filmPlay(film.rate)) return; fPlaying = true; }
+      const fr = film.vm.filmFrac(); if (fr == null) return;
+      want = fr >= 0.999 ? film.to + 1e-4 : film.from + fr * (film.to - film.from);
+    } else { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } want = Math.min(film.holdTo + 1e-4, r + (film.holdTo - film.to) / film.holdS * dt); }
+    if (pxR && want > r + 1e-6) { scrollTo({ top: y + (want - r) * pxR, behavior: 'instant' }); fMine = scrollY; }
+  }
   let panel = null, hero = null, lastKey = '', held = false;
   const findPanel = () => panel && panel.isConnected ? panel : (panel = document.querySelector('#about .panel .mont'));
   const findHero = () => hero && hero.isConnected ? hero : (hero = document.getElementById('about'));
 
   function update(r) {
-    if (auto) tickAuto(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
+    if (auto) tickAuto(r); else if (film && !reduced) tickFilm(r);   // 14 Nov 2026, Simon: auto:false (now the default, beat.js finaleAuto) = the finale follows the scroll like the rest of the journey: no self-scroll, no lock
     // the closing line, over the open sea
     const a = smooth(lineIn[0], lineIn[1], r) * (land ? 1 - smooth(0.70, 0.74, r) : 1);
     el.style.opacity = a.toFixed(3); el.style.transform = `translate(-50%, ${(14 * (1 - smooth(lineIn[0], lineIn[1], r))).toFixed(1)}px)`;

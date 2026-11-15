@@ -294,7 +294,7 @@
   .beat-st-helier-approach .splay{display:none !important}   /* no game doors on a phone (14 Nov 2026, Simon) */
 }
 /* 14 Nov 2026, Simon: on a phone the Skip to CIPS pill steps aside while the quay card is up (the card sits where it was) */
-@media (max-width:760px), (orientation:landscape) and (max-height:480px){ html:has(.beat-st-helier-approach .sq-list.sq-on) #skipToCips{ display:none !important; } }
+/* 17 Nov 2026, Simon: Skip to CIPS is back at the quay on a phone (the card is bottom right now, so the pill no longer sits over it); it used to be hidden while the card showed */
 /* 14 Nov 2026, Simon: on a phone no plotter at the quay, and the On Scene footage moves to the left; the plotter comes back for the finale (html.cips-quay, set by beat.js) */
 @media (max-width:760px), (orientation:landscape) and (max-height:480px){ html.cips-quay .beat-st-helier-approach .plotter-box{ display:none !important; } html.cips-quay .vm-box{ right:auto !important; left:10px !important; transform-origin:left bottom !important; } }
 /* 14 Nov 2026, Simon: on a phone the quay card covered the top of the brow, where the provisions crew walk; at the quay the bottom right is free (no plotter, the footage is
