@@ -32,6 +32,21 @@ export function cutTime(cuts, t) { for (const c of cuts || []) { if (t >= c[0]) 
 export function stretchFile(st, k) { let add = 0; for (const [a, b, f] of st || []) { if (k <= a) break; if (k < b) return k + add + (k - a) * (f - 1); add += (b - a) * (f - 1); } return k + add; }
 export function stretchKept(st, t) { let add = 0; for (const [a, b, f] of st || []) { const fa = a + add, fb = fa + (b - a) * f; if (t <= fa) break; if (t < fb) return a + (t - fa) / f; add += (b - a) * (f - 1); } return t - add; }
 const stretchExtra = st => (st || []).reduce((s, x) => s + (x[1] - x[0]) * (x[2] - 1), 0);
+// 16 Nov 2026, Simon (iPhone: "a problem repeatedly occurred", or back to the globe loading, after scrolling fast): every On Scene clip passed stayed loaded (its file and its video decoder) for the rest of the
+// journey, and a fast scroll loaded them all one after another, which is what makes Safari close the page for memory. On a phone at most CLIP_KEEP clips (of every scene together) stay loaded besides
+// the one showing; the oldest are let go (src removed) and load again if the visitor comes back to them.
+const CLIP_KEEP = 2, LOADED_CLIPS = [];
+function keepFew(m, isShown) {
+  if (!PHONE) return;
+  const i = LOADED_CLIPS.findIndex(x => x.m === m); if (i >= 0) LOADED_CLIPS.splice(i, 1);
+  LOADED_CLIPS.push({ m, isShown });
+  while (LOADED_CLIPS.length > CLIP_KEEP + 1) {
+    const k = LOADED_CLIPS.findIndex(x => !x.isShown() && x.m !== m); if (k < 0) break;
+    const o = LOADED_CLIPS.splice(k, 1)[0].m;
+    try { o.v.pause(); o.v.removeAttribute('src'); o.v.load(); } catch (e) {}
+    o.loaded = false; o.primed = false; o.ended = false;
+  }
+}
 export function uncutTime(cuts, t) { let k = t; for (const c of cuts || []) { if (t >= c[1]) k -= c[1] - c[0]; else if (t > c[0]) { k -= t - c[0]; break; } else break; } return k; }
 export function unwarpTime(warp, k, kept) { if (!warp || !warp.length) return kept > 0 ? Math.max(0, Math.min(1, k / kept)) : 0; for (let i = 1; i < warp.length; i++) { const a = warp[i - 1], c = warp[i], ta = Math.min(kept, a[1]), tc = Math.min(kept, c[1]); if (k <= tc) return a[0] + (c[0] - a[0]) * (tc > ta ? Math.max(0, (k - ta) / (tc - ta)) : 1); } return 1; }
 let cssReady = null;
@@ -119,7 +134,7 @@ export function mountVideoMoment(stage, { moments = [], plotter = null, reduced 
   // 14 Nov 2026, Simon (phone: each clip froze the first time round, then played on the second loop): on a phone there is no hidden primer, the clip is not sent back to 0 when
   // it is already at the start, and a clip that stops moving while it should be playing is nudged on (update(), below)
   const prime = m => { if (still || m.primed || m.bad || PHONE) return; m.primed = true; const v = m.v; const go = () => { if (active === m) return; const pr = v.play(); if (pr && pr.then) pr.then(() => { if (active !== m) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }).catch(() => {}); }; if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go, { once: true }); };
-  const ensure = m => { if (m.loaded || m.bad) return; m.loaded = true; if (!still) { m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); prime(m); } };
+  const ensure = m => { if (m.loaded || m.bad) return; m.loaded = true; if (!still) { m.v.preload = 'auto'; m.v.src = m.src; m.v.load(); prime(m); keepFew(m, () => active === m); } };
   function syncWide() { root.classList.toggle('wide', wideSetting); bigBtn.textContent = wideSetting ? '⤣' : '⤢'; bigBtn.title = wideSetting ? 'Smaller' : 'Enlarge'; bigBtn.setAttribute('aria-label', wideSetting ? 'Make the footage smaller' : 'Enlarge the footage'); }
   function start(m) {
     m.ended = false; userPaused = false; m.plays = 1; m.onLoop = false;

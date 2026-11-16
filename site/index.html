@@ -1055,7 +1055,7 @@
       if (restarting) return;
       const y = scrollY, floor = mainTop(), prev = lastY, d = y - prev; lastY = y;
       if (d > 3 && performance.now() > quietUntil) hidePill();                                           // the pill goes as soon as the visitor scrolls down
-      if (y > floor + 60 || prev > floor + 60) armed = true;                                                                // properly on the main site: from here the way up is the pill
+      if ((y > floor + 60 || prev > floor + 60) && openingEl && openingEl.offsetHeight > innerHeight * 40) armed = true;   /* 16 Nov 2026, Simon (iPhone: back to the globe loading after scrolling fast): only once the journey has its full length; scrolled fast while it was still loading (600vh), the page could pass that early 'top of the main site', arm, and then be pulled to the main site or reloaded to the globe when the journey laid itself out */                                                                // properly on the main site: from here the way up is the pill
       if (armed && !collapsed && y < floor - 1) {   // (17 Nov 2026, Simon: a fast flick up broke through the top. Once the journey is folded away the page's top IS the main site's, and an iPhone's bounce past it reads as a negative scroll, which used to count as a jump to the top and reload the globe)
         if (y <= 2) { restartAtGlobe(); return; }                                                     // a jump to the very top (the logo, Home) means "back to the globe"
         scrollTo({ top: floor, behavior: 'instant' }); showPill();                                                                // anything else is held at the top of the main site

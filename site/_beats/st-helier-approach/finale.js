@@ -80,11 +80,11 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // where index.html folds the journey away as for any arrival; a touch or a wheel stops the glide and leaves the visitor where they are
   let glide = 0;
   const stopGlide = () => { if (glide) { cancelAnimationFrame(glide); glide = 0; } };
-  const mainTopY = () => { const oa = document.getElementById('openingAct'); return oa ? oa.getBoundingClientRect().bottom + scrollY - (land ? innerHeight - 1 : 0) : scrollY; };   // where the main site begins (index.html, mainTop)
-  const glideTo = (y1, D) => { if (glide) return; const y0 = scrollY; if (y1 <= y0 + 2) return; window.__cipsGlide = true; setTimeout(() => { window.__cipsGlide = false; }, D + 2500); /* (index.html: no arrival brake for a glide) */ const t0 = performance.now();
+  const mainTopY = () => { const oa = document.getElementById('openingAct'); return oa ? oa.getBoundingClientRect().bottom + scrollY - (land ? innerHeight - 1 : 0) + 2 : scrollY; };   // (2 px past the line, so index.html certainly folds the journey away: 16 Nov 2026, a glide that stopped a fraction short left the page parked and every swipe taken over)   // where the main site begins (index.html, mainTop)
+  const glideTo = (y1, D) => { if (glide) return true; const y0 = scrollY; if (y1 <= y0 + 2) return false; window.__cipsGlide = true; setTimeout(() => { window.__cipsGlide = false; }, D + 2500); /* (index.html: no arrival brake for a glide) */ const t0 = performance.now();
     const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = 0.5 - 0.5 * Math.cos(Math.PI * k);
-      scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; };
-    glide = requestAnimationFrame(step); };
+      scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; if (!glide) fParked = false; };
+    glide = requestAnimationFrame(step); return true; };
   const glideHome = () => glideTo(mainTopY(), 1800);
   /* 18 Nov 2026, later, Simon (a fast flick at the end of the quay flew through the finale with the card still up, and trying to scroll on while the film played paused it for a moment, so it juddered):
      from the moment the card starts to fold the page is LOCKED: it cannot be scrolled on at all (overflow hidden stops a glide, every touch move is taken over), and a flick that has already
@@ -99,7 +99,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   /* 16 Nov 2026, later, Simon (phone: after the film, a swipe on bounced back to the top, once flew to the foot of the site): a free swipe from the park ran on with the phone's momentum past the top
      of the main site and was pulled back (and the page shortening under it as the journey folds away sent it flying). Now, parked, a finger pushing up starts the same glide into the main site
      (0.9 s, nothing of the swipe's own momentum), and a finger dragged down goes back into the film as before. */
-  const parkedEnd = () => fParked && film.park === 'end' && !root.classList.contains('main-collapsed');
+  const parkedEnd = () => fParked && film.park === 'end' && !root.classList.contains('main-collapsed') && scrollY < mainTopY() - 4;
   const parkBack = () => { const px = pxOf(); pauseFilm(); if (px && vr !== null && fParkR !== null) scrollTo({ top: Math.max(0, scrollY - (fParkR - vr) * px), behavior: 'instant' }); fParked = false; vr = null; fMine = scrollY; fUserAt = performance.now(); fMax = scrollY; };
   const pauseFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } };
   const park = now => { fParked = true; fDone = true; fGone = false; fParkT = now; setLock(false);
@@ -120,7 +120,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     addEventListener('touchstart', e => { fTouchY = fT0 = e.touches[0] ? e.touches[0].clientY : 0; fBack = false; if (parkedEnd()) fGest = 'park'; else { stopGlide(); fGest = fLock; } }, { passive: true });
     const lift = () => { if (fBack) fUserAt = performance.now(); fBack = false; fGest = false; }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
     addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY;
-      if (fGest === 'park') { if (e.cancelable) e.preventDefault(); if (fBack) backBy(y - fTouchY); else if (!glide) { if (y < fT0 - 6) glideTo(mainTopY(), 900); else if (y - fT0 > 10) { parkBack(); fBack = true; backBy(y - fT0 - 10); } } }
+      if (fGest === 'park') { if (e.cancelable) e.preventDefault(); if (fBack) backBy(y - fTouchY); else if (!glide) { if (y < fT0 - 6) { if (!glideTo(mainTopY(), 900)) { fParked = false; fGest = false; } } else if (y - fT0 > 10) { parkBack(); fBack = true; backBy(y - fT0 - 10); } } }
       else if (fGest) { if (e.cancelable) e.preventDefault(); if (!fBack && y - fT0 > 10) { fBack = true; backStart(); backBy(y - fT0 - 10); } else if (fBack) backBy(y - fTouchY); }
       fTouchY = y; }, { passive: false });
     addEventListener('wheel', e => { stopGlide(); if (!fLock || e.ctrlKey) return; e.preventDefault(); if (e.deltaY < 0) { backStart(); backBy(-e.deltaY / 6); } }, { passive: false });
