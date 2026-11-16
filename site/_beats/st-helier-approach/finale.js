@@ -80,7 +80,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // where index.html folds the journey away as for any arrival; a touch or a wheel stops the glide and leaves the visitor where they are
   let glide = 0;
   const stopGlide = () => { if (glide) { cancelAnimationFrame(glide); glide = 0; } };
-  const glideHome = () => { const oa = document.getElementById('openingAct'); if (!oa || glide) return; const y0 = scrollY, y1 = oa.getBoundingClientRect().bottom + scrollY; if (y1 <= y0 + 2) return; const t0 = performance.now(), D = 1800;
+  const glideHome = () => { const oa = document.getElementById('openingAct'); if (!oa || glide) return; window.__cipsGlide = true; setTimeout(() => { window.__cipsGlide = false; }, 4000); /* (index.html: no arrival brake for a glide) */ const y0 = scrollY, y1 = oa.getBoundingClientRect().bottom + scrollY; if (y1 <= y0 + 2) return; const t0 = performance.now(), D = 1800;
     const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(2 - 2 * k, 3) / 2;
       scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; };
     glide = requestAnimationFrame(step); };
