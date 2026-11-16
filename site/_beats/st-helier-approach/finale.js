@@ -80,18 +80,32 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   // where index.html folds the journey away as for any arrival; a touch or a wheel stops the glide and leaves the visitor where they are
   let glide = 0;
   const stopGlide = () => { if (glide) { cancelAnimationFrame(glide); glide = 0; } };
-  const glideHome = () => { const oa = document.getElementById('openingAct'); if (!oa || glide) return; window.__cipsGlide = true; setTimeout(() => { window.__cipsGlide = false; }, 4000); /* (index.html: no arrival brake for a glide) */ const y0 = scrollY, y1 = oa.getBoundingClientRect().bottom + scrollY; if (y1 <= y0 + 2) return; const t0 = performance.now(), D = 1800;
-    const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(2 - 2 * k, 3) / 2;
+  const mainTopY = () => { const oa = document.getElementById('openingAct'); return oa ? oa.getBoundingClientRect().bottom + scrollY - (land ? innerHeight - 1 : 0) : scrollY; };   // where the main site begins (index.html, mainTop)
+  const glideTo = (y1, D) => { if (glide) return; const y0 = scrollY; if (y1 <= y0 + 2) return; window.__cipsGlide = true; setTimeout(() => { window.__cipsGlide = false; }, D + 2500); /* (index.html: no arrival brake for a glide) */ const t0 = performance.now();
+    const step = now => { if (root.classList.contains('main-collapsed')) { glide = 0; return; } const k = Math.min(1, (now - t0) / D), e = 0.5 - 0.5 * Math.cos(Math.PI * k);
       scrollTo({ top: y0 + (y1 - y0) * e, behavior: 'instant' }); glide = k < 1 ? requestAnimationFrame(step) : 0; };
     glide = requestAnimationFrame(step); };
+  const glideHome = () => glideTo(mainTopY(), 1800);
   /* 18 Nov 2026, later, Simon (a fast flick at the end of the quay flew through the finale with the card still up, and trying to scroll on while the film played paused it for a moment, so it juddered):
      from the moment the card starts to fold the page is LOCKED: it cannot be scrolled on at all (overflow hidden stops a glide, every touch move is taken over), and a flick that has already
      carried past the fold is put back to it. Going back still works, by hand: a finger dragged DOWN (decided once it has gone 10 px down) pauses the film and the page follows the finger back,
      never further on than where the playback was; a finger pushing up, or a tap, does nothing to the film. Unlocked again back at the quay, while the film is still loading, and at the end. */
   let fLock = false, fBack = false, fGest = false, fT0 = 0, fMax = 0, fPrev = -1, fCalled = 0;
+  /* 16 Nov 2026, Simon ("unlock scroll 1 s after the logo comes onto the screen ... user can either scroll to the main site or it will transition smoothly on its own around 2 s after that"; there was still a pause at the end):
+     at film.unlockAt (a fraction of the film) the page is PARKED and unlocked. Phone (park 'end'): the page goes, unseen (the stage is pinned), to the very end of the journey, where the next scroll
+     slides the stage up into the main site with the film still playing; on a computer (park 'sync') it goes to where the film is, so scrolling on runs the closing line and the shrink into the home page.
+     film.glideAfter seconds later, if the visitor has not scrolled, the page glides there by itself (film.glideMs). Going back takes the scroll back as before. */
+  let fParked = false, fDone = false, fParkT = 0, fParkY = 0, fGone = false;
+  const pauseFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } };
+  const park = now => { fParked = true; fDone = true; fGone = false; fParkT = now; setLock(false);
+    if (film.park === 'end') { const t = mainTopY() - innerHeight; if (t > scrollY) scrollTo({ top: t, behavior: 'instant' }); }
+    else { const px = pxOf(); if (px && vr !== null) scrollTo({ top: scrollY + (vr - lastReal) * px, behavior: 'instant' }); }
+    fParkY = scrollY; fMine = scrollY; };
+  const unlockR = () => film.unlockAt != null ? film.from + film.unlockAt * (film.to - film.from) : Infinity;
+
   if (film && !reduced) setInterval(() => { if (fLock && performance.now() - fCalled > 600) setLock(false); }, 300);   // never left locked when the scene is no longer being drawn (Skip to CIPS, a link, the page in the background)
   const pxOf = () => (film.pxPerR && film.pxPerR()) || pxR;
-  const setLock = on => { if (on === fLock) return; fLock = on; if (on) root.style.overflow = 'hidden'; else if (root.style.overflow === 'hidden') root.style.overflow = ''; };
+  const setLock = on => { if (on === fLock) return; fLock = on; if (film.hardLock === false) return; if (on) root.style.overflow = 'hidden'; else if (root.style.overflow === 'hidden') root.style.overflow = ''; };   // (16 Nov 2026: on a computer no overflow hidden, which would take the scroll bar away and shift the page; the wheel and the keys are stopped instead, and anything else is put back)
   const syncPage = () => { if (vr === null) return; const px = pxOf(); if (px) scrollTo({ top: scrollY + (vr - lastReal) * px, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
   const stopFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } syncPage(); };
   const handNow = () => performance.now() - fUserAt < FILM_RESUME_MS;
@@ -104,16 +118,28 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
       if (fGest) { if (e.cancelable) e.preventDefault(); if (!fBack && y - fT0 > 10) { fBack = true; backStart(); backBy(y - fT0 - 10); } else if (fBack) backBy(y - fTouchY); }
       fTouchY = y; }, { passive: false });
     addEventListener('wheel', e => { stopGlide(); if (!fLock || e.ctrlKey) return; e.preventDefault(); if (e.deltaY < 0) { backStart(); backBy(-e.deltaY / 6); } }, { passive: false });
+    addEventListener('keydown', e => { if (!fLock || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) return; if ([' ', 'PageDown', 'ArrowDown', 'End'].includes(e.key)) e.preventDefault(); else if (['PageUp', 'ArrowUp'].includes(e.key)) { e.preventDefault(); backStart(); backBy(e.key === 'PageUp' ? 60 : 20); } });
   }
   function filmR(r) {   // r from the scroll -> the r the scene shows
     if (!film || reduced) return r;
-    const now = performance.now(), dt = Math.min(0.25, Math.max(0, (now - fLastT) / 1000)); fLastT = now; fCalled = now; let y = scrollY;
+    const now = performance.now(), dt = Math.min(0.5, Math.max(0, (now - fLastT) / 1000)); fLastT = now; fCalled = now; let y = scrollY;
     if (r > 0 && r < 1) { if (calY === null) { calY = y; calR = r; } else if (Math.abs(y - calY) >= 300 && Math.abs(r - calR) > 1e-4) { const e = (y - calY) / (r - calR); if (e > 0 && isFinite(e)) pxR = e; calY = y; calR = r; } } else calY = null;   // pixels of scroll per unit of r, measured over at least 300 px (only while the page itself moves)
+    if (fParked) {
+      const take = () => { fParked = false; fUserAt = now; pauseFilm(); vr = null; fMine = y; lastReal = r; fPrev = r; return r; };
+      if (!glide && (y < fParkY - 3 || (film.park !== 'end' && y > fParkY + 3))) return take();   // back by hand (or, on a computer, on by hand): the scroll is the truth again
+      fParkY = y;   // (phone: scrolled on, or gliding: the stage leaves with the film still playing)
+      if (fPlaying) { const fr = film.vm.filmFrac(); if (fr != null) vr = fr >= 0.999 ? film.to + 1e-4 : Math.max(vr === null ? film.from : vr, film.from + fr * (film.to - film.from)); }
+      if (!glide && !fGone && now - fParkT > film.glideAfter * 1000) { fGone = true; if (film.park !== 'end') { const px = pxOf(); pauseFilm(); if (px && vr !== null) scrollTo({ top: y + (vr - r) * px, behavior: 'instant' }); fParked = false; vr = null; fMine = scrollY; } glideTo(mainTopY(), film.glideMs || 1800); }
+      return vr !== null ? vr : r;
+    }
+    if (fLock && film.hardLock === false && fMine !== null && y > fMine + 3 && !glide) { scrollTo({ top: fMine, behavior: 'instant' }); y = scrollY; }   // (a computer: nothing scrolls on while it is locked)
     if (fMine !== null && Math.abs(y - fMine) > 3) { fUserAt = now; if (vr !== null) { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } vr = null; } }   // scrolled by something else (a glide, a link): the scroll is the truth again
     // a flick that has carried past the fold in one go is put back to it (the card folds, the message flashes, then it all plays from there)
     if (vr === null && fPrev < CLOSE_R && r > CLOSE_R + 0.002 && r < film.holdTo && fStart() === CLOSE_R) { const px = pxOf(); if (px) { const back = CLOSE_R + 0.0006; setLock(true); scrollTo({ top: y - (r - back) * px, behavior: 'instant' }); y = scrollY; r = back; } }
     fMine = y; lastReal = r;
     const cur = vr !== null ? vr : r; fPrev = cur;
+    if (fDone && cur < unlockR() - 1e-4) fDone = false;   // back before the unlock: it plays by itself again from there
+    if (fDone) { setLock(false); pauseFilm(); vr = null; return r; }   // after the unlock the scroll is the truth
     fZone = cur >= fStart() && cur < film.holdTo; fPull = fZone && cur < film.from;
     if (cur < CLOSE_R) { fHoldAt = 0; fHoldDone = false; }   // back at the quay: the wait happens again next time
     setLock(fZone && (fPull || cur >= film.to || film.vm.filmReady()));   // (not while the film is still loading: it is then scrolled by hand)
@@ -130,6 +156,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
       if (!fPlaying) { if (!film.vm.filmPlay(film.rate)) return cur; fPlaying = true; }
       const fr = film.vm.filmFrac(); if (fr == null) return cur;
       vr = fr >= 0.999 ? film.to + 1e-4 : Math.max(cur, film.from + fr * (film.to - film.from));
+      if (film.unlockAt != null && fr >= film.unlockAt) { park(now); return vr; }
     } else {
       if (fPlaying) { film.vm.filmPause(); fPlaying = false; }
       vr = cur + (film.holdTo - film.to) / film.holdS * dt;
