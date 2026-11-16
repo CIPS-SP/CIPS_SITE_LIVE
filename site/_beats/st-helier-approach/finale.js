@@ -95,7 +95,12 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
      at film.unlockAt (a fraction of the film) the page is PARKED and unlocked. Phone (park 'end'): the page goes, unseen (the stage is pinned), to the very end of the journey, where the next scroll
      slides the stage up into the main site with the film still playing; on a computer (park 'sync') it goes to where the film is, so scrolling on runs the closing line and the shrink into the home page.
      film.glideAfter seconds later, if the visitor has not scrolled, the page glides there by itself (film.glideMs). Going back takes the scroll back as before. */
-  let fParked = false, fDone = false, fParkT = 0, fParkY = 0, fGone = false;
+  let fParked = false, fDone = false, fParkT = 0, fParkY = 0, fGone = false, fParkR = null;
+  /* 16 Nov 2026, later, Simon (phone: after the film, a swipe on bounced back to the top, once flew to the foot of the site): a free swipe from the park ran on with the phone's momentum past the top
+     of the main site and was pulled back (and the page shortening under it as the journey folds away sent it flying). Now, parked, a finger pushing up starts the same glide into the main site
+     (0.9 s, nothing of the swipe's own momentum), and a finger dragged down goes back into the film as before. */
+  const parkedEnd = () => fParked && film.park === 'end' && !root.classList.contains('main-collapsed');
+  const parkBack = () => { const px = pxOf(); pauseFilm(); if (px && vr !== null && fParkR !== null) scrollTo({ top: Math.max(0, scrollY - (fParkR - vr) * px), behavior: 'instant' }); fParked = false; vr = null; fMine = scrollY; fUserAt = performance.now(); fMax = scrollY; };
   const pauseFilm = () => { if (fPlaying) { film.vm.filmPause(); fPlaying = false; } };
   const park = now => { fParked = true; fDone = true; fGone = false; fParkT = now; setLock(false);
     if (film.park === 'end') { const t = mainTopY() - innerHeight; if (t > scrollY) scrollTo({ top: t, behavior: 'instant' }); }
@@ -103,7 +108,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     fParkY = scrollY; fMine = scrollY; };
   const unlockR = () => film.unlockAt != null ? film.from + film.unlockAt * (film.to - film.from) : Infinity;
 
-  if (film && !reduced) setInterval(() => { if (fLock && performance.now() - fCalled > 600) setLock(false); }, 300);   // never left locked when the scene is no longer being drawn (Skip to CIPS, a link, the page in the background)
+  if (film && !reduced) setInterval(() => { if (performance.now() - fCalled > 600) { if (fLock) setLock(false); fParked = false; } }, 300);   // never left locked when the scene is no longer being drawn (Skip to CIPS, a link, the page in the background)
   const pxOf = () => (film.pxPerR && film.pxPerR()) || pxR;
   const setLock = on => { if (on === fLock) return; fLock = on; if (film.hardLock === false) return; if (on) root.style.overflow = 'hidden'; else if (root.style.overflow === 'hidden') root.style.overflow = ''; };   // (16 Nov 2026: on a computer no overflow hidden, which would take the scroll bar away and shift the page; the wheel and the keys are stopped instead, and anything else is put back)
   const syncPage = () => { if (vr === null) return; const px = pxOf(); if (px) scrollTo({ top: scrollY + (vr - lastReal) * px, behavior: 'instant' }); fMine = scrollY; lastReal = vr; vr = null; };   // the page to where the film is
@@ -112,10 +117,11 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
   const backStart = () => { if (!handNow()) { stopFilm(); fMax = scrollY; } };
   const backBy = dy => { if (!dy) return; scrollTo({ top: Math.min(fMax, Math.max(0, scrollY - 6 * dy)), behavior: 'instant' }); fUserAt = performance.now(); };   // the page follows the finger back, 6 px to each px of the finger (one screen's drag is about a second of film), never on past where the playback was
   if (film && !reduced) {
-    addEventListener('touchstart', e => { stopGlide(); fTouchY = fT0 = e.touches[0] ? e.touches[0].clientY : 0; fGest = fLock; fBack = false; }, { passive: true });
+    addEventListener('touchstart', e => { fTouchY = fT0 = e.touches[0] ? e.touches[0].clientY : 0; fBack = false; if (parkedEnd()) fGest = 'park'; else { stopGlide(); fGest = fLock; } }, { passive: true });
     const lift = () => { if (fBack) fUserAt = performance.now(); fBack = false; fGest = false; }; addEventListener('touchend', lift, { passive: true }); addEventListener('touchcancel', lift, { passive: true });
     addEventListener('touchmove', e => { const y = e.touches[0] ? e.touches[0].clientY : fTouchY;
-      if (fGest) { if (e.cancelable) e.preventDefault(); if (!fBack && y - fT0 > 10) { fBack = true; backStart(); backBy(y - fT0 - 10); } else if (fBack) backBy(y - fTouchY); }
+      if (fGest === 'park') { if (e.cancelable) e.preventDefault(); if (fBack) backBy(y - fTouchY); else if (!glide) { if (y < fT0 - 6) glideTo(mainTopY(), 900); else if (y - fT0 > 10) { parkBack(); fBack = true; backBy(y - fT0 - 10); } } }
+      else if (fGest) { if (e.cancelable) e.preventDefault(); if (!fBack && y - fT0 > 10) { fBack = true; backStart(); backBy(y - fT0 - 10); } else if (fBack) backBy(y - fTouchY); }
       fTouchY = y; }, { passive: false });
     addEventListener('wheel', e => { stopGlide(); if (!fLock || e.ctrlKey) return; e.preventDefault(); if (e.deltaY < 0) { backStart(); backBy(-e.deltaY / 6); } }, { passive: false });
     addEventListener('keydown', e => { if (!fLock || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) return; if ([' ', 'PageDown', 'ArrowDown', 'End'].includes(e.key)) e.preventDefault(); else if (['PageUp', 'ArrowUp'].includes(e.key)) { e.preventDefault(); backStart(); backBy(e.key === 'PageUp' ? 60 : 20); } });
@@ -127,7 +133,7 @@ export function createFinale({ stage, host, line = 'The Channel Islands – Your
     if (fParked) {
       const take = () => { fParked = false; fUserAt = now; pauseFilm(); vr = null; fMine = y; lastReal = r; fPrev = r; return r; };
       if (!glide && (y < fParkY - 3 || (film.park !== 'end' && y > fParkY + 3))) return take();   // back by hand (or, on a computer, on by hand): the scroll is the truth again
-      fParkY = y;   // (phone: scrolled on, or gliding: the stage leaves with the film still playing)
+      fParkY = y; fParkR = r;   // (phone: scrolled on, or gliding: the stage leaves with the film still playing)
       if (fPlaying) { const fr = film.vm.filmFrac(); if (fr != null) vr = fr >= 0.999 ? film.to + 1e-4 : Math.max(vr === null ? film.from : vr, film.from + fr * (film.to - film.from)); }
       if (!glide && !fGone && now - fParkT > film.glideAfter * 1000) { fGone = true; if (film.park !== 'end') { const px = pxOf(); pauseFilm(); if (px && vr !== null) scrollTo({ top: y + (vr - r) * px, behavior: 'instant' }); fParked = false; vr = null; fMine = scrollY; } glideTo(mainTopY(), film.glideMs || 1800); }
       return vr !== null ? vr : r;

@@ -2487,6 +2487,7 @@ export async function mount(stage, o, ctx){
     camera.aspect = w / h; camera.updateProjectionMatrix();
     renderer.setSize(w, h);
     labelRenderer.setSize(w, h);
+    try { renderer.render(scene, camera); } catch (e) {}   // 16 Nov 2026, Simon (iPhone: the globe went black for a moment on the first scroll): resizing wipes the canvas (the toolbar folding away makes the screen taller), so it is drawn again at once rather than on the next frame
     kinHostR = host.getBoundingClientRect(); kinStageR = stage.getBoundingClientRect();   // refresh the cache worldToStagePx() uses
   }
   // CIPS/site fix (15 Sep 2026): in this page's layout, `host` can still be 0×0 at mount — before layoutGroups() has
