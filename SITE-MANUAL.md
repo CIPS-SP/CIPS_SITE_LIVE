@@ -103,6 +103,52 @@ The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the da
 | **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time; shows today, 7, 30, 90 and 365 days and all time (nothing is ever deleted). |
 | **Business listing** | Google Business Profile (business.google.com/locations shows the ones you manage). Two listings were found on 17 Nov 2026: A, "Channel Island Port Services" (07797 720723, 1 review, links to the site), and B, "... - CIPS (St Helier Port Services Ltd)" (01534 870300, 22 reviews, no website). The plan: claim or get access to B, bring it up to date (name, www.cips.agency, the 24/7 number, open 24 hours, the address exactly as on the site), then merge A into it or report A as a duplicate. |
 
+### Monthly check (about 20 minutes)
+
+Do this once a month. To have it read through, export or screenshot what you see and share it in a Claude session: it can explain what the figures mean and suggest what to change.
+
+**1. Google Search Console** (search.google.com/search-console, property cips.agency; set the date range to the last 28 days, or compare with the previous period):
+- **Performance:**
+  - The four numbers: impressions (how often the site appeared in Google), clicks, CTR (clicks as a share of impressions) and average position (1 is the top).
+  - Then the **Queries** tab (the searches people typed before seeing the site) and the **Pages** tab.
+  - To share it: Export (top right) > Download CSV.
+- **Indexing > Pages:**
+  - Indexed should be the home page and the three legal pages.
+  - Expected under "Not indexed", and fine: the switched-off desk pages ("Excluded by noindex tag"), the old Wix addresses ("Page with redirect"), and /review/ ("Blocked by robots.txt").
+  - Anything else listed there is worth a look.
+- **Sitemaps:** the status should be **Success**, with 4 pages.
+- **Experience** (Core Web Vitals, HTTPS): green is good. It needs a few weeks of visitors first.
+- Google also emails real problems to the account.
+
+**2. Cloudflare Web Analytics** (Cloudflare menu > Web Analytics > www.cips.agency):
+- visits and page views over the month
+- the top pages
+- where visitors came from ("referrers": Google, LinkedIn, WhatsApp, typed in)
+- countries, and phone or computer
+
+**3. Journey counts** (https://cips-review-drop-box.simon-92c.workers.dev/stats, any user name, the `STATS_KEY` password). Look at the "Last 30 days" column:
+- How many started the journey, as a share of those who saw the globe.
+- How far they got: sea, coast, harbour, quay, film.
+- How many skipped to CIPS, and where: at the globe, or during the journey.
+- How many sent an enquiry.
+
+A sharp drop between two milestones shows where people lose interest.
+
+**4. The drop box's health** (Cloudflare > Workers & Pages > **cips-review-drop-box**):
+- **Metrics:** requests and errors over the month. A few errors are normal (made-up review codes, refused requests from other websites). A steady stream is worth a look.
+- **Logs** (Observability): the drop box's own log of recent requests and anything that went wrong. Filter by "error" to see only problems.
+- **Settings > Triggers:** the 5-minute schedule should be listed (it resends enquiries that failed and raises the ntfy alert).
+- **Allowances:**
+  - Cloudflare > Storage & databases > KV > **BOX**: the daily writes, against the ~1,000 a day free allowance. Reviews, links and enquiries use them, and should be far below.
+  - Durable Objects > **Counter**: the journey counts' requests, against the ~100,000 a day allowance.
+  - Workers & Pages > Overview: the account's daily Worker requests (also ~100,000 a day).
+- **Enquiries:** each one should have arrived at dutyagent@. If an ntfy alert ever came in, check that enquiry was answered.
+
+**5. Google Business Profile** (business.google.com):
+- new reviews: reply to them
+- the profile's own figures: searches, calls, direction requests
+- that the details still match the website
+
 ## 5. Privacy promises the code must keep
 
 The **Cookies** and **Privacy** pages (`site/legal/`) describe exactly what the site does. If the code changes, they change with it:
