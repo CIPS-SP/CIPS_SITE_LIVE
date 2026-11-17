@@ -127,7 +127,7 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 3. Add it to `site/sitemap.xml`, without ".html".
 4. Turn its home page card back into a link: `data-off-href` becomes `href` in `index.html`.
 
-**The business details Google and AI assistants read:** the `application/ld+json` block near the top of `site/index.html`. Name, legal name, phone, email, area, opening hours, services, LinkedIn.
+**The business details Google and AI assistants read:** the `application/ld+json` block near the top of `site/index.html`. Name, legal name, address (New North Quay, St Helier Marina, St Helier, Jersey JE2 3ND, Simon 17 Nov 2026), phone, email, area, opening hours, services, LinkedIn.
 
 **Something to count on the journey:** add the word in `review-drop-box/src/counts.js` (`EVENTS`) and in `site/js/journey-counts.js`, deploy the drop box, then release the site.
 
