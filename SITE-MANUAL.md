@@ -90,7 +90,7 @@ If writes ever run out, new reviews and enquiries could not be saved until the n
 
 The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the dashboard and that file the same**: a deploy from this PC writes the file's values over the dashboard's.
 
-**Enquiry alert (17 Nov 2026):** `ALERT_URL` (secret) is a private **ntfy** channel (`https://ntfy.sh/<topic>`; the topic name is in Simon's ntfy app, never in the repo). If an enquiry is not confirmed delivered within an hour, or Brevo refuses the key, the drop box sends an urgent push notification to the ntfy app on Simon's phone. It carries only the enquiry reference, topic and time; the names and contact details stay in the drop box. Anyone else who should get the alert subscribes to the same topic in the ntfy app. To change it, set a new `ALERT_URL` secret.
+**Enquiry alert (17 Nov 2026):** `ALERT_URL` (secret) is a private **ntfy** channel (`https://ntfy.sh/<topic>`; the topic name is in Simon's ntfy app, never in the repo). If an enquiry is not confirmed delivered within an hour, or Brevo refuses the key, the drop box sends an urgent push notification to the ntfy app on Simon's phone. It carries only the enquiry reference, topic and time; the names and contact details stay in the drop box. Anyone else who should get the alert installs the free ntfy app and subscribes to the same topic (server ntfy.sh). A test can be sent with any web request to the topic's address. To change it, set a new `ALERT_URL` secret.
 
 **Brevo's free plan** sends up to 300 emails a day. It is used only for enquiries.
 
@@ -98,10 +98,10 @@ The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the da
 
 | What | Where |
 |---|---|
-| **Visits:** how many people, which pages, where they came from, country, device | **Cloudflare Web Analytics** (Cloudflare menu > Web Analytics). Cookie-free. Switched on in the Pages project on 17 Nov 2026; Cloudflare adds its script when the site is next published. |
-| **Search:** how often you appear in Google, for which searches, clicks | **Google Search Console**, domain property **cips.agency**, verified by the TXT record above. Sitemap submitted: `https://www.cips.agency/sitemap.xml`. |
+| **Visits:** how many people, which pages, where they came from, country, device | **Cloudflare Web Analytics** (Cloudflare menu > Web Analytics). Cookie-free. Switched on in the Pages project on 17 Nov 2026 and live since the release that day. |
+| **Search:** how often you appear in Google, for which searches, clicks | **Google Search Console** (search.google.com/search-console, under the Google account Simon used on 17 Nov 2026), domain property **cips.agency**, verified by the TXT record above. Sitemap submitted: `https://www.cips.agency/sitemap.xml`. |
 | **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time; shows today, 7, 30, 90 and 365 days and all time (nothing is ever deleted). |
-| **Business listing** | Google Business Profile: there are two listings. The 07797 720723 one links to www.cips.agency. The 01534 870300 one (22 reviews) has no website link: Simon to check which he manages. |
+| **Business listing** | Google Business Profile (business.google.com/locations shows the ones you manage). Two listings were found on 17 Nov 2026: A, "Channel Island Port Services" (07797 720723, 1 review, links to the site), and B, "... - CIPS (St Helier Port Services Ltd)" (01534 870300, 22 reviews, no website). The plan: claim or get access to B, bring it up to date (name, www.cips.agency, the 24/7 number, open 24 hours, the address exactly as on the site), then merge A into it or report A as a duplicate. |
 
 ## 5. Privacy promises the code must keep
 
@@ -140,7 +140,7 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 3. Only when Simon says "push": push `dev`, then push `dev` to `main`. Cloudflare publishes `main` within a minute or two.
 4. **To undo a bad release quickly:** Cloudflare > cipslive > Deployments > pick the previous good one > Rollback.
 
-The drop box is separate. It changes only with `npx wrangler deploy` from `review-drop-box/`, after `npx wrangler login` as the CIPS Cloudflare account.
+The drop box is separate. It changes only with `npx wrangler deploy` from `review-drop-box/`, after `npx wrangler login` as the CIPS Cloudflare account (Simon clicks Allow in the browser). This PC is kept signed out between changes (`npx wrangler logout`, 17 Nov 2026), so nothing on it can reach the Cloudflare account.
 
 ## 8. Dates to remember
 
