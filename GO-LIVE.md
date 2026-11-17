@@ -2,6 +2,26 @@
 
 Prepared 17 Nov 2026. These steps move **www.cips.agency** from the old Wix site to the new site (Cloudflare Pages project `cipslive`, which builds `main`). They also send **cips.agency** on to www. Email (Microsoft 365) is not touched at any point.
 
+## Before the day: where things stand (Simon, 17 Nov 2026)
+
+**Done or settled:**
+- The self-playing finale is fine on a computer.
+- The iPhone crash after a fast scroll is fixed.
+- Nothing from the Wix gallery needs keeping.
+- Image and footage permissions are fine, the Visit Jersey logo included.
+
+**Still to check:** a tablet, an Android phone, a phone held sideways, slow mobile data.
+
+**Still to choose:** how to be alerted if an enquiry has not reached dutyagent@ within an hour (`ALERT_URL`, HANDOVER item 16).
+
+**Kept on the list, not blocking go-live (Simon):**
+- Airtable's data processing agreement and the Jersey addendum.
+- A Jersey adviser's read of the legal pages.
+
+**Google Business Profile (checked on Google Maps, 17 Nov 2026):** there are two listings.
+- "Channel Island Port Services": Shipping service, New North Quay, open 24 hours, 07797 720723, 5.0 from 1 review. It already links to https://www.cips.agency/, so nothing to change at go-live.
+- "Channel Island Port Services - CIPS (St Helier Port Services Ltd)": Port, New North Quay, 01534 870300, 4.2 from 22 reviews, no website link. Simon to check which one he manages, and whether the second should be claimed and merged, or given the website.
+
 ## How things are today (checked 17 Nov 2026)
 
 - **DNS is at GoDaddy** (nameservers ns19/ns20.domaincontrol.com), and it stays there. The nameservers do not move.
@@ -57,7 +77,7 @@ None of these do anything until www.cips.agency points at the new site.
 11. **Search engines.**
     - The response headers on www.cips.agency show no `noindex`.
     - Add www.cips.agency in Google Search Console (verified by a TXT record at GoDaddy; a new TXT record does not affect email) and submit `https://www.cips.agency/sitemap.xml`. Same in Bing Webmaster Tools.
-    - Update the website address in the Google Business Profile.
+    - Google Business Profile: the listing with 07797 720723 already links to https://www.cips.agency/ (see above).
 
 ## Afterwards
 
