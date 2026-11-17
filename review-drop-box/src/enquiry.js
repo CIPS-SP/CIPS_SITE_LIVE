@@ -9,8 +9,8 @@
 //   GET /api/enquiries (Desk password) lists them with their state, so nothing depends on the email alone.
 //
 // Settings: BREVO_API_KEY (secret), BREVO_WEBHOOK_TOKEN (secret: the bearer token Brevo's webhook sends), MAIL_FROM (variable,
-// "Name <address>", a sender verified in Brevo; cips.agency is deliberately not authenticated there, Simon 7 Nov), ALERT_URL (secret: an address anyone could post to; channel still to
-// choose), ALERT_AFTER_MIN (variable, default 60). BREVO_API is only changed for local tests.
+// "Name <address>", a sender verified in Brevo; cips.agency is deliberately not authenticated there, Simon 7 Nov), ALERT_URL (secret: since 17 Nov 2026 a private ntfy.sh topic,
+// https://ntfy.sh/<topic>; Simon's phone has the ntfy app subscribed to it), ALERT_AFTER_MIN (variable, default 60). BREVO_API is only changed for local tests.
 
 import { makeCode } from './code.js';
 
@@ -193,8 +193,8 @@ export async function runSchedule(env, now, fetcher = fetch) {
   }
   if (late.length && env.ALERT_URL) {
     const text = late.length + (late.length === 1 ? ' website enquiry has' : ' website enquiries have') + ' not been confirmed delivered to ' + TO + '.\n\n' +
-      late.map((i) => i.ref + ' · ' + (TOPICS[i.topic] || '') + ' · ' + i.name + ' · ' + i.contact + ' · ' + i.at.slice(0, 16).replace('T', ' ') + ' UTC · ' + (i.lastError || i.status)).join('\n') +
-      '\n\nThey are safe in the drop box (30 days). Please contact them directly and check the email set-up.';
+      late.map((i) => i.ref + ' · ' + (TOPICS[i.topic] || '') + ' · ' + i.at.slice(0, 16).replace('T', ' ') + ' UTC · ' + (i.lastError || i.status)).join('\n') +
+      '\n\nThey are safe in the drop box (30 days): the names and contact details are in GET /api/enquiries. Please contact them directly and check the email set-up.';   // 17 Nov 2026, Simon chose ntfy for this alert: references only, no names or contact details pass through it
     try {
       const r = await fetcher(env.ALERT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain; charset=utf-8', Title: 'CIPS website: enquiry not delivered', Priority: 'high', Tags: 'warning' }, body: text, signal: AbortSignal.timeout(10000) });
       if (r.ok) for (const i of late) { i.alertedAt = new Date(now).toISOString(); await put(env, i); }

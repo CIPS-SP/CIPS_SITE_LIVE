@@ -82,6 +82,7 @@ If writes ever run out, new reviews and enquiries could not be saved until the n
 | `BREVO_API_KEY` | secret | Sending enquiry emails |
 | `BREVO_WEBHOOK_TOKEN` | secret | Brevo's delivery reports |
 | `STATS_KEY` | secret | The password for the journey counts page |
+| `ALERT_URL` | secret | The private ntfy channel for the enquiry alert |
 | `ALLOWED_ORIGINS` | setting | The site's own addresses (cipslive.pages.dev, cips.agency, www.cips.agency) |
 | `REVIEW_PAGE` | setting | `https://www.cips.agency/review/` |
 | `MAIL_FROM` | setting | `CIPS Website <admin@cips.agency>` |
@@ -89,7 +90,7 @@ If writes ever run out, new reviews and enquiries could not be saved until the n
 
 The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the dashboard and that file the same**: a deploy from this PC writes the file's values over the dashboard's.
 
-**Still open:** `ALERT_URL`, which would alert someone when an enquiry has not been delivered within an hour, is not set yet (HANDOVER item 16).
+**Enquiry alert (17 Nov 2026):** `ALERT_URL` (secret) is a private **ntfy** channel (`https://ntfy.sh/<topic>`; the topic name is in Simon's ntfy app, never in the repo). If an enquiry is not confirmed delivered within an hour, or Brevo refuses the key, the drop box sends an urgent push notification to the ntfy app on Simon's phone. It carries only the enquiry reference, topic and time; the names and contact details stay in the drop box. Anyone else who should get the alert subscribes to the same topic in the ntfy app. To change it, set a new `ALERT_URL` secret.
 
 **Brevo's free plan** sends up to 300 emails a day. It is used only for enquiries.
 
@@ -155,7 +156,6 @@ The drop box is separate. It changes only with `npx wrangler deploy` from `revie
 
 - Airtable's data processing agreement, with Jersey's addendum.
 - A Jersey adviser's read of the legal pages.
-- The enquiry alert channel (`ALERT_URL`).
 - A look on a tablet and an Android phone.
 - Email security on sthelierportservices.com and sthps.com.
 - A one-page "if something goes wrong" note.

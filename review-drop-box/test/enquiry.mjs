@@ -128,12 +128,12 @@ await t('a report is also matched by our tag if the message id is missing', asyn
   await report(e, 'delivered', undefined, { extra: { tags: ['enq-' + it.id] } });
   assert.equal((await items(e))[0].status, 'delivered');
 });
-await t('not confirmed delivered after an hour: one alert, with the reference and how to reach them; not repeated', async () => {
+await t('not confirmed delivered after an hour: one alert, with the reference but no contact details; not repeated', async () => {
   net = fakeNet(); const e = env();
   await post(e, form()); const [it] = await items(e);
   clock += 59 * 60000; await runSchedule(e, clock, net.f); assert.equal(net.alerts.length, 0);
   clock += 2 * 60000; await runSchedule(e, clock, net.f);
-  assert.equal(net.alerts.length, 1); assert.ok(net.alerts[0].includes(it.ref)); assert.ok(net.alerts[0].includes('alex@yacht.example'));
+  assert.equal(net.alerts.length, 1); assert.ok(net.alerts[0].includes(it.ref)); assert.ok(!net.alerts[0].includes('alex@yacht.example'))   // (17 Nov 2026: the alert goes through ntfy, so no contact details in it);
   clock += 5 * 60000; await runSchedule(e, clock, net.f); assert.equal(net.alerts.length, 1);
 });
 await t('a bounce raises the alert at once', async () => {
