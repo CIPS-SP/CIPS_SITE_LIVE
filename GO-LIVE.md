@@ -10,7 +10,7 @@ Prepared 17 Nov 2026. These steps move **www.cips.agency** from the old Wix site
 - Nothing from the Wix gallery needs keeping.
 - Image and footage permissions are fine, the Visit Jersey logo included.
 
-**Still to check:** a tablet, an Android phone, a phone held sideways, slow mobile data.
+**Still to check:** a tablet, an Android phone, slow mobile data. (A phone held sideways now gets 'Turn your phone upright' over the journey, with Skip to CIPS; 17 Nov 2026.)
 
 **Still to choose:** how to be alerted if an enquiry has not reached dutyagent@ within an hour (`ALERT_URL`, HANDOVER item 16).
 

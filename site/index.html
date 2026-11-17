@@ -1144,5 +1144,36 @@
       skipBtn.classList.toggle('ingame', inGame); syncMainClass();
     }, 300);
   </script>
+  <!-- 17 Nov 2026, Simon (iPhone held sideways: the globe half hidden by the header and the cards, then a crash on scrolling): the journey is made for a phone held upright, so a sideways phone
+       sees this instead while the journey is on screen, with Skip to CIPS for the main site (which works sideways). Nothing scrolls under it, so the scenes are not driven or rebuilt. -->
+  <div id="turnUpright" hidden><svg class="tu-ico" viewBox="0 0 184 72" width="184" height="72" aria-hidden="true"><rect x="4" y="20" width="60" height="34" rx="6" fill="none" stroke="rgba(244,239,230,.55)" stroke-width="2.5"/><circle cx="58" cy="37" r="1.8" fill="rgba(244,239,230,.55)"/><path class="tu-arr" d="M78 30 A16 16 0 0 1 106 30" fill="none" stroke="#F45300" stroke-width="2.5" stroke-linecap="round"/><path class="tu-arr" d="M106 30 l-7 -1.5 M106 30 l1.5 -7" fill="none" stroke="#F45300" stroke-width="2.5" stroke-linecap="round"/><path class="tu-arr" d="M106 46 A16 16 0 0 1 78 46" fill="none" stroke="#F45300" stroke-width="2.5" stroke-linecap="round"/><path class="tu-arr" d="M78 46 l7 1.5 M78 46 l-1.5 7" fill="none" stroke="#F45300" stroke-width="2.5" stroke-linecap="round"/><rect x="122" y="4" width="36" height="62" rx="6" fill="none" stroke="#f4efe6" stroke-width="2.5"/><circle cx="140" cy="60" r="1.8" fill="#f4efe6"/></svg><h2>Turn your phone upright</h2><p>The journey is made to be held upright. Turn your phone, or go straight to the site.</p><button type="button">Skip to CIPS &darr;</button></div>
+  <style>
+    #turnUpright{position:fixed;inset:0;z-index:100000;background:#04070e;color:#f4efe6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px 28px}
+    #turnUpright[hidden]{display:none}
+    #turnUpright .tu-ico{margin-bottom:6px}   /* a sideways phone, turning arrows, an upright phone */
+    #turnUpright .tu-arr{animation:tuPulse 1.8s ease-in-out infinite}
+    @keyframes tuPulse{0%,100%{opacity:.45}50%{opacity:1}}
+    #turnUpright h2{margin:0;font:500 22px/1.2 'Jost',system-ui,sans-serif;letter-spacing:.02em}
+    #turnUpright p{margin:0;max-width:30em;font:400 15px/1.45 'Inter Tight',system-ui,sans-serif;color:rgba(244,239,230,.72)}
+    #turnUpright button{margin-top:4px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:11px 22px;font:600 12px 'Jost',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+  </style>
+  <script>
+    (() => {
+      const el = document.getElementById('turnUpright'), skip = document.getElementById('skipToCips'), oa = document.getElementById('openingAct'), root = document.documentElement;
+      const coarse = matchMedia('(pointer: coarse)').matches;
+      let shown = false, skipping = false;
+      const sync = () => {
+        const sideways = coarse && Math.min(innerWidth, innerHeight) <= 480 && innerWidth > innerHeight;
+        const inJourney = !!oa && !root.classList.contains('main-collapsed') && oa.getBoundingClientRect().bottom > innerHeight * 0.5;
+        const want = sideways && inJourney && !skipping;
+        if (want !== shown) { shown = want; el.hidden = !want; }
+      };
+      const stop = e => { if (shown && e.cancelable) e.preventDefault(); };
+      addEventListener('touchmove', stop, { passive: false }); addEventListener('wheel', stop, { passive: false });
+      addEventListener('keydown', e => { if (shown && [' ', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'End', 'Home'].includes(e.key)) e.preventDefault(); });
+      el.querySelector('button').addEventListener('click', () => { skipping = true; shown = false; el.hidden = true; if (skip) skip.click(); setTimeout(() => { skipping = false; sync(); }, 3000); });
+      addEventListener('resize', sync); addEventListener('orientationchange', () => setTimeout(sync, 300)); setInterval(sync, 500); sync();
+    })();
+  </script>
 </body>
 </html>
