@@ -99,7 +99,7 @@ The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the da
 |---|---|
 | **Visits:** how many people, which pages, where they came from, country, device | **Cloudflare Web Analytics** (Cloudflare menu > Web Analytics). Cookie-free. Switched on in the Pages project on 17 Nov 2026; Cloudflare adds its script when the site is next published. |
 | **Search:** how often you appear in Google, for which searches, clicks | **Google Search Console**, domain property **cips.agency**, verified by the TXT record above. Sitemap submitted: `https://www.cips.agency/sitemap.xml`. |
-| **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time. |
+| **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time; shows today, 7, 30, 90 and 365 days and all time (nothing is ever deleted). |
 | **Business listing** | Google Business Profile: there are two listings. The 07797 720723 one links to www.cips.agency. The 01534 870300 one (22 reviews) has no website link: Simon to check which he manages. |
 
 ## 5. Privacy promises the code must keep

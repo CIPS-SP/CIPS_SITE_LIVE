@@ -148,7 +148,7 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     let pass = ''; try { pass = h.startsWith('Basic ') ? atob(h.slice(6)).split(':').slice(1).join(':') : ''; } catch (e) { pass = ''; }
     if (!(await sameSecret(pass, env.STATS_KEY))) return new Response('Sign in to see the CIPS journey counts.', { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="CIPS journey counts", charset="UTF-8"', 'Cache-Control': 'no-store' } });
     const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
-    const rows = await (await stub.fetch('https://counter/list?since=' + dayOf(now - 89 * 86400000))).json();
+    const rows = await (await stub.fetch('https://counter/list?since=0000-00-00')).json();
     return new Response(statsPage(rows, now), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
   }
 

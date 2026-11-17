@@ -52,12 +52,14 @@ export class Counter {
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-// the totals page: the last 7, 30 and 90 days per milestone (with the share of everyone who saw the globe), then day by day
+// the totals page: today, the last 7, 30, 90 and 365 days and all time per milestone (with the share of everyone who saw the globe), then day by day.
+// Nothing is ever deleted: every day's totals are kept (a row per milestone per day, a few kilobytes a year).
 export function statsPage(rows, now) {
   const days = [...new Set(rows.map((r) => r.day))].sort().reverse();
   const get = {}; for (const r of rows) (get[r.day] || (get[r.day] = {}))[r.ev] = r.n;
-  const sum = (n, ev) => { const from = dayOf(now - (n - 1) * 86400000); return rows.filter((r) => r.ev === ev && r.day >= from).reduce((a, r) => a + r.n, 0); };
-  const spans = [[1, 'Today'], [7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days']];
+  const sum = (n, ev) => { const from = n ? dayOf(now - (n - 1) * 86400000) : ''; return rows.filter((r) => r.ev === ev && r.day >= from).reduce((a, r) => a + r.n, 0); };
+  const first = days.length ? days[days.length - 1] : null;
+  const spans = [[1, 'Today'], [7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days'], [365, 'Last 12 months'], [0, 'All time']];
   const pct = (a, b) => (b ? ' <small>' + Math.round((100 * a) / b) + '%</small>' : '');
   const head = '<tr><th>Milestone</th>' + spans.map(([, l]) => '<th>' + l + '</th>').join('') + '</tr>';
   const body = ORDER.map((ev) => '<tr><td>' + esc(EVENTS[ev]) + '</td>' + spans.map(([n]) => { const v = sum(n, ev), o = sum(n, 'open'); return '<td>' + v + (ev === 'open' ? '' : pct(v, o)) + '</td>'; }).join('') + '</tr>').join('');
@@ -67,6 +69,6 @@ export function statsPage(rows, now) {
     '<style>body{font:15px/1.45 system-ui,sans-serif;margin:24px;color:#14202a;max-width:1100px}h1{font-size:22px;margin:0 0 4px}p{color:#56636e;margin:0 0 18px}' +
     'table{border-collapse:collapse;margin:0 0 28px;font-variant-numeric:tabular-nums}th,td{border-bottom:1px solid #e3e6ea;padding:7px 12px;text-align:right}th:first-child,td:first-child{text-align:left}' +
     'th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#56636e}small{color:#8a95a0}.wrap{overflow-x:auto}</style>' +
-    '<h1>CIPS journey counts</h1><p>Each milestone counts once per visit (a browser tab). Percentages are of everyone who saw the globe. Days are Jersey time. No cookies, nothing about the visitor is kept.</p>' +
+    '<h1>CIPS journey counts</h1><p>Each milestone counts once per visit (a browser tab). Percentages are of everyone who saw the globe. Days are Jersey time. No cookies, nothing about the visitor is kept.' + (first ? ' Counting since ' + first + '.' : '') + '</p>' +
     '<div class="wrap"><table>' + head + body + '</table></div><h1 style="font-size:18px">Day by day (last 30 days with visits)</h1><div class="wrap"><table>' + dhead + (dbody || '<tr><td colspan="14">Nothing yet.</td></tr>') + '</table></div></html>';
 }
