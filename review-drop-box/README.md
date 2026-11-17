@@ -36,6 +36,8 @@ node tools/fake-desk.mjs          # collects what was sent (add --keep to look w
 | `PUT /api/reviews` | Desk | Publishes the approved list. The box cuts it to the public fields. |
 | `GET /api/reviews` | public | That list, cached 5 minutes. Empty list until the Desk publishes. |
 | `GET /api/health` | public | `{ok:true}` |
+| `POST /api/count` | public (site addresses only) | Journey milestones from the home page, plain text such as `open,start` (17 Nov 2026, `src/counts.js`). Counted per day in the `Counter` Durable Object, never in BOX. Always answers 204. |
+| `GET /stats` | Simon | The journey counts as a page (today, 7, 30, 90 days, and day by day). The browser asks for a password: any user name, the `STATS_KEY` secret as the password. 404 until `STATS_KEY` is set. |
 
 Desk calls carry `Authorization: Bearer <COLLECT_SECRET>`. Raw IP addresses are never stored (a hash is used for the rate limit and expires in two hours). Cross-site posts are only accepted from `ALLOWED_ORIGINS`.
 
@@ -72,3 +74,12 @@ Check Cloudflare's current free allowances first (not checked: expected to be fa
 
 ## Not built yet
 Bot check beyond the trap field and rate limits (Cloudflare Turnstile is the planned extra); switching the website's review sections to read `/api/reviews`; replacing the home page's "Rate…" link.
+
+## Journey counts (17 Nov 2026)
+The home page (`site/js/journey-counts.js`) sends one word per milestone, once per visit (browser tab): `open` (saw the globe), `start`, `skip_globe`, `sea`, `coast`, `harbour`, `quay`, `film`, `skip_journey`, `finished` (on to the main site after the film), `main`, `sideways`, `enquiry`. The list and the labels are in `src/counts.js` (`EVENTS`); add a word there and in the page to count something new.
+
+**Why a Durable Object and not BOX:** the free plan gives BOX about **1,000 writes a day for everything**, and those are kept for reviews, review links, enquiries and the rate limits. The counts would use them up on a busy day, so they live in their own Durable Object (`Counter`, one SQLite table, binding `COUNTER`, see `wrangler.toml`), which has its own, much larger free allowance (100,000 requests and row writes a day at the time of writing; check Cloudflare's current figures). One milestone is one request and one row write.
+
+**Setting up (once):** the Durable Object comes with the code, so the box must be deployed from this folder (`npx wrangler deploy`, after `npx wrangler login` as the CIPS Cloudflare account). Then add the secret `STATS_KEY` (Workers & Pages > cips-review-drop-box > Settings > Variables and Secrets > Add, type Secret) and open `https://cips-review-drop-box.simon-92c.workers.dev/stats`.
+
+**Local test:** `node dev/dev-server.mjs` (a stand-in counter, `dev/memory-counter.js`), the site at http://localhost:8787/, the counts at http://localhost:8787/stats (password `dev-stats`).

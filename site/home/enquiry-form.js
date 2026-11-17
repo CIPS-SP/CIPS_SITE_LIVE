@@ -77,7 +77,7 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { s: r.status, j: j }; }); })
       .then(function (o) {
         clearTimeout(timer);
-        if (o.s === 200 && o.j && o.j.ok && o.j.ref) return done(d, o.j.ref);
+        if (o.s === 200 && o.j && o.j.ok && o.j.ref) { try { dispatchEvent(new CustomEvent('cips:count', { detail: 'enquiry' })); } catch (e) {} return done(d, o.j.ref); }   // (17 Nov 2026: counted on the home page, js/journey-counts.js)
         failed(d, o.s === 429 ? 'We are receiving a lot of enquiries just now, so this one has not been sent.' : 'Sorry, this has not been sent.');
       })
       .catch(function () { clearTimeout(timer); failed(d, 'Sorry, we could not reach CIPS from here, so this has not been sent.'); });

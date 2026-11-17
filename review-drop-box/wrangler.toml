@@ -40,3 +40,13 @@ id = "2c88883b101e4edfaac53006ad8c7465"   # KV namespace "BOX", created 5 Nov 20
 #   wrangler secret put BREVO_API_KEY           (a Brevo API key, xkeysib-...)
 #   wrangler secret put BREVO_WEBHOOK_TOKEN     (a long random value; the same one goes in Brevo's webhook as its bearer token)
 #   wrangler secret put ALERT_URL               (where the "not delivered" alert is posted; channel still to choose)
+
+# 17 Nov 2026: the journey counts (src/counts.js) live in their own Durable Object with a small SQLite table, not in BOX
+# (BOX has about 1,000 writes a day on the free plan, kept for reviews and enquiries). STATS_KEY (secret, set in the dashboard) opens /stats.
+[[durable_objects.bindings]]
+name = "COUNTER"
+class_name = "Counter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Counter"]

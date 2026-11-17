@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { handle } from '../src/worker.js';
 import { runSchedule } from '../src/enquiry.js';
 import { memoryKV } from './memory-kv.js';
+import { memoryCounter } from './memory-counter.js';
 
 const PORT = Number(process.env.PORT || 8787);
 const here = fileURLToPath(new URL('.', import.meta.url));
@@ -30,6 +31,8 @@ const env = {
   ALERT_URL: BASE + '/__alerts',
   ALERT_AFTER_MIN: process.env.ALERT_AFTER_MIN || '2',
   MAIL_FROM: 'CIPS website <website@cips.agency>',
+  STATS_KEY: process.env.STATS_KEY || 'dev-stats',
+  COUNTER: memoryCounter(),   // (17 Nov 2026) a stand-in for the Durable Object that keeps the journey counts
 };
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.json': 'application/json', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.ico': 'image/x-icon' };
 
@@ -73,7 +76,7 @@ http.createServer(async (req, res) => {
       return;
     }
     // ---- the box ----
-    if (url.pathname.startsWith('/api/')) {
+    if (url.pathname.startsWith('/api/') || url.pathname === '/stats') {   // (/stats: the journey counts, 17 Nov 2026)
       const body = ['GET', 'HEAD', 'OPTIONS'].includes(req.method) ? undefined : await readBody(req);
       const headers = { ...req.headers, 'cf-connecting-ip': req.socket.remoteAddress || '' };
       const out = await handle(new Request(url, { method: req.method, headers, body }), env);

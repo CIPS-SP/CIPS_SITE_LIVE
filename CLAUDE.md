@@ -1,6 +1,6 @@
 # CIPS Site LIVE: notes for Claude
 
-Public website of Channel Island Port Services (cips.agency). **Read `HANDOVER.md` first** (state, map of the site, the journey in detail, how to test, editing traps, open jobs), then `README.md` for the branches and the folders. Keep `HANDOVER.md` true: when something it says changes, fix it in the same turn.
+Public website of Channel Island Port Services (cips.agency). **`SITE-MANUAL.md` is the short reference** (hosting, domain, drop box and its limits, analytics, common changes, dates): keep it true. **Read `HANDOVER.md` first** (state, map of the site, the journey in detail, how to test, editing traps, open jobs), then `README.md` for the branches and the folders. Keep `HANDOVER.md` true: when something it says changes, fix it in the same turn.
 
 ## Who and how
 - Simon Porritt (MD) is not a developer. Explain choices briefly and plainly; show him what you built before moving on.
