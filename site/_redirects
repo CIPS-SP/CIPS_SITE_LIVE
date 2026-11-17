@@ -1,5 +1,5 @@
-# Cloudflare Pages reads this file. The old Wix site's pages (cips.agency until go-live, see GO-LIVE.md) sent on to their new places, so links and search results keep working.
-/privacy         /legal/privacy.html  301
-/cookie-policy   /legal/cookies.html  301
-/terms-of-use    /legal/terms.html    301
-/gallery         /                    301
+# Cloudflare Pages reads this file. The old Wix site's pages (cips.agency until go-live, see GO-LIVE.md) all go to the new home page (Simon, 17 Nov 2026), so old links and search results keep working.
+/privacy         /  301
+/cookie-policy   /  301
+/terms-of-use    /  301
+/gallery         /  301

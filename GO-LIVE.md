@@ -16,7 +16,7 @@ Prepared 17 Nov 2026. These steps move **www.cips.agency** from the old Wix site
 
 None of these do anything until www.cips.agency points at the new site.
 
-- **`site/_redirects`:** the old Wix pages go to their new places (`/privacy`, `/cookie-policy`, `/terms-of-use` to the legal pages, `/gallery` to the home page), so old links and search results keep working.
+- **`site/_redirects`:** the old Wix pages (`/privacy`, `/cookie-policy`, `/terms-of-use`, `/gallery`) all go to the new home page (Simon, 17 Nov 2026), so old links and search results keep working.
 - **`site/_headers`:** "always use https" (HSTS) for www.cips.agency only, starting at one day. The cipslive.pages.dev address keeps its "do not index" rule. cips.agency is not matched by that rule, so it is indexable from the moment it is live.
 - **`site/sitemap.xml`** and a `Sitemap:` line in `robots.txt`, both for www.cips.agency.
 - **The review drop box** already accepts requests from cips.agency and www.cips.agency (`ALLOWED_ORIGINS`).
@@ -47,7 +47,7 @@ None of these do anything until www.cips.agency points at the new site.
    - https://www.cips.agency shows the new site.
    - http://www.cips.agency goes to https.
    - https://cips.agency and http://cips.agency both go to https://www.cips.agency.
-   - The old addresses /privacy, /cookie-policy, /terms-of-use and /gallery go to the new pages.
+   - The old addresses /privacy, /cookie-policy, /terms-of-use and /gallery go to the new home page.
 9. **The site itself.**
    - The journey runs on a phone and a computer, start to finish.
    - A test enquiry from the home page arrives at dutyagent@ with its reference.
