@@ -43,12 +43,12 @@ export function policy() {
   const box = dropBox();
   return [
     "default-src 'self'",
-    "script-src 'self' " + hashes.join(' '),
+    "script-src 'self' https://static.cloudflareinsights.com " + hashes.join(' '),   // 17 Nov 2026, Simon: Cloudflare Web Analytics (cookie-free visit counts), switched on in the Pages project; its script comes from Cloudflare
     "style-src 'self' 'unsafe-inline'", // style="" attributes are used throughout; styles cannot run code
     "img-src 'self' data: blob:", // data: the CIPS mark in index.html; blob: pictures the globe and films make
     "media-src 'self' blob:", // the films are fetched and played from blob: addresses
     "font-src 'self'",
-    "connect-src 'self'" + (box ? ' ' + box : ''),
+    "connect-src 'self' https://cloudflareinsights.com" + (box ? ' ' + box : ''),   // (and it reports to cloudflareinsights.com)
     "frame-src 'self'", // the journey's scenes and the arrival game are the site's own pages in frames
     "worker-src 'self'",
     "object-src 'none'",
