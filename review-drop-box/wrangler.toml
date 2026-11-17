@@ -11,8 +11,8 @@ send_metrics = false
 ALLOWED_ORIGINS = "https://cipslive.pages.dev,https://cips.agency,https://www.cips.agency"
 
 # The review page, for the full link the box hands back when the Desk makes a short link (…/review/?kinship-7KQ4M2XD).
-# Change to https://cips.agency/review/ when the site moves there.
-REVIEW_PAGE = "https://cipslive.pages.dev/review/"
+# 17 Nov 2026: the site moved to www.cips.agency (GO-LIVE.md).
+REVIEW_PAGE = "https://www.cips.agency/review/"
 
 # Website enquiries (7 Nov 2026, sent through Brevo): who the email to dutyagent@cips.agency is from, and how many minutes an
 # enquiry may go without a "delivered" report from Brevo before the alert goes out.
