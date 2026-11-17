@@ -7,6 +7,10 @@ https://:project.pages.dev/*
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex
 
+# Go-live (GO-LIVE.md): once www.cips.agency is the site, browsers are told to use https only. Start at one day; raise to a year (31536000) a week after go-live. No includeSubDomains (mail and other subdomains are not ours to promise).
+https://www.cips.agency/*
+  Strict-Transport-Security: max-age=86400
+
 # Fonts never change under the same name.
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
