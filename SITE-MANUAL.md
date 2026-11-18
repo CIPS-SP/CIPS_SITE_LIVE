@@ -90,6 +90,8 @@ If writes ever run out, new reviews and enquiries could not be saved until the n
 
 The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the dashboard and that file the same**: a deploy from this PC writes the file's values over the dashboard's.
 
+**Junk enquiries (18 Nov 2026):** robots are thanked and their posts dropped (nothing saved or emailed) if they fill the hidden trap field, take under 4 seconds, or post without the page (no form timing). A junk one that still gets through (made-up names, lorem-ipsum text): do not reply, just delete it. If they become regular, the next step is a bot check (Cloudflare Turnstile).
+
 **Enquiry alert (17 Nov 2026):** `ALERT_URL` (secret) is a private **ntfy** channel (`https://ntfy.sh/<topic>`; the topic name is in Simon's ntfy app, never in the repo). If an enquiry is not confirmed delivered within an hour, or Brevo refuses the key, the drop box sends an urgent push notification to the ntfy app on Simon's phone. It carries only the enquiry reference, topic and time; the names and contact details stay in the drop box. Anyone else who should get the alert installs the free ntfy app and subscribes to the same topic (server ntfy.sh). A test can be sent with any web request to the topic's address. To change it, set a new `ALERT_URL` secret.
 
 **Brevo's free plan** sends up to 300 emails a day. It is used only for enquiries.

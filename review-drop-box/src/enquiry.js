@@ -17,7 +17,7 @@ import { makeCode } from './code.js';
 export const TO = 'dutyagent@cips.agency'; // fixed in the code on purpose: the box can email no one else
 export const TOPICS = { port: 'Port call', cargo: 'Cargo/Freight', project: 'Project', registry: 'Registry services', other: 'Other enquiry' };
 const KEEP_DAYS = 30;
-const MIN_FILL_MS = 2500; // quicker than a person can fill the form: a robot
+const MIN_FILL_MS = 4000; // quicker than a person can fill the form: a robot (18 Nov 2026: was 2500)
 const PER_IP_HOUR = 5;
 // all visitors together; above it the page offers the email-app route instead. 60 (was 150; 7 Nov 2026, B6): each enquiry costs
 // about 8 storage writes and the free plan allows about 1,000 a day for everything, reviews included.
@@ -40,7 +40,8 @@ export const looksLikeEmail = (s) => /^[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[a-z]{2,
 export function validateEnquiry(body) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, error: 'bad request' };
   if (typeof body.website === 'string' && body.website.trim() !== '') return { trap: true }; // hidden field a person never fills in
-  if (typeof body.ms === 'number' && body.ms < MIN_FILL_MS) return { trap: true };
+  // 18 Nov 2026, Simon (a bot's made-up enquiry got through): the page always says how long the form was open; a post without it did not come from the page
+  if (typeof body.ms !== 'number' || !isFinite(body.ms) || body.ms < MIN_FILL_MS) return { trap: true };
   const topic = Object.prototype.hasOwnProperty.call(TOPICS, body.topic) ? body.topic : '';
   const name = clean(body.name, 80, true), contact = clean(body.contact, 120, true), message = clean(body.message, 4000, false);
   if (!topic || !name || !contact) return { ok: false, error: 'missing', need: 'topic, name, contact' };

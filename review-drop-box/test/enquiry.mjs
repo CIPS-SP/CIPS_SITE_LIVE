@@ -79,10 +79,13 @@ await t('name and contact are required, and the topic must be one of the five', 
   assert.equal((await post(e, form({ topic: 'spam' }))).status, 400);
   assert.equal(net.sent.length, 0); assert.equal((await items(e)).length, 0);
 });
-await t('robots: the trap field or a form filled in under 2.5 s is thanked and kept nowhere', async () => {
+await t('robots: the trap field, a form filled in under 4 s, or a post that did not come from the page (no time) is thanked and kept nowhere', async () => {
   net = fakeNet(); const e = env();
   assert.equal((await post(e, form({ website: 'http://spam' }))).status, 200);
   assert.equal((await post(e, form({ ms: 300 }))).status, 200);
+  assert.equal((await post(e, form({ ms: 3500 }))).status, 200);
+  assert.equal((await post(e, form({ ms: undefined }))).status, 200);
+  assert.equal((await post(e, form({ ms: 'slow' }))).status, 200);
   assert.equal(net.sent.length, 0); assert.equal((await items(e)).length, 0);
 });
 await t('another website cannot post, and a huge body is refused', async () => {
