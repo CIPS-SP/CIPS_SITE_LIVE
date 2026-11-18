@@ -7,8 +7,11 @@
   if (!opening) return;
   const root = document.documentElement, KEY = 'cips.counted';
   let sent = new Set(); try { sent = new Set(JSON.parse(sessionStorage.getItem(KEY) || '[]')); } catch (e) { /* private window: counted per page load instead */ }
+  const LATER = ['sea', 'coast', 'harbour', 'quay', 'film'];
   const send = (ev) => {
-    if (sent.has(ev)) return; sent.add(ev);
+    if (sent.has(ev)) return;
+    if (LATER.includes(ev) && !sent.has('start')) send('start');   // 18 Nov 2026: a quick first scroll can pass the start between checks; anyone at sea has started
+    sent.add(ev);
     try { sessionStorage.setItem(KEY, JSON.stringify([...sent])); } catch (e) {}
     const url = (window.REVIEW_API || '') + '/api/count';
     try { if (!(navigator.sendBeacon && navigator.sendBeacon(url, new Blob([ev], { type: 'text/plain' })))) fetch(url, { method: 'POST', body: ev, keepalive: true, headers: { 'Content-Type': 'text/plain' } }).catch(() => {}); } catch (e) {}
