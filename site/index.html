@@ -746,6 +746,12 @@
         list.forEach(function(r){ ul.appendChild(card(r, false)); });
         var loop = list.length > 1; if (loop) list.forEach(function(r){ ul.appendChild(card(r, true)); });   // a second set, so the glide goes round without a gap
         box.hidden = false;
+        // a review cut to six lines gets Read more, which opens it (and holds the glide while it is open)
+        var opened = 0;
+        requestAnimationFrame(function(){ [].forEach.call(ul.children, function(li){ var p = li.querySelector('p'); if (!p || p.scrollHeight <= p.clientHeight + 2) return;
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'more'; b.textContent = 'Read more'; if (li.getAttribute('aria-hidden') === 'true') b.tabIndex = -1;
+          b.addEventListener('click', function(){ var on = li.classList.toggle('open'); b.textContent = on ? 'Show less' : 'Read more'; opened += on ? 1 : -1; hold(on ? 1e9 : 5000); if (!opened) hold(5000); });
+          p.insertAdjacentElement('afterend', b); }); });
         var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), pos = 0, last = 0, holdUntil = 0, seen = false, SPEED = 26;   // px a second
         var half = function(){ return ul.scrollWidth / 2; }, hold = function(ms){ holdUntil = performance.now() + ms; };
         [].forEach.call(box.querySelectorAll('.vb'), function(b){ b.hidden = !loop; b.addEventListener('click', function(){ var w = (ul.firstElementChild ? ul.firstElementChild.getBoundingClientRect().width : 300) + 18; hold(7000); vs.scrollBy({ left: (+b.getAttribute('data-d')) * w, behavior: 'smooth' }); }); });

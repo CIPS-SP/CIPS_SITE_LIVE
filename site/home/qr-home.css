@@ -400,10 +400,12 @@
 .qr .voices .vw{display:flex;align-items:center;gap:8px;padding:0 14px}
 .qr .voices .vs{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
 .qr .voices .vs::-webkit-scrollbar{display:none}
-.qr .voices .vt{display:flex;align-items:stretch;gap:18px;width:max-content;margin:0;padding:6px 22px;list-style:none}
-.qr .voices li{flex:none;width:min(390px,76vw);display:flex;flex-direction:column;gap:12px;padding:22px 24px 20px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.55)}
-.qr .voices li p{margin:0;font:400 16.5px/1.55 'Inter Tight',system-ui,sans-serif;color:var(--ink)}
-.qr .voices li small{margin-top:auto;font:500 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.qr .voices .vt{display:flex;align-items:center;gap:18px;width:max-content;margin:0;padding:6px 22px;list-style:none}   /* 18 Nov 2026, Simon: each card fits its review, all on a centre line */
+.qr .voices li{flex:none;width:auto;max-width:min(390px,76vw);min-width:min(230px,60vw);display:flex;flex-direction:column;gap:12px;padding:22px 24px 20px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.55)}
+.qr .voices li p{margin:0;font:400 16.5px/1.55 'Inter Tight',system-ui,sans-serif;color:var(--ink);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;line-clamp:6;overflow:hidden}   /* long reviews shortened to six lines; Read more opens them */
+.qr .voices li.open p{display:block;-webkit-line-clamp:unset;line-clamp:none;overflow:visible}
+.qr .voices li .more{align-self:flex-start;margin:-4px 0 0;padding:0;border:0;background:none;color:var(--accent);font:500 13px 'Inter Tight',system-ui,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+/* (the from line under the words) */ .qr .voices li small{font:500 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
 .qr .voices li .via{font:400 12.5px 'Inter Tight',system-ui,sans-serif;color:var(--ink2)}
 .qr .voices li .via a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .qr .voices .vb{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font:300 28px/1 'Inter Tight',system-ui,sans-serif;padding:0 0 4px;cursor:pointer}
