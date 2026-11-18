@@ -652,6 +652,9 @@
         </div>
       </div></div>
 
+      <!-- 18 Nov 2026, Simon: "What our clients say": testimonials and reviews published elsewhere, typed into Airtable by hand (Type Testimonial or Imported), separate from the Port Call Index; filled by the script below the page, hidden until there are any -->
+      <div class="voices" id="voices" hidden aria-label="What our clients say"><div class="eyebrow">What our clients say</div><div class="vw"><button type="button" class="vb" data-d="-1" aria-label="Previous">&lsaquo;</button><div class="vs"><ul class="vt"></ul></div><button type="button" class="vb" data-d="1" aria-label="Next">&rsaquo;</button></div></div>
+
       <div class="assoc" aria-label="Trusted partners and memberships"><div class="eyebrow">Trusted Partners and Memberships</div><div class="mq"><ul class="track"><li><img src="images/logos/ics.png" alt="Institute of Chartered Shipbrokers, company member"></li><li><img src="images/logos/british-superyacht.png" alt="British Superyacht, Leading the Industry"></li><li><img src="images/logos/superyacht-ready.png" alt="Superyacht Ready"></li><li><img src="images/logos/captains-recommended-2026.png" alt="Captain's Recommended Service 2026, Superyacht Services Guide"></li><li><img src="images/logos/atlantic-gateway.svg" alt="The Atlantic Gateway, Channel Islands"></li><li><img src="images/logos/lucas-freight.png" alt="Lucas Freight"></li><li><img src="images/logos/water-taxi-ci.png" alt="Water Taxi CI"></li><li><img src="images/logos/le-mourier.png" alt="Le Mourier, Swim Sea Save"></li><li><img src="images/logos/la-collette.png" alt="La Collette"></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.svg" alt=""></li><li aria-hidden="true"><img src="images/logos/lucas-freight.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/le-mourier.png" alt=""></li><li aria-hidden="true"><img src="images/logos/la-collette.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.svg" alt=""></li><li aria-hidden="true"><img src="images/logos/lucas-freight.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/le-mourier.png" alt=""></li><li aria-hidden="true"><img src="images/logos/la-collette.png" alt=""></li><li aria-hidden="true"><img src="images/logos/ics.png" alt=""></li><li aria-hidden="true"><img src="images/logos/british-superyacht.png" alt=""></li><li aria-hidden="true"><img src="images/logos/superyacht-ready.png" alt=""></li><li aria-hidden="true"><img src="images/logos/captains-recommended-2026.png" alt=""></li><li aria-hidden="true"><img src="images/logos/atlantic-gateway.svg" alt=""></li><li aria-hidden="true"><img src="images/logos/lucas-freight.png" alt=""></li><li aria-hidden="true"><img src="images/logos/water-taxi-ci.png" alt=""></li><li aria-hidden="true"><img src="images/logos/le-mourier.png" alt=""></li><li aria-hidden="true"><img src="images/logos/la-collette.png" alt=""></li></ul></div></div>
 
       <div class="banner" style="margin:0"><img loading="lazy" src="images/home/corbiere.jpg" alt="La Corbière lighthouse at sunset" style="object-position:50% 24%"><span class="t">La Corbière, Jersey</span></div>
@@ -727,8 +730,40 @@
         if (rows.length) show(0);
       }
       cycle();
+      // "What our clients say" (18 Nov 2026, Simon): the cards glide sideways like the partner logos (paused while the pointer or a finger is on them, and for a while after an arrow or a swipe), and the arrows step one card at a time; still for reduced motion
+      function voices(list){
+        var box = document.getElementById('voices'); if (!box || !list.length) return;
+        var ul = box.querySelector('.vt'), vs = box.querySelector('.vs');
+        function card(r, copy){
+          var li = document.createElement('li'), via = '';
+          if (r.source) via = r.sourceLink ? '<a href="' + esc(r.sourceLink) + '" target="_blank" rel="noopener">via ' + esc(r.source) + ' &#8599;</a>' : 'via ' + esc(r.source);
+          li.innerHTML = '<p>&ldquo;' + esc(r.didWell.trim()) + '&rdquo;</p><small>' + esc(r.from || '') + (r.from && r.when ? ' &middot; ' : '') + esc(r.when || '') + '</small>' + (via ? '<span class="via">' + via + '</span>' : '');
+          if (copy) { li.setAttribute('aria-hidden', 'true'); [].forEach.call(li.querySelectorAll('a'), function(a){ a.tabIndex = -1; }); }
+          return li;
+        }
+        list = list.slice(0, 40);
+        list.forEach(function(r){ ul.appendChild(card(r, false)); });
+        var loop = list.length > 1; if (loop) list.forEach(function(r){ ul.appendChild(card(r, true)); });   // a second set, so the glide goes round without a gap
+        box.hidden = false;
+        var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), pos = 0, last = 0, holdUntil = 0, seen = false, SPEED = 26;   // px a second
+        var half = function(){ return ul.scrollWidth / 2; }, hold = function(ms){ holdUntil = performance.now() + ms; };
+        [].forEach.call(box.querySelectorAll('.vb'), function(b){ b.hidden = !loop; b.addEventListener('click', function(){ var w = (ul.firstElementChild ? ul.firstElementChild.getBoundingClientRect().width : 300) + 18; hold(7000); vs.scrollBy({ left: (+b.getAttribute('data-d')) * w, behavior: 'smooth' }); }); });
+        ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(function(ev){ vs.addEventListener(ev, function(){ hold(7000); }, { passive: true }); });
+        if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ seen = es[0].isIntersecting; }).observe(box); else seen = true;
+        function step(t){
+          var dt = last ? Math.min(0.1, (t - last) / 1000) : 0; last = t;
+          if (Math.abs(vs.scrollLeft - pos) > 2) pos = vs.scrollLeft;   // moved by an arrow or a finger: carry on from there
+          if (loop) { var h = half(); if (pos >= h) { pos -= h; vs.scrollLeft = pos; } else if (pos < 1 && t > holdUntil) { pos += h; vs.scrollLeft = pos; } }
+          if (loop && !still && seen && t > holdUntil && !box.matches(':hover')) { pos += SPEED * dt; vs.scrollLeft = pos; }
+          requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
       fetch((window.REVIEW_API || '') + '/api/reviews').then(function(x){ return x.json(); }).then(function(data){
-        var reviews = (data && data.reviews) ? data.reviews : []; if (!reviews.length) return;
+        var all = (data && data.reviews) ? data.reviews : [];
+        // 18 Nov 2026, Simon: the Port Call Index (its score and its panel) is the CIPS review form only (Type CIPS Form); testimonials and reviews from other sites (Testimonial, Imported) go in the strip below it; anything without a type is not shown
+        voices(all.filter(function(r){ return (r.type === 'Testimonial' || r.type === 'Imported') && r.didWell && r.didWell.trim(); }));
+        var reviews = all.filter(function(r){ return r.type === 'CIPS Form'; }); if (!reviews.length) return;
         // 6 Nov 2026, Simon: the big score is the CIPS overall score: the average of the overall star rating of every published (verified) review
         var scores = reviews.map(function(r){ return +r.overall; }).filter(function(n){ return n >= 1 && n <= 5; });
         if (scores.length) {

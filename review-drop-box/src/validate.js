@@ -54,6 +54,7 @@ export function validateAnswers(body) {
 const str = (v, n) => (typeof v === 'string' ? v.slice(0, n) : '');
 const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? Math.round(v * 10) / 10 : null);
 
+const TYPES = ['CIPS Form', 'Testimonial', 'Imported'];
 export function sanitizePublic(body) {
   if (!body || typeof body !== 'object' || !Array.isArray(body.reviews)) return null;
   const reviews = body.reviews.slice(0, 200).map((r) => ({
@@ -64,6 +65,11 @@ export function sanitizePublic(body) {
     port: str(r && r.port, 80),
     when: str(r && r.when, 20),
     role: ROLES.includes(r && r.role) ? r.role : '',
+    // 18 Nov 2026, Simon: CIPS Form (the review form: the Port Call Index), or Testimonial / Imported (typed in by hand in Airtable: the 'What our clients say' strip)
+    type: TYPES.includes(r && r.type) ? r.type : '',
+    from: str(r && r.from, 100),
+    source: str(r && r.source, 60),
+    sourceLink: /^https:\/\/[^\s"<>]{3,300}$/.test(String((r && r.sourceLink) || '')) ? String(r.sourceLink) : '',
   }));
   const averages = {};
   for (const [k, v] of Object.entries(body.averages && typeof body.averages === 'object' ? body.averages : {}).slice(0, 12)) {

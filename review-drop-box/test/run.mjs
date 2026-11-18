@@ -179,7 +179,7 @@ await t('publishing needs the secret; the public list is cached and cut to the p
   assert.match(res.headers.get('Cache-Control'), /max-age=300/);
   assert.equal(res.headers.get('Access-Control-Allow-Origin'), ORIGIN);
   const out = await res.json();
-  assert.deepEqual(Object.keys(out.reviews[0]).sort(), ['appoint', 'didWell', 'overall', 'port', 'role', 'ship', 'when']);
+  assert.deepEqual(Object.keys(out.reviews[0]).sort(), ['appoint', 'didWell', 'from', 'overall', 'port', 'role', 'ship', 'source', 'sourceLink', 'type', 'when']);
   assert.equal(out.reviews[0].role, 'Chef'); assert.equal(out.count, 1); assert.equal(out.stray, undefined);
   assert.equal(out.averages.overall.value, 4.7); assert.equal(out.averages.overall.secret, undefined);
 });

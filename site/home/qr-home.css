@@ -394,3 +394,19 @@
 @media(max-width:520px){.qr .stats{grid-template-columns:1fr 1fr}.qr .stats div{padding:20px 16px;border-bottom:1px solid var(--line)}.qr .stats div:nth-child(2n){border-right:0}.qr .stats div:nth-last-child(-n+2){border-bottom:0}.qr .stats b{font-size:26px}}   /* 14 Nov 2026 (phone review): the four figures two by two on a phone (they were one per row; placed last so it wins over the 900px rule above) */
 @media(max-width:900px){.qr .people{display:flex;flex-direction:column;align-items:stretch;gap:0}.qr .people > div:not(.pts){display:contents}.qr .people .eyebrow{order:1}.qr .people h2{order:2}.qr .people .pts{order:3;margin:6px 0 28px}.qr .people .sub{order:4}.qr .people .btn{order:5;align-self:flex-start}}   /* 14 Nov 2026, Simon: on a narrow screen the photos of Simon and Howard sit under the heading (In the Boardroom...), above "CIPS is led by..." */
 @media(max-width:760px){html.main-collapsed #homeWave{display:none}}   /* 18 Nov 2026, Simon: on a phone, once the journey has folded away, no empty band between the banner and the hero at the very top (the wave sat hidden under the banner and pushed the hero a further 66 px down) */
+/* 18 Nov 2026, Simon: "What our clients say" under the Port Call Index: testimonials and reviews from other sites, gliding sideways like the partner logos, with arrows */
+.qr .voices{padding:6px 0 42px;border-bottom:1px solid var(--line)}
+.qr .voices .eyebrow{padding:0 32px;margin-bottom:20px}
+.qr .voices .vw{display:flex;align-items:center;gap:8px;padding:0 14px}
+.qr .voices .vs{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.qr .voices .vs::-webkit-scrollbar{display:none}
+.qr .voices .vt{display:flex;align-items:stretch;gap:18px;width:max-content;margin:0;padding:6px 22px;list-style:none}
+.qr .voices li{flex:none;width:min(390px,76vw);display:flex;flex-direction:column;gap:12px;padding:22px 24px 20px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.55)}
+.qr .voices li p{margin:0;font:400 16.5px/1.55 'Inter Tight',system-ui,sans-serif;color:var(--ink)}
+.qr .voices li small{margin-top:auto;font:500 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.qr .voices li .via{font:400 12.5px 'Inter Tight',system-ui,sans-serif;color:var(--ink2)}
+.qr .voices li .via a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.qr .voices .vb{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font:300 28px/1 'Inter Tight',system-ui,sans-serif;padding:0 0 4px;cursor:pointer}
+.qr .voices .vb:hover{background:rgba(0,0,0,.04)}
+.qr .voices .vb[hidden]{display:block;visibility:hidden}
+@media(max-width:760px){.qr .voices .vw{padding:0 4px;gap:2px}.qr .voices .vb{width:34px;height:34px;font-size:24px}.qr .voices .vt{padding:6px 12px;gap:12px}}

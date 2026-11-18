@@ -175,6 +175,13 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 
 **The business details Google and AI assistants read:** the `application/ld+json` block near the top of `site/index.html`. Name, legal name, address (New North Quay, St Helier Marina, St Helier, Jersey JE2 3ND, Simon 17 Nov 2026), phone, email, area, opening hours, services, LinkedIn.
 
+**Reviews and testimonials** (18 Nov 2026): all in Airtable PORT CALL REVIEWS, by **Type**:
+- **CIPS Form:** set by the Desk on every review from the CIPS review form. Only these count in the Port Call Index score and panel.
+- **Testimonial** (a comment a client gave CIPS, used with their OK) and **Imported** (a review published elsewhere, such as Yachting Pages or SSG), typed in by hand: Published text, Type, From (Manual), and for Imported, Source (Manual) and Source link (Manual).
+- Set Status to **Verified · Published** to show it. Testimonial and Imported rows appear in the "What our clients say" strip under the Port Call Index, gliding sideways, with arrows.
+- A row with no Type is not shown.
+- The Desk sends the list to the drop box, which passes on only known fields (`review-drop-box/src/validate.js`). The website reads it.
+
 **Something to count on the journey:** add the word in `review-drop-box/src/counts.js` (`EVENTS`) and in `site/js/journey-counts.js`, deploy the drop box, then release the site.
 
 **Old addresses that should redirect:** `site/_redirects`. The old Wix pages all go to the home page.
