@@ -456,3 +456,11 @@
 .qr .wph figure{margin:0}
 .qr .wph img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 .qr .wph figcaption{margin-top:7px;font:400 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+
+/* 19 Nov 2026, Simon: Other desks as tiles, the desk's drawing above its name */
+.qr .dtiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.qr .dtile{display:flex;flex-direction:column;align-items:center;gap:12px;padding:22px 16px 18px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none;transition:border-color .2s}
+.qr .dtile:hover{border-color:var(--ink)}
+.qr .dtile img{display:block;height:74px;width:auto;max-width:100%}
+.qr .dtile span{font:500 15px 'Inter Tight',system-ui,sans-serif}
+@media(max-width:620px){.qr .dtiles{grid-template-columns:1fr}.qr .dtile{flex-direction:row;justify-content:flex-start;gap:18px;padding:12px 16px}.qr .dtile img{height:46px}}
