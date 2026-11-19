@@ -184,6 +184,14 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 - A row with no Type is not shown.
 - The Desk sends the list to the drop box, which passes on only known fields (`review-drop-box/src/validate.js`). The website reads it.
 
+**Photos in a desk page's carousel** (19 Nov 2026): chosen with the image picker.
+1. Put new photos in the CIPS Image Library in Dropbox (any subfolder; HEIC is fine).
+2. Double-click **Open Image Picker (Windows).bat** in this folder (or ask Claude to open it). It shows every photo in the library; "Newest added first" brings new ones to the top.
+3. Choose the desk at the top ("Picking for"), click a photo and press P (or the star) to add or remove it. In "Show picks only", drag or use the arrows to set the order. Everything saves as you go, in `tools/picker-picks.json`.
+4. Ask Claude to "update the yachting carousel from the picker". The website never reads Dropbox itself (it must not ask any other server for anything), so each picked photo is copied into `site/images/`, cropped to the carousel's shape and made small enough for the web. Then release as usual.
+
+The picker code is `tools/image-picker.py` (it needs Python with Pillow and pillow-heif, already on this PC). It runs on this PC only, at http://localhost:8095, and only reads the library.
+
 **Something to count on the journey:** add the word in `review-drop-box/src/counts.js` (`EVENTS`) and in `site/js/journey-counts.js`, deploy the drop box, then release the site.
 
 **Old addresses that should redirect:** `site/_redirects`. The old Wix pages all go to the home page.
