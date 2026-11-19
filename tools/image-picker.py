@@ -170,5 +170,13 @@ class H(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     if not os.path.isdir(LIB): sys.exit('Cannot find the image library: ' + LIB)
     LIST = scan()
-    print(f'{len(LIST)} pictures in the library. Open http://localhost:{PORT}  (Ctrl+C to stop)')
-    ThreadingHTTPServer(('127.0.0.1', PORT), H).serve_forever()
+    server = None
+    for port in range(PORT, PORT + 20):   # 19 Nov 2026: if the usual port is taken by something else, use the next free one
+        try: server = ThreadingHTTPServer(('127.0.0.1', port), H); break
+        except OSError: continue
+    if not server: sys.exit('No free port between %d and %d.' % (PORT, PORT + 19))
+    url = 'http://localhost:%d' % port
+    print(f'{len(LIST)} pictures in the library. Open {url}  (Ctrl+C to stop)')
+    if '--no-open' not in sys.argv:
+        import webbrowser; webbrowser.open(url)
+    server.serve_forever()
