@@ -169,7 +169,7 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 
 **The picture shown when the site is shared:** replace `site/images/brand/og-share.jpg` (1200 × 630) under the same name and release. LinkedIn's Post Inspector refreshes a preview it has cached.
 
-**Switching on a desk page** (Yachting, Cruise, Offshore, Shipping; all switched off now):
+**Switching a desk page on or off** (Yachting, Cruise, Offshore, Shipping; all four switched on 19 Nov 2026). To switch one off again, reverse these steps:
 1. Finish the page.
 2. Remove its `<meta name="robots" content="noindex">`.
 3. Add it to `site/sitemap.xml`, without ".html".

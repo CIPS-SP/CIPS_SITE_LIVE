@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.cips.agency/</loc></url>
+  <url><loc>https://www.cips.agency/sectors/shipping</loc></url>
+  <url><loc>https://www.cips.agency/sectors/yachting</loc></url>
+  <url><loc>https://www.cips.agency/sectors/offshore</loc></url>
+  <url><loc>https://www.cips.agency/sectors/cruise</loc></url>
   <url><loc>https://www.cips.agency/legal/privacy</loc></url>
   <url><loc>https://www.cips.agency/legal/cookies</loc></url>
   <url><loc>https://www.cips.agency/legal/terms</loc></url>
