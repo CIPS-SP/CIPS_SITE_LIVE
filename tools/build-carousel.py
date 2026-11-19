@@ -45,6 +45,8 @@ def main():
         note = notes.get(rel, {}); fx, fy = note.get('focus', [0.5, 0.5])
         im = ImageOps.exif_transpose(Image.open(src)).convert('RGB')      # upright, and the hidden camera details are not carried over
         w, h = im.size
+        t = note.get('trim')                                             # edges to cut off first (a finger over the lens...): [left, top, right, bottom] as shares
+        if t: im = im.crop((round(t[0] * w), round(t[1] * h), round(w - t[2] * w), round(h - t[3] * h))); w, h = im.size
         for bx in note.get('blur', []):                                  # areas to blur, such as a yacht's name: [x0, y0, x1, y1] as shares of the photo
             box = (round(bx[0] * w), round(bx[1] * h), round(bx[2] * w), round(bx[3] * h)); r = max(8, (box[2] - box[0]) // 10)
             part = im.crop(box).filter(ImageFilter.GaussianBlur(r)); mask = Image.new('L', part.size, 0)

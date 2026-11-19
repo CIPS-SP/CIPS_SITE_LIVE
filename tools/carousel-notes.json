@@ -1,5 +1,5 @@
 {
- "_about": "For tools/build-carousel.py: per photo in the CIPS Image Library (its path as the picker shows it), the description shown to search engines and screen readers (alt), and optionally where to keep when cropping to 4:3 (focus: [x, y], 0 to 1, default the middle). A picked photo with no entry gets a plain description; add one here. Optionally \"blur\": a list of [x0, y0, x1, y1] areas (shares of the whole photo) to blur, such as a yacht's name.",
+ "_about": "For tools/build-carousel.py: per photo in the CIPS Image Library (its path as the picker shows it), the description shown to search engines and screen readers (alt), and optionally where to keep when cropping to 4:3 (focus: [x, y], 0 to 1, default the middle). A picked photo with no entry gets a plain description; add one here. Optionally \"blur\": a list of [x0, y0, x1, y1] areas (shares of the whole photo) to blur, such as a yacht's name. Optionally \"trim\": [left, top, right, bottom] shares to cut off first, such as a finger over the lens.",
  "IMG_2429 blue sky.jpg": {
   "alt": "The bow of a superyacht moored alongside the pontoon in St Helier"
  },
@@ -173,6 +173,16 @@
   "alt": "Ship's tenders at the Albert Pier tender pontoon in St Helier"
  },
  "CRUISE_IMG_8404.HEIC": {
-  "alt": "An expedition cruise ship at anchor, seen from a boat alongside"
+  "alt": "An expedition cruise ship at anchor, seen from a boat alongside",
+  "trim": [
+   0,
+   0.07,
+   0,
+   0
+  ],
+  "focus": [
+   0.0,
+   0.5
+  ]
  }
 }
