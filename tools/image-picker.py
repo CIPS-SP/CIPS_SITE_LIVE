@@ -35,7 +35,9 @@ def scan():
         for f in sorted(files):
             if os.path.splitext(f)[1].lower() in EXT:
                 rel = os.path.relpath(os.path.join(root, f), LIB).replace('\\', '/')
-                out.append({'path': rel, 'folder': os.path.dirname(rel) or '(top level)', 'name': f})
+                full = os.path.join(root, f); st = os.stat(full)
+                # added: when the file arrived on this PC (Windows creation time; Dropbox sets it when it syncs a new file); taken: its own modified time
+                out.append({'path': rel, 'folder': os.path.dirname(rel) or '(top level)', 'name': f, 'added': max(st.st_ctime, st.st_mtime), 'taken': st.st_mtime})
     return out
 
 def load_picks():
@@ -84,7 +86,7 @@ button{cursor:pointer}button.on{background:var(--ink);color:#fff;border-color:va
 <header><h1>CIPS image picker</h1>
 <label>Picking for <select id="desk"></select></label><span class="count" id="cnt"></span>
 <select id="folder"><option value="">All folders</option></select>
-<input id="q" placeholder="Search names" size="14"><button id="only">Show picks only</button>
+<select id="sort"><option value="folder">By folder</option><option value="added">Newest added first</option><option value="addedOld">Oldest added first</option><option value="taken">Newest photo first</option><option value="name">Name A to Z</option></select><input id="q" placeholder="Search names" size="14"><button id="only">Show picks only</button>
 <span class="help">Click a picture to see it large. &#9733; or P marks it. Arrow keys move. Saved as you go.</span></header>
 <main id="m">Loading the library&hellip;</main>
 <div id="big"><img id="bi" alt=""><div class="bar"><button id="bp">&#8249; Back</button><button id="bk" class="pk">&#9733; Pick</button><button id="bn">Next &#8250;</button><button id="bx">Close (Esc)</button></div><div class="nm" id="bnm"></div></div>
@@ -92,6 +94,7 @@ button{cursor:pointer}button.on{background:var(--ink);color:#fff;border-color:va
 const DESKS = {yachting:'Yachting desk', cruise:'Cruise desk', offshore:'Offshore desk', shipping:'Shipping desk'};
 let all = [], picks = {}, desk = localStorage.getItem('pdesk') || 'yachting', onlyPicks = false, shown = [], cur = -1;
 const $ = s => document.querySelector(s), esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const day = t => new Date(t * 1000).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
 const img = (p, s) => '/img?s=' + s + '&p=' + encodeURIComponent(p);
 Object.entries(DESKS).forEach(([k, v]) => $('#desk').add(new Option(v, k, false, k === desk)));
 const others = p => Object.keys(DESKS).filter(d => d !== desk && (picks[d] || []).includes(p)).map(d => d[0].toUpperCase()).join(' ');
@@ -104,13 +107,17 @@ async function toggle(p){ const l = picks[desk] = picks[desk] || []; const i = l
 function render(){
   const f = $('#folder').value, q = $('#q').value.toLowerCase();
   shown = all.filter(x => (!f || x.folder === f) && (!q || x.path.toLowerCase().includes(q)) && (!onlyPicks || isP(x.path)));
+  const so = $('#sort').value, grouped = !onlyPicks && so === 'folder';
   if (onlyPicks) shown.sort((a, b) => picks[desk].indexOf(a.path) - picks[desk].indexOf(b.path));
+  else if (so === 'added') shown.sort((a, b) => b.added - a.added); else if (so === 'addedOld') shown.sort((a, b) => a.added - b.added);
+  else if (so === 'taken') shown.sort((a, b) => b.taken - a.taken); else if (so === 'name') shown.sort((a, b) => a.name.localeCompare(b.name));
   let h = '', last = null;
-  shown.forEach((x, i) => { if (!onlyPicks && x.folder !== last) { if (last !== null) h += '</div>'; h += '<h2>' + esc(x.folder) + '</h2><div class="grid">'; last = x.folder; } else if (onlyPicks && i === 0) h += '<h2>Picked for the ' + DESKS[desk] + ', in order</h2><div class="grid">';
+  shown.forEach((x, i) => { if (!grouped && i === 0 && !onlyPicks) h += '<h2>' + $('#sort').selectedOptions[0].text + '</h2><div class="grid">';
+    if (grouped && x.folder !== last) { if (last !== null) h += '</div>'; h += '<h2>' + esc(x.folder) + '</h2><div class="grid">'; last = x.folder; } else if (onlyPicks && i === 0) h += '<h2>Picked for the ' + DESKS[desk] + ', in order</h2><div class="grid">';
     const o = others(x.path);
-    h += '<div class="t' + (isP(x.path) ? ' p' : '') + '" data-i="' + i + '" data-p="' + esc(x.path) + '"><img loading="lazy" src="' + img(x.path, 360) + '" alt=""><button class="s" title="Pick (P)">&#9733;</button>' + (o ? '<span class="o" title="Also picked for">' + o + '</span>' : '') + '<span class="n">' + esc(x.name) + '</span></div>'; });
+    h += '<div class="t' + (isP(x.path) ? ' p' : '') + '" data-i="' + i + '" data-p="' + esc(x.path) + '"><img loading="lazy" src="' + img(x.path, 360) + '" alt=""><button class="s" title="Pick (P)">&#9733;</button>' + (o ? '<span class="o" title="Also picked for">' + o + '</span>' : '') + '<span class="n">' + esc(grouped ? x.name : x.path) + ' · ' + day(x.added) + '</span></div>'; });
   $('#m').innerHTML = shown.length ? h + '</div>' : '<p>Nothing to show.</p>'; count(); }
-function open(i){ if (i < 0 || i >= shown.length) return; cur = i; const x = shown[i]; $('#bi').src = img(x.path, 1600); $('#bnm').textContent = (i + 1) + ' / ' + shown.length + '  ·  ' + x.path;
+function open(i){ if (i < 0 || i >= shown.length) return; cur = i; const x = shown[i]; $('#bi').src = img(x.path, 1600); $('#bnm').textContent = (i + 1) + ' / ' + shown.length + '  ·  ' + x.path + '  ·  added ' + day(x.added);
   $('#bk').innerHTML = isP(x.path) ? '&#9733; Picked (P to unpick)' : '&#9734; Pick (P)'; $('#big').classList.add('on'); }
 function close(){ $('#big').classList.remove('on'); cur = -1; }
 $('#m').addEventListener('click', e => { const t = e.target.closest('.t'); if (!t) return; if (e.target.closest('.s')) toggle(t.dataset.p); else open(+t.dataset.i); });
@@ -118,6 +125,7 @@ $('#bp').onclick = () => open(cur - 1); $('#bn').onclick = () => open(cur + 1); 
 $('#big').addEventListener('click', e => { if (e.target.id === 'big') close(); });
 addEventListener('keydown', e => { if (cur < 0 || e.target.tagName === 'INPUT') return; if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft') open(cur - 1); else if (e.key === 'ArrowRight') open(cur + 1); else if (e.key.toLowerCase() === 'p' || e.key === ' ') { e.preventDefault(); toggle(shown[cur].path); } });
 $('#desk').onchange = () => { desk = $('#desk').value; try { localStorage.setItem('pdesk', desk); } catch (e) {} render(); };
+$('#sort').value = localStorage.getItem('psort') || 'folder'; $('#sort').onchange = () => { try { localStorage.setItem('psort', $('#sort').value); } catch (e) {} render(); };
 $('#folder').onchange = render; $('#q').oninput = render; $('#only').onclick = () => { onlyPicks = !onlyPicks; $('#only').classList.toggle('on', onlyPicks); render(); };
 Promise.all([fetch('/api/list').then(r => r.json()), fetch('/api/picks').then(r => r.json())]).then(([l, p]) => { all = l; picks = p;
   [...new Set(all.map(x => x.folder))].forEach(f => $('#folder').add(new Option(f + ' (' + all.filter(x => x.folder === f).length + ')', f))); render(); });
