@@ -77,6 +77,9 @@ button{cursor:pointer}button.on{background:var(--ink);color:#fff;border-color:va
 .t img{width:100%;height:100%;object-fit:cover;display:block}.t.p{border-color:var(--pick)}
 .t .s{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:17px;line-height:30px;padding:0;text-align:center;cursor:pointer}
 .t.p .s{background:var(--pick);color:#fff}.t .n{position:absolute;left:0;right:0;bottom:0;padding:3px 6px;font-size:11px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t .mvw{position:absolute;left:6px;bottom:24px;display:flex;gap:4px}.t .mv{width:30px;height:28px;border-radius:6px;border:0;background:rgba(255,255,255,.92);font-size:15px;cursor:pointer;padding:0}
+.t .num{position:absolute;top:6px;left:6px;min-width:26px;height:26px;border-radius:13px;background:var(--ink);color:#fff;font-size:13px;font-weight:700;line-height:26px;text-align:center;padding:0 6px}
+.t.drag{opacity:.4}.t.over{outline:3px dashed var(--acc);outline-offset:2px}
 .t .o{position:absolute;top:6px;left:6px;font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,.55);border-radius:4px;padding:1px 5px}
 #big{position:fixed;inset:0;background:rgba(10,12,16,.94);display:none;z-index:10;align-items:center;justify-content:center;flex-direction:column}
 #big.on{display:flex}#big img{max-width:94vw;max-height:80vh;border-radius:6px}#big .bar{color:#fff;margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center}
@@ -87,7 +90,7 @@ button{cursor:pointer}button.on{background:var(--ink);color:#fff;border-color:va
 <label>Picking for <select id="desk"></select></label><span class="count" id="cnt"></span>
 <select id="folder"><option value="">All folders</option></select>
 <select id="sort"><option value="folder">By folder</option><option value="added">Newest added first</option><option value="addedOld">Oldest added first</option><option value="taken">Newest photo first</option><option value="name">Name A to Z</option></select><input id="q" placeholder="Search names" size="14"><button id="only">Show picks only</button>
-<span class="help">Click a picture to see it large. &#9733; or P marks it. Arrow keys move. Saved as you go.</span></header>
+<span class="help">Click a picture to see it large. &#9733; or P marks it. Arrow keys move. In Show picks only, drag a picture or use &#9664; &#9654; to change the order. Saved as you go.</span></header>
 <main id="m">Loading the library&hellip;</main>
 <div id="big"><img id="bi" alt=""><div class="bar"><button id="bp">&#8249; Back</button><button id="bk" class="pk">&#9733; Pick</button><button id="bn">Next &#8250;</button><button id="bx">Close (Esc)</button></div><div class="nm" id="bnm"></div></div>
 <script>
@@ -115,12 +118,19 @@ function render(){
   shown.forEach((x, i) => { if (!grouped && i === 0 && !onlyPicks) h += '<h2>' + $('#sort').selectedOptions[0].text + '</h2><div class="grid">';
     if (grouped && x.folder !== last) { if (last !== null) h += '</div>'; h += '<h2>' + esc(x.folder) + '</h2><div class="grid">'; last = x.folder; } else if (onlyPicks && i === 0) h += '<h2>Picked for the ' + DESKS[desk] + ', in order</h2><div class="grid">';
     const o = others(x.path);
-    h += '<div class="t' + (isP(x.path) ? ' p' : '') + '" data-i="' + i + '" data-p="' + esc(x.path) + '"><img loading="lazy" src="' + img(x.path, 360) + '" alt=""><button class="s" title="Pick (P)">&#9733;</button>' + (o ? '<span class="o" title="Also picked for">' + o + '</span>' : '') + '<span class="n">' + esc(grouped ? x.name : x.path) + ' · ' + day(x.added) + '</span></div>'; });
+    h += '<div class="t' + (isP(x.path) ? ' p' : '') + '" data-i="' + i + '" data-p="' + esc(x.path) + '"' + (onlyPicks ? ' draggable="true"' : '') + '>' + (onlyPicks ? '<span class="num">' + (i + 1) + '</span><span class="mvw"><button class="mv" data-m="-1" title="Move earlier">&#9664;</button><button class="mv" data-m="1" title="Move later">&#9654;</button></span>' : '') + '<img loading="lazy" src="' + img(x.path, 360) + '" alt=""><button class="s" title="Pick (P)">&#9733;</button>' + (o && !onlyPicks ? '<span class="o" title="Also picked for">' + o + '</span>' : '') + '<span class="n">' + esc(grouped ? x.name : x.path) + ' · ' + day(x.added) + '</span></div>'; });
   $('#m').innerHTML = shown.length ? h + '</div>' : '<p>Nothing to show.</p>'; count(); }
 function open(i){ if (i < 0 || i >= shown.length) return; cur = i; const x = shown[i]; $('#bi').src = img(x.path, 1600); $('#bnm').textContent = (i + 1) + ' / ' + shown.length + '  ·  ' + x.path + '  ·  added ' + day(x.added);
   $('#bk').innerHTML = isP(x.path) ? '&#9733; Picked (P to unpick)' : '&#9734; Pick (P)'; $('#big').classList.add('on'); }
 function close(){ $('#big').classList.remove('on'); cur = -1; }
-$('#m').addEventListener('click', e => { const t = e.target.closest('.t'); if (!t) return; if (e.target.closest('.s')) toggle(t.dataset.p); else open(+t.dataset.i); });
+async function savePicks(){ count(); await fetch('/api/picks', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(picks)}); }
+function moveTo(p, to){ const l = picks[desk], from = l.indexOf(p); if (from < 0) return; to = Math.max(0, Math.min(l.length - 1, to)); if (to === from) return; l.splice(from, 1); l.splice(to, 0, p); const y = scrollY; render(); scrollTo(0, y); savePicks(); }
+let dragP = null;
+$('#m').addEventListener('dragstart', e => { const t = e.target.closest('.t'); if (!t || !onlyPicks) return; dragP = t.dataset.p; t.classList.add('drag'); e.dataTransfer.effectAllowed = 'move'; });
+$('#m').addEventListener('dragover', e => { if (!dragP) return; e.preventDefault(); document.querySelectorAll('.t.over').forEach(x => x.classList.remove('over')); const t = e.target.closest('.t'); if (t) t.classList.add('over'); });
+$('#m').addEventListener('drop', e => { if (!dragP) return; e.preventDefault(); const t = e.target.closest('.t'); if (t) moveTo(dragP, picks[desk].indexOf(t.dataset.p)); dragP = null; });
+$('#m').addEventListener('dragend', () => { dragP = null; document.querySelectorAll('.t.drag,.t.over').forEach(x => x.classList.remove('drag', 'over')); });
+$('#m').addEventListener('click', e => { const t = e.target.closest('.t'); if (!t) return; const mv = e.target.closest('.mv'); if (mv) { moveTo(t.dataset.p, picks[desk].indexOf(t.dataset.p) + (+mv.dataset.m)); return; } if (e.target.closest('.s')) toggle(t.dataset.p); else open(+t.dataset.i); });
 $('#bp').onclick = () => open(cur - 1); $('#bn').onclick = () => open(cur + 1); $('#bx').onclick = close; $('#bk').onclick = () => toggle(shown[cur].path);
 $('#big').addEventListener('click', e => { if (e.target.id === 'big') close(); });
 addEventListener('keydown', e => { if (cur < 0 || e.target.tagName === 'INPUT') return; if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft') open(cur - 1); else if (e.key === 'ArrowRight') open(cur + 1); else if (e.key.toLowerCase() === 'p' || e.key === ' ') { e.preventDefault(); toggle(shown[cur].path); } });
