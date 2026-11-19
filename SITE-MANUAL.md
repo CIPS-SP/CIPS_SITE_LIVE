@@ -54,6 +54,8 @@ The domain lock is on, it auto-renews, and it renews on **22 July 2028**.
 - Set `@` A back to `185.230.63.107`.
 - Set the `www` CNAME back to `cips.agency.`
 
+**Always share links with www** (19 Nov 2026): the bare `cips.agency` is only GoDaddy's forwarding, which sends the home address on to `https://www.cips.agency/` but not the rest of an address: `cips.agency/sectors/yachting` gives GoDaddy's "Not Found", `www.cips.agency/sectors/yachting` works. The site, the sitemap and Google only use www, so search is unaffected. A full fix needs Cloudflare to answer for the bare domain (moving the nameservers, which we do not do), unless GoDaddy's forwarding offers a "forward/preserve path" option.
+
 ## 3. The drop box and its limits
 
 The free Cloudflare plan is enough for everything today, but two allowances are worth knowing.
