@@ -438,3 +438,14 @@
 @media(max-width:900px){.qr .ash{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.qr .ash{grid-template-columns:1fr}.qr .ash .mont{aspect-ratio:4/3}}
 @media(prefers-reduced-motion:reduce){.qr .ash .mont img{animation:none}.qr .ash .mont img:first-child{opacity:1}}
+
+/* 19 Nov 2026, Simon: The CIPS advantage (home page): the two paragraphs side by side and four figures across, filling the width */
+.qr .adv .advc{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:26px}
+.qr .adv .advc p{margin:0;font-size:18px;line-height:1.6;color:var(--ink2)}
+.qr .adv .advp{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border-top:1px solid var(--line)}
+.qr .adv .advp>div{padding:26px 22px 4px 0;border-right:1px solid var(--line);margin-right:22px}
+.qr .adv .advp>div:last-child{border-right:0;margin-right:0}
+.qr .adv .advp b{display:block;font:300 34px/1.1 'Inter Tight',system-ui,sans-serif;letter-spacing:-.02em;color:var(--ink)}
+.qr .adv .advp span{display:block;margin-top:10px;font:400 12px/1.6 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+@media(max-width:900px){.qr .adv .advc{grid-template-columns:1fr;gap:18px}.qr .adv .advp{grid-template-columns:1fr 1fr}.qr .adv .advp>div:nth-child(2n){border-right:0;margin-right:0}}
+@media(max-width:480px){.qr .adv .advp b{font-size:28px}}
