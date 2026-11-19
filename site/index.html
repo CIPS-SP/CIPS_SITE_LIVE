@@ -543,6 +543,26 @@
       </nav>
     </div>
   </header>
+  <script>
+  /* 19 Nov 2026, Simon ("even during the journey or globe they should skip direct to the main page and correct section"): the journey's own code takes over the header links only once
+     the globe has loaded, which can take a few seconds. Until then a header link was the browser's plain jump, which left the section under the header. Now, until that code is ready,
+     a header link puts its section just below the header at once and keeps it in the address; the journey code then takes the journey out and keeps the section in place. */
+  document.addEventListener('click', function (e) {
+    if (window.__cipsHeaderReady) return;
+    var a = e.target.closest && e.target.closest('header a[href^="#"]'); if (!a || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var id = a.getAttribute('href').slice(1), t = id && id !== 'top' ? document.getElementById(id) : null; if (!t) return;
+    e.preventDefault();
+    try { history.replaceState(null, '', '#' + id); } catch (_) {}
+    var h = (document.querySelector('header') || {}).offsetHeight || 0;
+    scrollTo({ top: t.getBoundingClientRect().top + scrollY - h, behavior: 'instant' });
+  });
+  /* the same when the page is opened at a section from another page (a desk page's header: index.html#islands): just below the header, not under it */
+  if (location.hash.length > 1 && document.querySelector('header a[href="' + location.hash.replace(/[^#\w-]/g, '') + '"]')) {
+    var putArrival = function () { if (window.__cipsHeaderReady) return; var t = document.getElementById(location.hash.slice(1)); if (!t) return;
+      var h = (document.querySelector('header') || {}).offsetHeight || 0; scrollTo({ top: t.getBoundingClientRect().top + scrollY - h, behavior: 'instant' }); };
+    addEventListener('DOMContentLoaded', putArrival); addEventListener('load', putArrival);
+  }
+  </script>
 
   <main id="top">
 
@@ -592,7 +612,7 @@
         <!-- 6 Nov 2026, Simon: the desk pages are being finished offline, so the four cards are not links for now (the pages stay in sectors/). To switch them back on: href= for data-off-href= on the four cards, and the Yachting desk button in 404.html. -->
         <div class="desks tall">
           <a data-off-href="sectors/shipping.html"><div class="im"><img loading="lazy" src="images/home/sector-shipping.jpg" alt="Two tankers alongside, from above" style="object-position:40% 50%"></div><div class="b"><h3>SHIPPING <span>→</span></h3><p>Commercial vessel agency, bunkering and fast-track customs clearance.</p></div></a>
-          <a data-off-href="sectors/yachting.html"><div class="im"><img loading="lazy" src="images/home/sector-yachting.jpg" alt="A CIPS client's superyacht passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
+          <a data-off-href="sectors/yachting.html"><div class="im"><img loading="lazy" src="images/home/sector-yachting.jpg" alt="A CIPS client's superyacht passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with crew and guest support.</p></div></a>
           <a data-off-href="sectors/offshore.html"><div class="im"><img loading="lazy" src="images/home/sector-offshore.jpg" alt="An offshore wind turbine" style="object-position:50% 20%"></div><div class="b"><h3>OFFSHORE <span>→</span></h3><p>Reliable logistics, provisioning and clearances for offshore operations.</p></div></a>
           <a data-off-href="sectors/cruise.html"><div class="im"><img loading="lazy" src="images/home/sector-cruise.jpg" alt="Vista, bow-on" style="object-position:38% 50%"></div><div class="b"><h3>CRUISE <span>→</span></h3><p>Ground handling, shore experiences and port formalities for cruise calls.</p></div></a>
         </div>
@@ -1113,6 +1133,7 @@
         if (performance.now() < until) requestAnimationFrame(hold); else ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev => removeEventListener(ev, stop)); };
       requestAnimationFrame(hold);
     });
+    window.__cipsHeaderReady = true;   // from here on the header links are handled above (the early handler after the header stands down)
     /* 19 Nov 2026: arriving from another page (a desk page's header) with a section in the address, e.g. index.html#proof: go there as the header link would, instead of staying on the globe */
     { const a = location.hash && location.hash.length > 1 ? document.querySelector('header a[href="' + location.hash.replace(/[^#\w-]/g, '') + '"]') : null;
       if (a) { const go = () => setTimeout(() => { a.dataset.arrive = '1'; a.click(); }, 50); if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true }); } }   /* this script can run after the page has loaded */

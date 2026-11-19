@@ -2,7 +2,7 @@
 // Looks at the live site on your own computer: serves the site/ folder at http://localhost:8080 and opens it in your browser.
 //   node serve.mjs [--port 8080] [--no-open]
 // Nothing is changed, nothing is cached (so you always see the current files), and video can be skipped through.
-// Only this folder is served; the site itself never talks to anything else.
+// Only this folder is served; the site itself never talks to anything else. The one exception: /api/reviews, the published reviews, read from the live drop box.
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { createReadStream, existsSync, statSync } from 'node:fs';
@@ -20,6 +20,13 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 const server = http.createServer((req, res) => {
   let p;
   try { p = decodeURIComponent(new URL(req.url, 'http://x').pathname); } catch (e) { res.writeHead(400); res.end('bad request'); return; }
+  // 19 Nov 2026, Simon ("I can't see What our clients say"): the published reviews are read from the live drop box, so this PC shows the same reviews
+  // as the site. Only this one public list is fetched; nothing is ever sent to the drop box from here (enquiries and review answers still go nowhere).
+  if (req.method === 'GET' && p === '/api/reviews') {
+    fetch('https://cips-review-drop-box.simon-92c.workers.dev/api/reviews').then((r) => r.text()).then((t) => { res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(t); })
+      .catch(() => { res.writeHead(502, { 'Content-Type': 'text/plain' }); res.end('reviews unavailable'); });
+    return;
+  }
   if (p.endsWith('/')) p += 'index.html';
   const f = normalize(join(SITE, p));
   if (!f.startsWith(SITE) || !existsSync(f) || !statSync(f).isFile()) { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found: ' + p); return; }
