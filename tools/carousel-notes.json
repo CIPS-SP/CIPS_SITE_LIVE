@@ -1,5 +1,5 @@
 {
- "_about": "For tools/build-carousel.py: per photo in the CIPS Image Library (its path as the picker shows it), the description shown to search engines and screen readers (alt), and optionally where to keep when cropping to 4:3 (focus: [x, y], 0 to 1, default the middle). A picked photo with no entry gets a plain description; add one here.",
+ "_about": "For tools/build-carousel.py: per photo in the CIPS Image Library (its path as the picker shows it), the description shown to search engines and screen readers (alt), and optionally where to keep when cropping to 4:3 (focus: [x, y], 0 to 1, default the middle). A picked photo with no entry gets a plain description; add one here. Optionally \"blur\": a list of [x0, y0, x1, y1] areas (shares of the whole photo) to blur, such as a yacht's name.",
  "IMG_2429 blue sky.jpg": {
   "alt": "The bow of a superyacht moored alongside the pontoon in St Helier"
  },
@@ -80,7 +80,21 @@
   "alt": "A superyacht moored in St Helier harbour"
  },
  "_SITE GALLERIES/GALLERY PAGE/FACILITIES AND SERVICES/YACHTING_IMG_8532.HEIC": {
-  "alt": "The stern and passerelle of a superyacht on the pontoon"
+  "alt": "The stern and passerelle of a superyacht on the pontoon",
+  "blur": [
+   [
+    0.3,
+    0.425,
+    0.47,
+    0.5
+   ],
+   [
+    0.874,
+    0.335,
+    0.903,
+    0.366
+   ]
+  ]
  },
  "_Ollie Voak Images/2025 - CIPS Website Content Images/CIPS 5.png": {
   "alt": "A motor yacht seen from above as it turns in the harbour"

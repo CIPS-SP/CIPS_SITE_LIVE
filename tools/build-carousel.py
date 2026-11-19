@@ -14,7 +14,7 @@ is rewritten (home/hero-gallery.js runs it).
 Afterwards: look at the page, run the check, commit, and push when Simon says so.
 """
 import json, os, re, sys
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter, ImageDraw
 try:
     import pillow_heif; pillow_heif.register_heif_opener()
 except Exception:
@@ -45,6 +45,11 @@ def main():
         note = notes.get(rel, {}); fx, fy = note.get('focus', [0.5, 0.5])
         im = ImageOps.exif_transpose(Image.open(src)).convert('RGB')      # upright, and the hidden camera details are not carried over
         w, h = im.size
+        for bx in note.get('blur', []):                                  # areas to blur, such as a yacht's name: [x0, y0, x1, y1] as shares of the photo
+            box = (round(bx[0] * w), round(bx[1] * h), round(bx[2] * w), round(bx[3] * h)); r = max(8, (box[2] - box[0]) // 10)
+            part = im.crop(box).filter(ImageFilter.GaussianBlur(r)); mask = Image.new('L', part.size, 0)
+            ImageDraw.Draw(mask).rounded_rectangle((0, 0, part.size[0] - 1, part.size[1] - 1), radius=r, fill=255)
+            im.paste(part, box[:2], mask.filter(ImageFilter.GaussianBlur(r // 2)))
         cw, ch = (round(h * W / H), h) if w / h > W / H else (w, round(w * H / W))
         x0, y0 = round((w - cw) * fx), round((h - ch) * fy)
         im = im.crop((x0, y0, x0 + cw, y0 + ch)).resize((W, H), Image.LANCZOS)
