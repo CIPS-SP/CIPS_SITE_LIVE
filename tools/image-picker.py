@@ -3,6 +3,7 @@
 
 Runs on this PC only: python tools/image-picker.py   then open http://localhost:8095
 It shows every picture in the CIPS Image Library (Dropbox) and its subfolders, HEIC included, as a grid by folder.
+New pictures added to the library show when the page is reloaded.
 Click a picture to see it large; press P (or the button) to mark it for the chosen desk's carousel. The marks are saved
 as you go in tools/picker-picks.json, which Claude reads to build the carousels. Nothing is uploaded anywhere; the
 library is only read. Small copies for the grid are kept in tools/.picker-cache (safe to delete).
@@ -129,7 +130,7 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
         if u.path == '/': return self.send(200, PAGE.encode(), 'text/html; charset=utf-8')
-        if u.path == '/api/list': return self.send(200, json.dumps(LIST).encode(), 'application/json')
+        if u.path == '/api/list': return self.send(200, json.dumps(scan()).encode(), 'application/json')   # looked at afresh each time: new pictures show on a reload
         if u.path == '/api/picks': return self.send(200, json.dumps(load_picks()).encode(), 'application/json')
         if u.path == '/img':
             try: b = sized(q['p'][0], max(64, min(2400, int(q.get('s', ['360'])[0]))))
