@@ -184,7 +184,7 @@ The security headers (`site/_headers`, written by `tools/csp.mjs`) allow exactly
 - A row with no Type is not shown.
 - The Desk sends the list to the drop box, which passes on only known fields (`review-drop-box/src/validate.js`). The website reads it.
 
-**Photos in a desk page's carousel** (19 Nov 2026): chosen with the image picker.
+**Photos in a desk page's gallery** (the top panel: a large photo, moving on by itself, with thumbnails under it; 19 Nov 2026): chosen with the image picker. The first pick opens the gallery.
 1. Put new photos in the CIPS Image Library in Dropbox (any subfolder; HEIC is fine).
 2. Double-click **Open Image Picker (Windows).bat** in this folder (or ask Claude to open it). It shows every photo in the library; "Newest added first" brings new ones to the top.
 3. Choose the desk at the top ("Picking for"), click a photo and press P (or the star) to add or remove it. In "Show picks only", drag or use the arrows to set the order. Everything saves as you go, in `tools/picker-picks.json`.

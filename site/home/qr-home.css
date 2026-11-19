@@ -413,14 +413,18 @@
 .qr .voices .vb[hidden]{display:block;visibility:hidden}
 @media(max-width:760px){.qr .voices .vw{padding:0 4px;gap:2px}.qr .voices .vb{width:34px;height:34px;font-size:24px}.qr .voices .vt{padding:6px 12px;gap:12px}}
 
-/* 19 Nov 2026, Simon: a desk page's photo carousel (home/desk-gallery.js): one photo after another, swipe or the arrows */
-.qr .dgal{padding:8px 0 44px;border-bottom:1px solid var(--line)}
-.qr .dgal .gw{display:flex;align-items:center;gap:8px;padding:0 14px}
-.qr .dgal .gs{flex:1;min-width:0;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth}
-.qr .dgal .gs::-webkit-scrollbar{display:none}
-.qr .dgal .gt{display:flex;gap:16px;margin:0;padding:0 18px;list-style:none}
-.qr .dgal li{flex:none;width:min(560px,78vw);scroll-snap-align:center}
-.qr .dgal img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:#eee}
-.qr .dgal .gb{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font:300 28px/1 'Inter Tight',system-ui,sans-serif;padding:0 0 4px;cursor:pointer}
-.qr .dgal .gb:hover{background:rgba(0,0,0,.04)}
-@media(max-width:760px){.qr .dgal .gw{padding:0 4px;gap:2px}.qr .dgal .gb{width:34px;height:34px;font-size:24px}.qr .dgal .gt{padding:0;gap:10px}.qr .dgal li{width:100%}}
+/* 19 Nov 2026, Simon: a desk page's photo gallery in the top panel (home/hero-gallery.js; written by tools/build-carousel.py) */
+.qr .hgal{min-width:0;max-width:100%}   /* a grid item: without this the thumbnail strip would widen the page */
+.qr .hgal .bar .hcap{margin-left:8px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qr .hgal .bar .hn{flex:none;color:#5c6a77}
+.qr .hgal .hst{position:relative;aspect-ratio:4/3;overflow:hidden;background:#0d1319}
+.qr .hgal .hm{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .22s ease}
+.qr .hgal .hm.fade{opacity:.15}
+.qr .hgal .hb{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:rgba(8,12,16,.45);color:#fff;font:300 28px/1 'Inter Tight',system-ui,sans-serif;padding:0 0 4px;cursor:pointer;transition:background .2s}
+.qr .hgal .hb:hover{background:rgba(8,12,16,.7)}.qr .hgal .hb[data-d="-1"]{left:10px}.qr .hgal .hb[data-d="1"]{right:10px}
+.qr .hgal .hth{display:flex;gap:6px;margin:0;padding:8px;list-style:none;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#2a3744 transparent;border-top:1px solid #1f2a35}
+.qr .hgal .hth li{flex:none}
+.qr .hgal .hth button{display:block;padding:0;border:2px solid transparent;border-radius:4px;background:none;cursor:pointer;opacity:.55;transition:opacity .2s}
+.qr .hgal .hth button:hover{opacity:.9}.qr .hgal .hth button.on{border-color:#4FB0E4;opacity:1}
+.qr .hgal .hth img{display:block;width:72px;height:54px;object-fit:cover;border-radius:2px}
+@media(max-width:760px){.qr .hgal .hth img{width:60px;height:45px}.qr .hgal .hb{width:34px;height:34px;font-size:24px}}
