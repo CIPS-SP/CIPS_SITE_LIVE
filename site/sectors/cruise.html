@@ -1,35 +1,260 @@
-<!doctype html><html lang="en"><head>
-<script src="../js/dev-device.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>Cruise desk | Channel Island Port Services (wireframe)</title>
+<!doctype html>
+<html lang="en">
+<head>
+<script src="../js/dev-device.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex">
+<title>Cruise desk | Channel Island Port Services (CIPS)</title>
+<meta name="description" content="The CIPS cruise desk: cruise and expedition ship calls in Jersey, Guernsey, Alderney, Sark and Herm, handled. Alongside berths up to 150m in St Helier, six anchorages, the Albert Pier tender pontoon, tenders, shore experiences, port formalities and VAT and duty free bunkers, 24/7.">
+<meta name="theme-color" content="#1A1D22">
 <link rel="icon" type="image/png" sizes="32x32" href="../images/brand/favicon-32.png"><link rel="icon" type="image/png" sizes="256x256" href="../images/brand/favicon-256.png"><link rel="apple-touch-icon" href="../images/brand/favicon-180.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
-<link rel="stylesheet" href="../home/qr-home.css"><link rel="stylesheet" href="wireframe.css"></head><body class="qr wf">
-<nav class="wfnav"><a href="../index.html" class="logo"><img src="../images/brand/logo-long-black.png" alt="Channel Island Port Services"></a><span class="sp"></span><a href="../index.html#desks">Sectors</a><a href="../index.html#services">Services</a><a href="../index.html#islands">Islands</a><a href="../index.html#gateway">Atlantic Gateway</a><a href="../desk-live.html">Desk LIVE</a><a href="../index.html#proof">Reviews</a><a href="../index.html#contact">Contact</a><span class="tel">24/7 +44 7797 720 723</span><a class="btn pri sm" href="#plan">Plan a call</a></nav>
-<div class="frame">
-<div class="wfflag"><b>WIREFRAME</b> · Cruise desk · structure, draft copy and notes. Grey boxes are photographs or film still to be placed. Items marked <span class="todo">to confirm</span> need a fact or a decision.</div>
-<div class="crumb"><a href="../index.html">Home</a> / <a href="../index.html#desks">Sectors</a> / Cruise</div>
+<link rel="stylesheet" href="../home/qr-home.css"><link rel="stylesheet" href="../home/qr-chrome.css">
+<style>html,body{-webkit-font-smoothing:antialiased}body{font-family:'Inter',system-ui,sans-serif;background:#FBFAF7;color:#1e293b;margin:0}.nav-link{position:relative}.nav-link::after{content:"";position:absolute;left:0;bottom:-6px;height:2px;width:0;background:#4FB0E4;transition:width .25s}.nav-link:hover::after{width:100%}</style>
+<link rel="stylesheet" href="../css/tailwind.css">
+</head>
+<body class="antialiased">
+<header id="header" class="sticky top-0 z-50 transition-all duration-300 bg-ink/95 backdrop-blur supports-[backdrop-filter]:bg-ink/80 border-b border-white/5">
+    <div class="max-w-8xl mx-auto px-5 sm:px-8">
+      <div class="flex items-center justify-between h-[74px]">
+        <!-- Logo -->
+        <a href="../index.html" class="flex items-center group" aria-label="Channel Island Port Services — home">
+          <img src="../images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-9 sm:h-10 w-auto" />
+        </a>
 
-<section class="wfblock"><div class="ph hero"><span>HERO PHOTO OR LOOPING CLIP</span><small>Vista bow-on (master image, CIPS_sector_4).</small></div>
-<div class="in"><span class="pill mono"><i></i> CRUISE DESK · 24/7</span><h1>Cruise calls, <span class="grad">from first tender to final line.</span></h1><p class="lead">Ground handling, shore experiences and port formalities for cruise ships and expedition vessels calling the Channel Islands.</p><div class="ctas"><a class="btn pri" href="#plan">Plan a call →</a><a class="btn" href="tel:+447797720723">Call +44 7797 720 723</a></div></div></section>
+        <!-- Desktop nav -->
+        <nav class="hidden lg:flex items-center gap-5 xl:gap-8 text-[15px] text-cream/85">
+          <a href="../index.html#desks" class="nav-link hover:text-white transition-colors">Sectors</a>
+          <a href="../index.html#islands" class="nav-link hover:text-white transition-colors">Islands</a>
+          <a href="../index.html#services" class="nav-link hover:text-white transition-colors">Services</a>
+          <a href="../index.html#gateway" class="nav-link hover:text-white transition-colors">Atlantic Gateway</a>
+          <a href="../index.html#deskl" class="nav-link hover:text-white transition-colors">Desk LIVE</a>
+          <a href="../index.html#proof" class="nav-link hover:text-white transition-colors">Reviews</a>
+          <a href="#contact" class="nav-link hover:text-white transition-colors">Contact</a>
+        </nav>
 
-<div class="sec"><div class="eyebrow">What changes for you</div><h2>Three things <span class="grad">we do for cruise.</span></h2><br>
-<div class="points"><div><span class="mono" style="font-size:12px;color:var(--orange)">01</span><h4>A smooth call</h4><p>Pilotage, anchorage and tender logistics planned with the master and the port.</p></div><div><span class="mono" style="font-size:12px;color:var(--orange)">02</span><h4>Shore experiences</h4><p>Tours and transport that show guests the island at its best.</p></div><div><span class="mono" style="font-size:12px;color:var(--orange)">03</span><h4>Formalities handled</h4><p>Customs, immigration and port paperwork done before arrival.</p></div></div></div>
+        <!-- WhatsApp: a small round logo in the top bar at every width, menu open or closed (Howard, 21 Sep 2026) -->
+        <div class="flex items-center gap-3 ml-auto mr-2 lg:ml-0 lg:mr-0">
+          <!-- Log in to CIPS Desk LIVE: link hidden 7 Nov 2026 (Simon; SECURITY-PLAN.md A4) until log-in is real: the preview page asked for a password that went nowhere. Put the <a> back to show it. -->
+          <!-- 7 Nov 2026, Simon (option C): the call button replaces the old top bar. Full number on wide screens; "24/7" and a phone icon below that. -->
+          <a href="tel:+447797720723" class="inline-flex items-center gap-2 h-10 px-3 xl:px-4 rounded-full border border-white/25 text-cream hover:bg-white/10 hover:border-white/40 transition-colors whitespace-nowrap" aria-label="Call CIPS, 24/7, on +44 7797 720 723" title="Call CIPS, 24/7">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#3ccf7a] animate-pulse" aria-hidden="true"></span>
+            <span class="hidden sm:inline text-[12px] font-semibold tracking-wide text-goldl">24/7</span>
+            <svg class="w-4 h-4 xl:hidden" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+            <span class="hidden xl:inline text-[14px] font-medium tracking-wide">+44 7797 720 723</span>
+          </a>
+          <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="inline-flex items-center justify-center w-10 h-10 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-md transition-all" aria-label="Message CIPS on WhatsApp" title="WhatsApp CIPS">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
+          </a>
+        </div>
 
-<div class="sec"><div class="eyebrow">A call, start to finish</div><h2>Welcoming Vista, in practice.</h2><p class="sub">One worked example in pictures. Short caption under each.</p>
-<div class="wfgal"><div class="ph a"><span>PHOTO / CLIP</span><small>Pilot boards the ship (Vista film frame)</small></div><div class="ph"><span>PHOTO</span><small>Orange tenders at the pontoon (media 0196)</small></div><div class="ph"><span>PHOTO</span><small>Expedition ship at anchor (0190)</small></div></div>
-<p class="mono wfcap">FILM: Vista cruise ship film, 49 s (short loop on the live page)</p></div>
+        <!-- Mobile toggle -->
+        <button id="menuBtn" aria-label="Open menu" class="lg:hidden text-cream p-2 -mr-2">
+          <svg id="menuIcon" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg>
+        </button>
+      </div>
+    </div>
 
-<div class="sec"><div class="eyebrow">The services you will use most</div><h2>Six of the nine, <span class="grad">in the order cruise needs them.</span></h2><br>
-<div class="grid8"><div><span class="k">01</span><h4>Itinerary & ground handling</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div><div><span class="k">02</span><h4>Crew & guest services</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div><div><span class="k">03</span><h4>Customs & clearances</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div><div><span class="k">04</span><h4>Berthing & quayside</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div><div><span class="k">05</span><h4>Provisions & produce</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div><div><span class="k">06</span><h4>Fuel & bunkering</h4><p>One line: what it means for this sector. <span class="todo">draft</span></p></div></div>
-<p style="margin-top:18px"><a href="../index.html#services" style="color:var(--accent)">See all nine services →</a></p></div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-white/10 bg-ink">
+      <nav class="px-5 py-4 flex flex-col gap-1 text-cream/90">
+        <a href="../index.html#desks" class="mobile-link py-3 border-b border-white/5">Sectors</a>
+        <a href="../index.html#islands" class="mobile-link py-3 border-b border-white/5">Islands</a>
+        <a href="../index.html#services" class="mobile-link py-3 border-b border-white/5">Services</a>
+        <a href="../index.html#gateway" class="mobile-link py-3 border-b border-white/5">Atlantic Gateway</a>
+        <a href="../index.html#deskl" class="mobile-link py-3 border-b border-white/5">Desk LIVE</a>
+        <a href="../index.html#proof" class="mobile-link py-3 border-b border-white/5">Reviews</a>
+        <a href="#contact" class="mobile-link py-3 border-b border-white/5">Contact</a>
+        <a href="tel:+447797720723" class="mobile-link mt-3 py-3 rounded-full text-center font-semibold border border-white/25 text-cream inline-flex items-center justify-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-[#3ccf7a]" aria-hidden="true"></span>Call +44 7797 720 723 · 24/7</a>
+        <a href="https://wa.me/447797720723" target="_blank" rel="noopener" class="mobile-link mt-2 py-3 rounded-full text-center font-semibold bg-[#25D366] text-white inline-flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2C6.486 2 2 6.486 2 12.004c0 1.998.585 3.858 1.593 5.425L2 22l4.71-1.545a9.94 9.94 0 0 0 5.294 1.522h.004C17.514 21.977 22 17.49 22 11.972 22 6.454 17.514 2 12.004 2zm0 18.06h-.003a8.05 8.05 0 0 1-4.104-1.126l-.294-.175-3.045.998.999-3.033-.192-.31a8.04 8.04 0 0 1-1.245-4.31c0-4.463 3.638-8.1 8.11-8.1a8.06 8.06 0 0 1 5.716 2.373 8.05 8.05 0 0 1 2.376 5.727c0 4.463-3.638 8.1-8.318 8.1z"/></svg>
+          WhatsApp
+        </a>
+      </nav>
+    </div>
+  </header>
 
-<div class="sec"><div class="split"><div><div class="eyebrow">Where we work</div><h2>Jersey, Guernsey <span class="grad">and Alderney.</span></h2><p class="sub">Alongside berths for vessels up to 150m in Jersey and Guernsey, pontoon berths up to 70m, VAT and duty free fuel. We help you choose the island that suits the call.</p><a class="btn" href="../index.html#islands">See the islands</a></div>
-<div class="panel idx" style="align-self:stretch"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cruise · verified reviews</span></div><div class="top"><div class="big" style="color:#5b6670;font-size:60px">[ ]</div><span style="color:#9aa8b4">PLACEHOLDER</span></div><div class="row"><p style="color:#8f9aa5">A cruise-line or master quote, with permission (the Vista presentation shots suggest one).</p><small>NAME · VESSEL · <span style="color:#e0a060">TO SOURCE</span></small></div></div></div></div>
+<main id="top"><div class="qr"><div class="frame">
 
-<div class="sec"><div class="eyebrow">Before we write the final copy</div><h2>Open <span class="grad">questions.</span></h2><ul class="wftodo"><li>How cruise calls work here: anchorage, tenders, pilotage, passenger limits</li><li>Ship sizes we can handle</li><li>Shore experiences we offer or partner on</li><li>Photo permissions for the Vista presentation photos</li></ul></div>
+      <section id="about" class="hero grid-bg">
+        <div class="row">
+          <div>
+            <span class="pill mono"><i></i> CRUISE DESK · 24/7</span>
+            <h1>Your cruise call, <span class="grad">handled.</span></h1>
+            <p class="lead">Berths, anchorages, tenders, shore experiences and port formalities for cruise and expedition ships, from first message to final departure.</p>
+            <div class="ctas"><a class="btn pri" href="#contact">Plan a call →</a><a class="btn" href="tel:+447797720723">Call +44 7797 720 723</a></div>
+          </div>
+          <!-- hero-gallery:start (written by tools/build-carousel.py from the image picker's picks; run it again rather than editing here) -->
+          <div class="panel hgal" data-hero-gallery role="region" aria-roledescription="carousel" aria-label="Photos from CIPS cruise port calls" tabindex="0">
+            <div class="bar"><b></b><b></b><b></b><span class="hcap">cruise desk</span><span class="hn">1 / 10</span></div>
+            <div class="hst"><img class="hm" src="../images/carousel/CRUISE_1.jpg" alt="A cruise ship under way, bow-on, off Jersey" width="1120" height="840" fetchpriority="high"><button type="button" class="hb" data-d="-1" aria-label="Previous photo">&lsaquo;</button><button type="button" class="hb" data-d="1" aria-label="Next photo">&rsaquo;</button></div>
+            <ul class="hth">
+              <li><button type="button" data-src="../images/carousel/CRUISE_1.jpg" data-alt="A cruise ship under way, bow-on, off Jersey" aria-label="Photo 1 of 10: A cruise ship under way, bow-on, off Jersey" class="on"><img src="../images/carousel/thumbs/CRUISE_1.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_2.jpg" data-alt="A cruise ship at anchor off St Helier" aria-label="Photo 2 of 10: A cruise ship at anchor off St Helier"><img src="../images/carousel/thumbs/CRUISE_2.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_3.jpg" data-alt="An expedition cruise ship at anchor off the Jersey coast" aria-label="Photo 3 of 10: An expedition cruise ship at anchor off the Jersey coast"><img src="../images/carousel/thumbs/CRUISE_3.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_4.jpg" data-alt="Guests stepping from a cruise ship into a tender" aria-label="Photo 4 of 10: Guests stepping from a cruise ship into a tender"><img src="../images/carousel/thumbs/CRUISE_4.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_5.jpg" data-alt="Orange ship's tenders at the Albert Pier tender pontoon in St Helier" aria-label="Photo 5 of 10: Orange ship's tenders at the Albert Pier tender pontoon in St Helier"><img src="../images/carousel/thumbs/CRUISE_5.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_6.jpg" data-alt="A ship's tender alongside the cruise ship, ready to take guests ashore" aria-label="Photo 6 of 10: A ship's tender alongside the cruise ship, ready to take guests ashore"><img src="../images/carousel/thumbs/CRUISE_6.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_7.jpg" data-alt="An expedition cruise ship close to the Jersey shore" aria-label="Photo 7 of 10: An expedition cruise ship close to the Jersey shore"><img src="../images/carousel/thumbs/CRUISE_7.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_8.jpg" data-alt="An expedition ship alongside in St Helier harbour" aria-label="Photo 8 of 10: An expedition ship alongside in St Helier harbour"><img src="../images/carousel/thumbs/CRUISE_8.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_9.jpg" data-alt="The pool deck of a cruise ship" aria-label="Photo 9 of 10: The pool deck of a cruise ship"><img src="../images/carousel/thumbs/CRUISE_9.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+              <li><button type="button" data-src="../images/carousel/CRUISE_10.jpg" data-alt="The dining room of a cruise ship" aria-label="Photo 10 of 10: The dining room of a cruise ship"><img src="../images/carousel/thumbs/CRUISE_10.jpg" alt="" width="160" height="120" loading="lazy"></button></li>
+            </ul>
+          </div>          <!-- hero-gallery:end -->
+        </div>
+      </section>
 
-<div class="sec grid-bg" id="plan"><div class="eyebrow">Plan a call</div><h2>Tell us about <span class="grad">the vessel.</span></h2><p class="sub">We reply fast. For anything urgent, call or message us on WhatsApp, any hour.</p>
-<div class="form"><div><label>Vessel name</label><div class="f ph">Name or IMO number</div></div><div><label>Type</label><div class="f">Cruise ▾</div></div><div><label>Island</label><div class="f ph">Jersey, Guernsey or Alderney</div></div><div><label>Arrival</label><div class="f ph">Date or window</div></div><div class="full"><label>What do you need?</label><div class="f ph" style="min-height:90px">…</div></div><div><label>Your name and company</label><div class="f ph">Name, company</div></div><div><label>Email or phone</label><div class="f ph">How we reach you</div></div><div class="full"><a class="btn pri" href="#">Send enquiry →</a> <span style="margin-left:14px;color:var(--ink2);font-size:15px">or call +44 7797 720 723, 24/7. The same form as the home page, with the type already set to Cruise.</span></div></div>
-<div class="wfother"><span class="mono">OTHER DESKS</span><a href="shipping.html">Shipping desk →</a><a href="yachting.html">Yachting desk →</a><a href="offshore.html">Offshore desk →</a></div></div>
-<footer><span>© 2026 Channel Island Port Services · Jersey · Guernsey · Alderney</span><span>dutyagent@cips.agency · Privacy · Cookies · Terms</span></footer>
-</div></body></html>
+      <div class="stats">
+        <div><b>Up to 150m</b><br><span>alongside, St Helier</span></div>
+        <div><b>6 anchorages</b><br><span>off St Helier, ships of any size</span></div>
+        <div><b>Albert Pier</b><br><span>tender pontoon, in the heart of town</span></div>
+        <div><b>24/7</b><br><span>every day of the year</span></div>
+      </div>
+
+      <div class="sec"><div class="eyebrow">In practice</div><h2>Why cruise lines <span class="grad">call us first.</span></h2>
+        <div class="three" style="margin-top:36px">
+          <div><span class="n">1</span><h4>Plan</h4><p>Berth or anchorage, pilotage, clearance and tenders planned with the master and the port before arrival: alongside up to 150m in St Helier, or one of six anchorages off the harbour.</p></div>
+          <div><span class="n">2</span><h4>Land</h4><p>Guests ashore by tender at the Albert Pier pontoon, minutes from the heart of St Helier, with transport and guides waiting.</p></div>
+          <div><span class="n">3</span><h4>Explore</h4><p>Shore experiences across Jersey, Guernsey, Alderney, Sark and Herm: castles, cliff paths and beaches, Jersey Royals and seafood, or zodiac trips out to the offshore reefs.</p></div>
+        </div>
+      </div>
+
+      <div class="sec" id="services"><div class="eyebrow">Services</div><h2>What cruise lines ask us <span class="grad">for most.</span></h2><p class="sub">Six of our nine services, the ones cruise ships ask for first.</p>
+        <div class="grid8">
+          <div><div class="svcph"><img src="../images/home/svc-berthing.jpg" alt="A ship alongside" style="object-position:50% 50%" loading="lazy"></div><span class="k">01</span><h4>Berthing, anchorage &amp; tenders</h4><p>Alongside berths up to 150m, six anchorages off St Helier and the Albert Pier tender pontoon, with pilotage and tenders arranged.</p></div>
+          <div><div class="svcph"><img src="../images/home/svc-itinerary.jpg" alt="Guests boarding a transfer minibus" style="object-position:50% 50%" loading="lazy"></div><span class="k">02</span><h4>Shore experiences &amp; ground handling</h4><p>Excursions, coaches and guides planned around your programme, with full shoreside support on the day.</p></div>
+          <div><div class="svcph"><img src="../images/home/svc-crew-guests.jpg" alt="Crew on deck" style="object-position:50% 50%" loading="lazy"></div><span class="k">03</span><h4>Crew &amp; guest services</h4><p>Crew changes, joining and leaving guests, transfers and concierge: 15+ daily flights to UK hubs, 10 minutes from airport to harbour.</p></div>
+          <div><div class="svcph"><img src="../images/home/svc-customs.jpg" alt="Port formalities handled on the quay" style="object-position:50% 45%" loading="lazy"></div><span class="k">04</span><h4>Customs &amp; clearances</h4><p>Clearance in and out, fast, correct and handled for you.</p></div>
+          <div><div class="svcph"><img src="../images/home/svc-fuel.jpg" alt="A fuel hose being passed up to a ship" style="object-position:50% 40%" loading="lazy"></div><span class="k">05</span><h4>Fuel &amp; bunkering</h4><p>VAT and duty free bunkers, MGO, ULSD or renewable (HVO), arranged for the call.</p></div>
+          <div><div class="svcph"><img src="../images/home/svc-produce.jpg" alt="A hamper of fresh local produce" style="object-position:50% 50%" loading="lazy"></div><span class="k">06</span><h4>Provisions, stores &amp; waste</h4><p>Fresh local produce, stores, fresh water and waste, delivered and handled during the call.</p></div>
+        </div>
+        <div class="ctas" style="margin-top:28px"><a class="btn" href="../index.html#services">See all nine services →</a></div>
+      </div>
+
+      <div class="sec" id="islands"><div class="split"><div><div class="eyebrow">Where we work</div><h2>Choose the port that <span class="grad">suits the call.</span></h2><p class="sub">One team, one standard, wherever the call is. We help you choose the place that suits it.</p>
+        <ul class="dlpoints"><li><b>Jersey:</b> alongside berths up to 150m in St Helier, six anchorages off the harbour and the Albert Pier tender pontoon; quieter anchorages at Bouley Bay and St Catherine for expedition ships</li><li><b>Guernsey:</b> St Peter Port, a sheltered anchorage with the town a short tender ride away</li><li><b>Alderney, Sark and Herm:</b> smaller islands with charm and natural beauty, for boutique and expedition cruises</li><li><b>Beyond:</b> UK, France, Spain, Portugal and the Caribbean, with our trusted associates and partners</li></ul></div>
+        <div><img class="photo" src="../images/home/place-guernsey.jpg" alt="A cruise ship off Castle Cornet, Guernsey" loading="lazy" style="object-position:50% 50%"></div></div></div>
+
+      <div class="sec" id="deskl"><div class="split dl"><div><div class="eyebrow">CIPS Desk LIVE</div><h2>Your ship's calls, <span class="grad">live.</span></h2><p class="sub">Ask us to open a private portal, a live view of your vessel's calls with us, set up for you and showing what matters to you.</p>
+        <ul class="dlpoints"><li>Arrival times, berth and live status for each call</li><li>Our updates, crew travel, documents and accounts in one place</li><li>Private to you, on any device</li><li>Set up by arrangement, with the 24/7 duty agent behind it</li></ul>
+        <div class="ctas"><a class="btn pri" href="#contact">Talk to us about CIPS Desk LIVE →</a><a class="btn" href="../desk-live.html">Find out more</a></div></div>
+        <div class="dlcar"><div class="panel"><div class="bar"><b></b><b></b><b></b><span class="dlttl" style="margin-left:8px">cips desk live · cruise lines</span></div>
+          <button type="button" class="dlslides" data-lb-open aria-label="Enlarge the CIPS Desk LIVE concept screen"><img class="on" src="../images/desk/desk-live-cruise.webp" data-lb data-cap="Cruise lines" alt="Concept screen for a cruise line: a ship tendering at anchor with guests ashore and coach tours" width="2000" height="944" loading="lazy"></button>
+          <p class="dlnote">Concept screen: every name, vessel and figure is made up.</p></div></div></div></div>
+
+      <div class="sec" id="proof"><div class="split"><div><div class="eyebrow">Port Call Index</div><h2>Don't take our word. <span class="grad">Take the master's.</span></h2><p class="sub" style="margin:0">Every score is tied to a real booking and verified by our team before it is published.</p><p class="sub" style="margin:14px 0 0">Had a port call with CIPS? Look out for your review link by email after you sail.</p><!-- 6 Nov 2026, Simon: the old reviews pages are gone; this button comes back with a new full reviews page: <div class="ctas"><a class="btn" href="../reviews.html">Read every review →</a></div> --></div>
+        <div class="panel idx" id="homeReviewCards"><div class="bar"><b></b><b></b><b></b><span style="margin-left:8px">cips port call index</span></div><div class="ttl">CIPS overall score <i>· the average of every verified review</i></div><div class="top"><div class="big" id="pciScore">5.0</div><span id="pciStars">★★★★★ VERIFIED</span></div>
+          <!-- 6 Nov 2026, Simon: one review at a time, with its own star rating, and an arrow at each end to go through the rest (the script below the page fills it from the drop box when there are published reviews) -->
+          <div class="rv"><button type="button" class="rvb" data-d="-1" aria-label="Previous review">&lsaquo;</button><div class="rvs" aria-live="polite">
+          <!-- 18 Nov 2026, Simon: the built-in examples (shown only when the live list cannot be reached) are anonymised lines from published five-star reviews -->
+          <div class="row"><p>“He made our visit extremely smooth.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CAPTAIN · 35M MOTOR YACHT</small></div>
+          <div class="row"><p>“Great service, very good communication and always available when needed.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CAPTAIN · 60M MOTOR YACHT</small></div>
+          <div class="row"><p>“Even the smallest request was handled in no time, with patience and care.”</p><small><span class="st" aria-label="5 out of 5">★★★★★</span>CHEF · 47M MOTOR YACHT</small></div>
+          </div><button type="button" class="rvb" data-d="1" aria-label="Next review">&rsaquo;</button><span class="rvc"></span></div>
+        </div>
+      </div></div>
+
+      <!-- 18 Nov 2026, Simon: "What our clients say": testimonials and reviews published elsewhere, typed into Airtable by hand (Type Testimonial or Imported), separate from the Port Call Index; filled by the script below the page, hidden until there are any -->
+      <div class="voices" id="voices" hidden aria-label="What our clients say"><div class="eyebrow">What our clients say</div><div class="vw"><button type="button" class="vb" data-d="-1" aria-label="Previous">&lsaquo;</button><div class="vs"><ul class="vt"></ul></div><button type="button" class="vb" data-d="1" aria-label="Next">&rsaquo;</button></div></div>
+
+      <section class="sec grid-bg" id="contact">
+        <div class="split" style="align-items:flex-start">
+          <div><div class="eyebrow">Get in touch</div><h2>Tell us <span class="grad">what you need.</span></h2><p class="sub">We reply fast. For anything urgent, call or message us on WhatsApp, any hour.</p>
+            <ul class="clist">
+              <li><span>Phone or WhatsApp · 24/7</span><a href="tel:+447797720723">+44 7797 720 723</a></li>
+              <li><span>Email</span><a href="mailto:dutyagent@cips.agency">dutyagent@cips.agency</a></li>
+            </ul>
+          </div>
+          <form id="enquiryForm" class="form" data-enquiry style="max-width:none">
+            <fieldset class="topics full"><legend>What is your enquiry about?</legend><div class="chips">
+              <label><input type="radio" name="topic" value="port" checked><span>Port Call</span></label>
+              <label><input type="radio" name="topic" value="cargo"><span>Cargo/Freight</span></label>
+              <label><input type="radio" name="topic" value="project"><span>Project</span></label>
+              <label><input type="radio" name="topic" value="registry"><span>Registry Services</span></label>
+              <label><input type="radio" name="topic" value="other"><span>Something Else</span></label>
+            </div></fieldset>
+            <div data-topic="port" data-main><label for="vessel">Vessel or company</label><input id="vessel" name="vessel" type="text" placeholder="Name or IMO number"></div>
+            <div data-topic="port"><label for="vtype">Type</label><select id="vtype" name="vtype"><option>Yacht</option><option selected>Cruise</option><option>Offshore</option><option>Shipping</option><option>Other</option></select></div>
+            <div data-topic="port"><label for="island">Port</label><select id="island" name="island"><option>Jersey</option><option>Guernsey</option><option>Other</option></select></div>
+            <div data-topic="port"><label for="arrival">Arrival</label><input id="arrival" name="arrival" type="text" placeholder="Date or window"></div>
+            <div data-topic="port"><label for="service">Service required</label><select id="service" name="service"><option value="General enquiry">General enquiry</option><option>Fuel / Bunkering</option><option>Itinerary &amp; Ground Handling</option><option>Crew &amp; Guest Services</option><option>Provisions &amp; Produce</option><option>Cargo &amp; Stores</option><option>Berthing &amp; Quayside</option><option>Customs &amp; Clearances</option><option>Crew Development &amp; Dispute Resolution</option><option>British Ship Registry</option></select></div>
+            <div data-topic="cargo" data-main><label for="ccompany">Company</label><input id="ccompany" name="ccompany" type="text"></div>
+            <div data-topic="cargo"><label for="cargo">Cargo</label><input id="cargo" name="cargo" type="text" placeholder="What, and how much"></div>
+            <div data-topic="cargo"><label for="corigin">From</label><input id="corigin" name="corigin" type="text" placeholder="Where it is coming from"></div>
+            <div data-topic="cargo"><label for="cdest">To</label><input id="cdest" name="cdest" type="text" placeholder="Where it needs to go"></div>
+            <div data-topic="cargo"><label for="cwhen">When</label><input id="cwhen" name="cwhen" type="text" placeholder="Date or window"></div>
+            <div data-topic="cargo"><label for="cservice">What do you need</label><select id="cservice" name="cservice"><option>Not sure yet</option><option>Import to the Channel Islands</option><option>Export from the Channel Islands</option><option>Customs clearance</option><option>Cargo handling and storage</option></select></div>
+            <div data-topic="project" data-main><label for="pcompany">Company</label><input id="pcompany" name="pcompany" type="text"></div>
+            <div data-topic="project"><label for="pproject">Project</label><input id="pproject" name="pproject" type="text" placeholder="Name, or a line on what it is"></div>
+            <div data-topic="project"><label for="plocation">Where</label><input id="plocation" name="plocation" type="text" placeholder="Location or island"></div>
+            <div data-topic="project"><label for="pdates">Dates</label><input id="pdates" name="pdates" type="text" placeholder="Start date and duration"></div>
+            <div data-topic="project" class="full"><label for="psupport">Support needed</label><select id="psupport" name="psupport"><option>Not sure yet</option><option>Crew changes</option><option>Freight and logistics</option><option>Provisions and supplies</option><option>Port services and berthing</option><option>A bit of everything</option></select></div>
+            <div data-topic="registry" data-main><label for="rcompany">Owner or company</label><input id="rcompany" name="rcompany" type="text"></div>
+            <div data-topic="registry"><label for="rvessel">Vessel</label><input id="rvessel" name="rvessel" type="text" placeholder="Name, or planned name"></div>
+            <div data-topic="registry"><label for="rtype">Type</label><select id="rtype" name="rtype"><option>Yacht</option><option>Commercial vessel</option><option>Offshore</option><option>Other</option></select></div>
+            <div data-topic="registry"><label for="rneed">What do you need</label><select id="rneed" name="rneed"><option>Not sure yet</option><option>Register a vessel</option><option>Move a vessel onto the British register</option><option>Renew or change a registration</option><option>General information</option></select></div>
+            <div data-topic="other" data-main><label for="ocompany">Company or organisation</label><input id="ocompany" name="ocompany" type="text" placeholder="Optional"></div>
+            <div><label for="name">Your name</label><input id="name" name="name" type="text" required></div>
+            <div class="full"><label for="email">Email or phone</label><input id="email" name="email" type="text" required placeholder="How we reach you"></div>
+            <div class="full"><label for="message">What do you need?</label><textarea id="message" name="message" rows="4" placeholder="Ship, date, guest numbers, tenders, excursions…"></textarea></div>
+            <div class="full"><button class="btn pri" type="submit" style="margin-right:10px">Send enquiry →</button> <span style="display:inline-block;margin:10px 0 0;color:var(--ink2);font-size:15px;line-height:1.5"><span style="white-space:nowrap">Goes to our duty agent</span> · <span style="white-space:nowrap"><a href="../legal/privacy.html" style="color:inherit;text-decoration:underline">Privacy</a></span></span></div>
+          </form>
+        </div>
+      </section>
+
+      <div class="sec"><div class="eyebrow">Other desks</div><div class="ctas" style="margin-top:14px"><a class="btn" href="yachting.html">Yachting desk →</a><a class="btn" href="shipping.html">Shipping desk →</a><a class="btn" href="offshore.html">Offshore desk →</a></div></div>
+
+    </div></div></main>
+
+<footer class="qrfoot bg-[#08111f] text-cream/70">
+    <div class="max-w-8xl mx-auto px-5 sm:px-8 py-16">
+      <div class="grid md:grid-cols-12 gap-10">
+        <div class="md:col-span-5">
+          <img src="../images/brand/logo-long-white.png" alt="Channel Island Port Services" class="h-11 w-auto" />
+          <p class="mt-6 max-w-sm leading-relaxed text-cream/55">
+            The Channel Islands' leading port agency. Strategic port solutions with a personal touch —
+            excellence from ship to shore, widely respected for visible excellence.
+          </p>
+        </div>
+
+        <div class="md:col-span-3 md:col-start-7">
+          <h4 class="eyebrow text-[11px] text-gold/70 mb-4">Explore</h4>
+          <ul class="space-y-2.5">
+            <li><a href="../index.html#desks" class="hover:text-white transition-colors">Sectors</a></li>
+            <li><a href="../index.html#islands" class="hover:text-white transition-colors">Islands</a></li>
+            <li><a href="../index.html#services" class="hover:text-white transition-colors">Services</a></li>
+            <li><a href="../index.html#gateway" class="hover:text-white transition-colors">Atlantic Gateway</a></li>
+            <li><a href="../index.html#deskl" class="hover:text-white transition-colors">Desk LIVE</a></li>
+            <li><a href="../index.html#proof" class="hover:text-white transition-colors">Reviews</a></li>
+            <li><a href="#contact" class="hover:text-white transition-colors">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-3">
+          <h4 class="eyebrow text-[11px] text-gold/70 mb-4">Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="../legal/privacy.html" class="hover:text-white transition-colors">Privacy &amp; Security</a></li>
+            <li><a href="../legal/cookies.html" class="hover:text-white transition-colors">Cookies</a></li>
+            <li><a href="../legal/terms.html" class="hover:text-white transition-colors">Terms of Use</a></li>
+            <li><a href="https://www.linkedin.com/company/channelislandportservices" target="_blank" rel="noopener" class="hover:text-white transition-colors">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-white/10">
+        <p class="text-xs leading-relaxed text-cream/50"><span class="text-cream">Built by CIPS.</span> We build and run our own integrated platforms and systems. If you like what you see and have development requirements of your own, we would be happy to talk about where we can help: <a href="#contact" class="underline hover:text-white">talk to us</a>.</p>
+      </div>
+      <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-cream/45">
+        <p>&copy; <span id="year">2026</span> Channel Island Port Services. All rights reserved.</p>
+        <p>The Channel Islands · Your Atlantic Gateway</p>
+      </div>
+    </div>
+  </footer>
+<script>
+(function(){ var b=document.getElementById('menuBtn'), m=document.getElementById('mobileMenu'); if(b&&m){ b.addEventListener('click',function(){ m.classList.toggle('hidden'); }); m.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',function(){ m.classList.add('hidden'); }); }); } })();
+</script>
+<script src="../review/config.js"></script>
+<script src="../home/reviews.js" defer></script>
+<script src="../home/enquiry-form.js" defer></script>
+<script src="../home/desk-lightbox.js" defer></script>
+<script src="../home/hero-gallery.js" defer></script>
+</body></html>
