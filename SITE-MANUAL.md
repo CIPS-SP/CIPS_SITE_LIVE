@@ -223,7 +223,6 @@ The drop box is separate. It changes only with `npx wrangler deploy` from `revie
 
 - **To do (Simon, 19 Nov 2026):** in GoDaddy, the cips.agency forwarding: look for a "forward path" or "preserve path" option and switch it on, so addresses like `cips.agency/sectors/yachting` reach the page (today only the bare home address forwards). A screenshot of the settings screen is enough for Claude to say which option.
 - **Come back to:** Desk LIVE's "Find out more" button on the desk pages, taken off until `desk-live.html` (still a wireframe) is finished.
-- Resubmit the sitemap in Google Search Console after the desk pages went live (steps given 19 Nov 2026), and request indexing for the four desk pages.
 - Airtable's data processing agreement, with Jersey's addendum.
 - A Jersey adviser's read of the legal pages.
 - A look on a tablet and an Android phone.
