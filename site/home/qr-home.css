@@ -443,3 +443,6 @@
 .qr .adv .advc{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:26px}
 .qr .adv .advc p{margin:0;font-size:18px;line-height:1.6;color:var(--ink2)}
 @media(max-width:900px){.qr .adv .advc{grid-template-columns:1fr;gap:18px}}
+
+/* 19 Nov 2026: a link to a section of the page (#deskl, #contact...) lands with the section below the sticky header, not under it */
+.qr .sec[id], .qr section[id]{scroll-margin-top:84px}
