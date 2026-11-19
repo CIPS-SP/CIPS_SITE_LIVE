@@ -447,7 +447,11 @@
 /* 19 Nov 2026: a link to a section of the page (#deskl, #contact...) lands with the section below the sticky header, not under it */
 .qr .sec[id], .qr section[id]{scroll-margin-top:84px}
 
-/* 19 Nov 2026, Simon: Where we work on the shipping desk: a harbour photo for each island, stacked, with a caption */
+/* 19 Nov 2026, Simon: Where we work on the shipping desk: the words across the top (text left, ports right), a harbour photo for each island in a row underneath */
+.qr .wtop{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end}
+.qr .wtop .dlpoints{margin:0}
+.qr .wph.wrow{grid-template-columns:repeat(3,1fr);margin-top:36px}
+@media(max-width:900px){.qr .wtop{grid-template-columns:1fr;gap:20px}.qr .wph.wrow{grid-template-columns:1fr}}
 .qr .wph{display:grid;gap:16px}
 .qr .wph figure{margin:0}
 .qr .wph img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
