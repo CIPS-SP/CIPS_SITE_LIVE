@@ -592,7 +592,7 @@
         <!-- 6 Nov 2026, Simon: the desk pages are being finished offline, so the four cards are not links for now (the pages stay in sectors/). To switch them back on: href= for data-off-href= on the four cards, and the Yachting desk button in 404.html. -->
         <div class="desks tall">
           <a data-off-href="sectors/shipping.html"><div class="im"><img loading="lazy" src="images/home/sector-shipping.jpg" alt="Two tankers alongside, from above" style="object-position:40% 50%"></div><div class="b"><h3>SHIPPING <span>→</span></h3><p>Commercial vessel agency, bunkering and fast-track customs clearance.</p></div></a>
-          <a data-off-href="sectors/yachting.html"><div class="im"><img loading="lazy" src="images/home/sector-yachting.jpg" alt="Savannah passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
+          <a data-off-href="sectors/yachting.html"><div class="im"><img loading="lazy" src="images/home/sector-yachting.jpg" alt="A CIPS client's superyacht passing the reef" style="object-position:50% 50%"></div><div class="b"><h3>YACHTING <span>→</span></h3><p>Superyacht transit and turnaround, with white-glove crew and guest support.</p></div></a>
           <a data-off-href="sectors/offshore.html"><div class="im"><img loading="lazy" src="images/home/sector-offshore.jpg" alt="An offshore wind turbine" style="object-position:50% 20%"></div><div class="b"><h3>OFFSHORE <span>→</span></h3><p>Reliable logistics, provisioning and clearances for offshore operations.</p></div></a>
           <a data-off-href="sectors/cruise.html"><div class="im"><img loading="lazy" src="images/home/sector-cruise.jpg" alt="Vista, bow-on" style="object-position:38% 50%"></div><div class="b"><h3>CRUISE <span>→</span></h3><p>Ground handling, shore experiences and port formalities for cruise calls.</p></div></a>
         </div>
@@ -717,81 +717,9 @@
     (function(){
       // "Replay the journey" returns to the start of the globe, exactly like the pill that appears when you scroll up
       var r = document.getElementById('homeReplay'); if (r) r.addEventListener('click', function(){ var b = document.getElementById('backToGlobe'); if (b) b.click(); else window.scrollTo({top:0,behavior:'smooth'}); });
-      // Port Call Index: the live reviews replace the three illustrative ones as soon as there are real ones
-      function esc(s){ return String(s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-      // one review at a time; the arrows go round them all (6 Nov 2026, Simon)
-      function stars(n){ n = Math.max(0, Math.min(5, Math.round(+n || 0))); return n ? '<span class="st" aria-label="' + n + ' out of 5">' + '★★★★★'.slice(0, n) + '<i>' + '★★★★★'.slice(n) + '</i></span>' : ''; }
-      // the score's stars filled to the exact score: 4.5 = four full stars and half of the fifth (6 Nov 2026, Simon)
-      function partStars(v){ v = Math.max(0, Math.min(5, +v || 0)); var h = ''; for (var k = 0; k < 5; k++) { var f = Math.max(0, Math.min(1, v - k)); h += '<span class="s"><i style="width:' + Math.round(f * 100) + '%">★</i>★</span>'; } return '<span class="stp" role="img" aria-label="' + (Math.round(v * 10) / 10) + ' out of 5">' + h + '</span>'; }
-      function cycle(){
-        var wrap = document.getElementById('homeReviewCards'); if (!wrap) return;
-        var rows = [].slice.call(wrap.querySelectorAll('.rvs .row')), c = wrap.querySelector('.rvc'), i = 0, many = rows.length > 1;
-        function show(n){ i = (n + rows.length) % rows.length; rows.forEach(function(r, k){ r.classList.toggle('on', k === i); r.setAttribute('aria-hidden', k === i ? 'false' : 'true'); }); if (c) c.textContent = many ? (i + 1) + ' / ' + rows.length : ''; }
-        [].forEach.call(wrap.querySelectorAll('.rvb'), function(b){ b.hidden = !many; b.onclick = function(){ show(i + (+b.getAttribute('data-d'))); }; });
-        if (rows.length) show(0);
-      }
-      cycle();
-      // "What our clients say" (18 Nov 2026, Simon): the cards glide sideways like the partner logos (paused while the pointer or a finger is on them, and for a while after an arrow or a swipe), and the arrows step one card at a time; still for reduced motion
-      function voices(list){
-        var box = document.getElementById('voices'); if (!box || !list.length) return;
-        var ul = box.querySelector('.vt'), vs = box.querySelector('.vs');
-        function card(r, copy){
-          var li = document.createElement('li'), via = '';
-          if (r.source) via = r.sourceLink ? '<a href="' + esc(r.sourceLink) + '" target="_blank" rel="noopener">via ' + esc(r.source) + ' &#8599;</a>' : 'via ' + esc(r.source);
-          li.innerHTML = '<p>&ldquo;' + esc(r.didWell.trim()) + '&rdquo;</p><small>' + esc(r.from || '') + (r.from && r.when ? ' &middot; ' : '') + esc(r.when || '') + '</small>' + (via ? '<span class="via">' + via + '</span>' : '');
-          if (copy) { li.setAttribute('aria-hidden', 'true'); [].forEach.call(li.querySelectorAll('a'), function(a){ a.tabIndex = -1; }); }
-          return li;
-        }
-        list = list.slice(0, 40);
-        list.forEach(function(r){ ul.appendChild(card(r, false)); });
-        var loop = list.length > 1; if (loop) list.forEach(function(r){ ul.appendChild(card(r, true)); });   // a second set, so the glide goes round without a gap
-        box.hidden = false;
-        // a review cut to six lines gets Read more, which opens it (and holds the glide while it is open)
-        var opened = 0;
-        requestAnimationFrame(function(){ [].forEach.call(ul.children, function(li){ var p = li.querySelector('p'); if (!p || p.scrollHeight <= p.clientHeight + 2) return;
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'more'; b.textContent = 'Read more'; if (li.getAttribute('aria-hidden') === 'true') b.tabIndex = -1;
-          b.addEventListener('click', function(){ var on = li.classList.toggle('open'); b.textContent = on ? 'Show less' : 'Read more'; opened += on ? 1 : -1; hold(on ? 1e9 : 5000); if (!opened) hold(5000); });
-          p.insertAdjacentElement('afterend', b); }); });
-        var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches), pos = 0, last = 0, holdUntil = 0, seen = false, SPEED = 26;   // px a second
-        var half = function(){ return ul.scrollWidth / 2; }, hold = function(ms){ holdUntil = performance.now() + ms; };
-        [].forEach.call(box.querySelectorAll('.vb'), function(b){ b.hidden = !loop; b.addEventListener('click', function(){ var w = (ul.firstElementChild ? ul.firstElementChild.getBoundingClientRect().width : 300) + 18; hold(7000); vs.scrollBy({ left: (+b.getAttribute('data-d')) * w, behavior: 'smooth' }); }); });
-        ['pointerdown', 'touchstart', 'wheel', 'focusin'].forEach(function(ev){ vs.addEventListener(ev, function(){ hold(7000); }, { passive: true }); });
-        if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ seen = es[0].isIntersecting; }).observe(box); else seen = true;
-        function step(t){
-          var dt = last ? Math.min(0.1, (t - last) / 1000) : 0; last = t;
-          if (Math.abs(vs.scrollLeft - pos) > 2) pos = vs.scrollLeft;   // moved by an arrow or a finger: carry on from there
-          if (loop) { var h = half(); if (pos >= h) { pos -= h; vs.scrollLeft = pos; } else if (pos < 1 && t > holdUntil) { pos += h; vs.scrollLeft = pos; } }
-          if (loop && !still && seen && t > holdUntil && !box.matches(':hover')) { pos += SPEED * dt; vs.scrollLeft = pos; }
-          requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
-      }
-      fetch((window.REVIEW_API || '') + '/api/reviews').then(function(x){ return x.json(); }).then(function(data){
-        var all = (data && data.reviews) ? data.reviews : [];
-        // 18 Nov 2026, Simon: the Port Call Index (its score and its panel) is the CIPS review form only (Type CIPS Form); testimonials and reviews from other sites (Testimonial, Imported) go in the strip below it; anything without a type is not shown
-        voices(all.filter(function(r){ return (r.type === 'Testimonial' || r.type === 'Imported') && r.didWell && r.didWell.trim(); }));
-        var reviews = all.filter(function(r){ return r.type === 'CIPS Form'; }); if (!reviews.length) return;
-        // 6 Nov 2026, Simon: the big score is the CIPS overall score: the average of the overall star rating of every published (verified) review
-        var scores = reviews.map(function(r){ return +r.overall; }).filter(function(n){ return n >= 1 && n <= 5; });
-        if (scores.length) {
-          var avg = scores.reduce(function(a, b){ return a + b; }, 0) / scores.length, el = document.getElementById('pciScore'), st = document.getElementById('pciStars');
-          if (el) el.textContent = (Math.round(avg * 10) / 10).toFixed(1);
-          if (st) st.innerHTML = partStars(avg) + ' VERIFIED &middot; ' + scores.length + (scores.length === 1 ? ' REVIEW' : ' REVIEWS');
-        }
-        var wrap = document.querySelector('#homeReviewCards .rvs'); if (!wrap) return;
-        wrap.querySelectorAll('.row').forEach(function(n){ n.remove(); });
-        reviews.slice(0, 30).forEach(function(r){
-          var who = (r.ship ? esc(r.ship) : 'Verified master'), when = [r.port, r.when].filter(Boolean).map(esc).join(' · ');
-          // the line made from the review's own answers: its overall rating, and "Will appoint again." when they said yes (6 Nov 2026, Simon: shown under the quote too, not only when there is no quote)
-          var rated = 'Rated ' + (r.overall||'-') + '/5 on the CIPS Port Call Index.' + (r.appoint === 'Yes' ? ' Will appoint again.' : '');
-          var quoted = !!(r.didWell && r.didWell.trim());
-          var body = quoted ? '<p>“' + esc(r.didWell) + '”</p><p class="rated">' + esc(rated) + '</p>' : '<p>' + esc(rated) + '</p>';
-          var d = document.createElement('div'); d.className = 'row'; d.innerHTML = body + '<small>' + stars(r.overall) + who.toUpperCase() + (when ? ' · ' + when.toUpperCase() : '') + '</small>'; wrap.appendChild(d);
-        });
-        cycle();
-      }).catch(function(){ /* keep the illustrative examples on any error */ });
     })();
     </script>
+    <script src="home/reviews.js" defer></script>   <!-- 19 Nov 2026: the Port Call Index and What our clients say, shared with the desk pages -->
     <script>
     (function(){
       // CIPS Desk LIVE: three concept screens (ship operators, yachts, cruise lines). Rotates on its own, stops once someone picks a tab, paused on hover, still for reduced motion.
@@ -1178,13 +1106,16 @@
       try { history.replaceState(null, '', '#' + id); } catch (_) {}
       /* 6 Nov 2026, Simon (from the globe, Reviews landed at The personal touch): things above the section can still be changing size just after the jump (photos arriving, the journey being taken out),
          so for 2.5 s the section is kept just below the header, until the visitor scrolls, swipes or presses a key themselves */
-      const until = performance.now() + 2500; let mine = true; const stop = () => { mine = false; };
+      const until = performance.now() + (a.dataset.arrive ? 8000 : 2500); delete a.dataset.arrive;   /* 8 s when arriving from another page: more is still loading */ let mine = true; const stop = () => { mine = false; };
       ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev => addEventListener(ev, stop, { once: true, passive: true }));
       const hold = () => { if (!mine) return; const header = document.querySelector('header')?.offsetHeight || 0, off = t.getBoundingClientRect().top - header;
         if (Math.abs(off) > 1.5) scrollTo({ top: scrollY + off, behavior: 'instant' }); lastY = scrollY;
         if (performance.now() < until) requestAnimationFrame(hold); else ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev => removeEventListener(ev, stop)); };
       requestAnimationFrame(hold);
     });
+    /* 19 Nov 2026: arriving from another page (a desk page's header) with a section in the address, e.g. index.html#proof: go there as the header link would, instead of staying on the globe */
+    { const a = location.hash && location.hash.length > 1 ? document.querySelector('header a[href="' + location.hash.replace(/[^#\w-]/g, '') + '"]') : null;
+      if (a) { const go = () => setTimeout(() => { a.dataset.arrive = '1'; a.click(); }, 50); if (document.readyState === 'complete') go(); else addEventListener('load', go, { once: true }); } }   /* this script can run after the page has loaded */
     setInterval(() => {                                                                    // show it through the journey; not on top of the globe's own skip link, not on the main site
       const inGame = !!document.querySelector('.splay-overlay'), own = document.querySelector('.skip-globe');
       const ownShown = (el => {                                                              // 28 Oct 2026, Simon: this pill takes over the moment the globe's own Skip pill is gone: off screen, hidden, or faded out with the opening copy
