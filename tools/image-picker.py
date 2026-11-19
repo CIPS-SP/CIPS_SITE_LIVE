@@ -3,7 +3,7 @@
 
 Runs on this PC only: python tools/image-picker.py   then open http://localhost:8095
 It shows every picture in the CIPS Image Library (Dropbox) and its subfolders, HEIC included, as a grid by folder.
-New pictures added to the library show when the page is reloaded.
+New pictures added to the library appear by themselves within about 15 seconds of reaching this PC (or reload the page).
 Click a picture to see it large; press P (or the button) to mark it for the chosen desk's carousel. The marks are saved
 as you go in tools/picker-picks.json, which Claude reads to build the carousels. Nothing is uploaded anywhere; the
 library is only read. Small copies for the grid are kept in tools/.picker-cache (safe to delete).
@@ -139,6 +139,9 @@ $('#sort').value = localStorage.getItem('psort') || 'folder'; $('#sort').onchang
 $('#folder').onchange = render; $('#q').oninput = render; $('#only').onclick = () => { onlyPicks = !onlyPicks; $('#only').classList.toggle('on', onlyPicks); render(); };
 // the picks file can also be changed outside this page (by Claude): look again every few seconds, unless a change of ours was just saved
 let lastSave = 0; const _save = savePicks; savePicks = async function(){ lastSave = Date.now(); return _save(); };
+// new photos arriving in the library (Dropbox can take a minute to bring them down): look every 15 seconds and add them without a reload
+setInterval(async () => { if (document.hidden || cur >= 0) return; try { const l = await (await fetch('/api/list')).json(); const key = x => x.map(i => i.path).join('|');
+  if (key(l) !== key(all)) { all = l; const f = $('#folder').value; $('#folder').length = 1; [...new Set(all.map(x => x.folder))].forEach(g => $('#folder').add(new Option(g + ' (' + all.filter(x => x.folder === g).length + ')', g))); $('#folder').value = f; const y = scrollY; render(); scrollTo(0, y); } } catch (e) {} }, 15000);
 setInterval(async () => { if (Date.now() - lastSave < 4000 || document.hidden) return; try { const p = await (await fetch('/api/picks')).json(); if (JSON.stringify(p) !== JSON.stringify(picks)) { picks = p; const y = scrollY; render(); scrollTo(0, y); } } catch (e) {} }, 4000);
 Promise.all([fetch('/api/list').then(r => r.json()), fetch('/api/picks').then(r => r.json())]).then(([l, p]) => { all = l; picks = p;
   [...new Set(all.map(x => x.folder))].forEach(f => $('#folder').add(new Option(f + ' (' + all.filter(x => x.folder === f).length + ')', f))); render(); });
