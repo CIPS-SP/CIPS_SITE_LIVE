@@ -12,7 +12,8 @@
       th.forEach(function (t, j) { t.classList.toggle('on', j === i); t.setAttribute('aria-current', j === i ? 'true' : 'false'); });
       if (cap && cap.hasAttribute('data-prefix')) cap.textContent = prefix + th[i].getAttribute('data-alt');   /* the description in the title bar only when the page asks for it (data-prefix); 19 Nov 2026, Simon: off for now */
       if (num) num.textContent = (i + 1) + ' / ' + n;
-      var b = th[i], left = b.offsetLeft - strip.clientWidth / 2 + b.offsetWidth / 2;   // keep the chosen thumbnail in view (the strip only, not the page)
+      var b = th[i], br = b.getBoundingClientRect(), sr = strip.getBoundingClientRect();   // keep the chosen thumbnail in the middle of the strip (measured within the strip: offsetLeft counted from elsewhere on the cruise page, 19 Nov 2026)
+      var left = strip.scrollLeft + (br.left - sr.left) - strip.clientWidth / 2 + br.width / 2;
       if (strip.scrollWidth > strip.clientWidth) strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
     }
     function show(k, byHand) {
