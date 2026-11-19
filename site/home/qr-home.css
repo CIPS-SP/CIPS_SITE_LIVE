@@ -428,3 +428,13 @@
 .qr .hgal .hth button:hover{opacity:.9}.qr .hgal .hth button.on{border-color:#4FB0E4;opacity:1}
 .qr .hgal .hth img{display:block;width:72px;height:54px;object-fit:cover;border-radius:2px}
 @media(max-width:760px){.qr .hgal .hth img{width:60px;height:45px}.qr .hgal .hb{width:34px;height:34px;font-size:24px}}
+
+/* 19 Nov 2026, Simon: the cruise page's "Ashore" cards (Explore, Indulge, Experience, Discover): each a tall photo fading through four, the word over it */
+.qr .ash{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}
+.qr .ash .mont{aspect-ratio:4/5;border-radius:14px}
+.qr .ash .mont::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.55));pointer-events:none}
+.qr .ash .aw{position:absolute;left:18px;bottom:14px;z-index:1;color:#fff;font:500 30px/1.1 'Inter Tight',system-ui,sans-serif;letter-spacing:-.01em}
+.qr .ash p{margin:14px 2px 0;color:var(--ink2);font-size:16px;line-height:1.5}
+@media(max-width:900px){.qr .ash{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.qr .ash{grid-template-columns:1fr}.qr .ash .mont{aspect-ratio:4/3}}
+@media(prefers-reduced-motion:reduce){.qr .ash .mont img{animation:none}.qr .ash .mont img:first-child{opacity:1}}
