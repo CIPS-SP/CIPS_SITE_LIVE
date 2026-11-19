@@ -62,7 +62,9 @@ def main():
             if mm and int(mm.group(1)) > len(picks): os.remove(os.path.join(folder, f)); removed += folder == OUT
     first = items[0][1]; total = len(items)
     block = [f'          <div class="panel hgal" data-hero-gallery role="region" aria-roledescription="carousel" aria-label="Photos from CIPS {desk} port calls" tabindex="0">',
-             f'            <div class="bar"><b></b><b></b><b></b><span class="hcap" data-prefix="{desk} desk · ">{desk} desk · {first}</span><span class="hn">1 / {total}</span></div>',
+             # the title bar says only "<desk> desk" and the count (Simon, 19 Nov 2026); to show each photo's description there as well,
+             # write <span class="hcap" data-prefix="{desk} desk · ">{desk} desk · {first}</span> instead
+             f'            <div class="bar"><b></b><b></b><b></b><span class="hcap">{desk} desk</span><span class="hn">1 / {total}</span></div>',
              f'            <div class="hst"><img class="hm" src="../images/carousel/{tag}_1.jpg" alt="{first}" width="{W}" height="{H}" fetchpriority="high">'
              f'<button type="button" class="hb" data-d="-1" aria-label="Previous photo">&lsaquo;</button><button type="button" class="hb" data-d="1" aria-label="Next photo">&rsaquo;</button></div>',
              '            <ul class="hth">']
