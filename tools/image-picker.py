@@ -106,7 +106,7 @@ function count(){ $('#cnt').textContent = (picks[desk] || []).length + ' picked'
 async function toggle(p){ const l = picks[desk] = picks[desk] || []; const i = l.indexOf(p); if (i < 0) l.push(p); else l.splice(i, 1);
   document.querySelectorAll('.t').forEach(t => { if (t.dataset.p === p) t.classList.toggle('p', isP(p)); });
   if (cur >= 0) $('#bk').innerHTML = isP(shown[cur].path) ? '&#9733; Picked (P to unpick)' : '&#9734; Pick (P)';
-  count(); await fetch('/api/picks', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(picks)}); }
+  count(); lastSave = Date.now(); await fetch('/api/picks', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(picks)}); }
 function render(){
   const f = $('#folder').value, q = $('#q').value.toLowerCase();
   shown = all.filter(x => (!f || x.folder === f) && (!q || x.path.toLowerCase().includes(q)) && (!onlyPicks || isP(x.path)));
@@ -137,6 +137,9 @@ addEventListener('keydown', e => { if (cur < 0 || e.target.tagName === 'INPUT') 
 $('#desk').onchange = () => { desk = $('#desk').value; try { localStorage.setItem('pdesk', desk); } catch (e) {} render(); };
 $('#sort').value = localStorage.getItem('psort') || 'folder'; $('#sort').onchange = () => { try { localStorage.setItem('psort', $('#sort').value); } catch (e) {} render(); };
 $('#folder').onchange = render; $('#q').oninput = render; $('#only').onclick = () => { onlyPicks = !onlyPicks; $('#only').classList.toggle('on', onlyPicks); render(); };
+// the picks file can also be changed outside this page (by Claude): look again every few seconds, unless a change of ours was just saved
+let lastSave = 0; const _save = savePicks; savePicks = async function(){ lastSave = Date.now(); return _save(); };
+setInterval(async () => { if (Date.now() - lastSave < 4000 || document.hidden) return; try { const p = await (await fetch('/api/picks')).json(); if (JSON.stringify(p) !== JSON.stringify(picks)) { picks = p; const y = scrollY; render(); scrollTo(0, y); } } catch (e) {} }, 4000);
 Promise.all([fetch('/api/list').then(r => r.json()), fetch('/api/picks').then(r => r.json())]).then(([l, p]) => { all = l; picks = p;
   [...new Set(all.map(x => x.folder))].forEach(f => $('#folder').add(new Option(f + ' (' + all.filter(x => x.folder === f).length + ')', f))); render(); });
 </script></body></html>'''
