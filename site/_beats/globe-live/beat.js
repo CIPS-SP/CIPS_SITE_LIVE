@@ -589,7 +589,7 @@ export async function mount(stage, o, ctx){
   const KIN_CALLOUT = { in: [0, 0.24], fadeOut: [0.97, 1.0],
     content: { title: 'DESTINATION: JERSEY', speedKts: 14,   // 20 Nov 2026, Simon: no vessel name; the destination is the heading (was M/Y KINSHIP)
                destination: { lat: 49.1869, lng: -2.1045 },   // St Helier
-               rows: [['For', 'Bunkers · Provisions · Crew change'], ['Speed', '14 kts'], ['ETA', '']] } };   // ETA filled in live in placeKinship(), matched by label
+               rows: [['For', 'Bunkers · Provisions · Crew change'], ['Speed', '14 kts'], ['Distance to run', ''], ['ETA', '']] } };   // 20 Nov 2026, Simon: Distance to run, counting down (filled in live like the ETA)   // ETA filled in live in placeKinship(), matched by label
 
   const SVGNS = 'http://www.w3.org/2000/svg';
   const svgEl = (t, attrs) => { const e = document.createElementNS(SVGNS, t); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
@@ -667,6 +667,7 @@ export async function mount(stage, o, ctx){
   // come from the route planned here, so the preview, the voyage card and the vessel's actual passage always agree: published on window.CIPS_VESSEL.route
   // and announced as 'cips:route'.
   const kinFmtNm = nm => (Math.round(nm / 10) * 10).toLocaleString('en-GB') + ' nm';
+  const kinFmtRun = nm => Math.max(0, Math.round(nm)).toLocaleString('en-GB') + ' nm';   // the countdown, to the mile
   function kinFmtEta(h) {
     if (h >= 48) { let d = Math.floor(h / 24), r = Math.round(h - d * 24); if (r === 24) { d++; r = 0; } return d + ' days' + (r ? ' ' + r + ' hrs' : ''); }
     return h >= 1.5 ? Math.round(h) + ' hrs' : Math.max(1, Math.round(h * 60)) + ' mins';
@@ -674,7 +675,7 @@ export async function mount(stage, o, ctx){
   function publishKinRoute() {
     const v = window.CIPS_VESSEL; if (!v || !kinRoute) return;
     const kts = KIN_CALLOUT.content.speedKts, eta = kinFmtEta(kinRoute.total / kts);
-    v.route = { departure: v.departure, from: KIN_ORIGIN.name, nm: kinRoute.total, nmText: kinFmtNm(kinRoute.total), etaText: eta, rows: KIN_CALLOUT.content.rows.map(r => r[0] === 'ETA' ? ['ETA', eta] : r) };
+    v.route = { departure: v.departure, from: KIN_ORIGIN.name, nm: kinRoute.total, nmText: kinFmtNm(kinRoute.total), etaText: eta, rows: KIN_CALLOUT.content.rows.map(r => r[0] === 'ETA' ? ['ETA', eta] : r[0] === 'Distance to run' ? [r[0], kinFmtNm(kinRoute.total)] : r) };
     try { window.dispatchEvent(new CustomEvent('cips:route', { detail: v.route })); } catch (_) {}
   }
   window.addEventListener('cips:vessel', e => {
@@ -910,7 +911,8 @@ export async function mount(stage, o, ctx){
         if (kinRoute) etaVal = kinFmtEta(kinRoute.total * (1 - kinRouteProgress(kinRoute, p)) / co.content.speedKts);   // 4 Nov 2026: from the route still to run (it was the straight line to St Helier), so it agrees with the preview in the picker and counts down as she sails
         else { const llNow = vec3ToLonLat(n), etaHrs = kinHaversineNm({ lat: llNow.lat, lng: llNow.lon }, co.content.destination) / co.content.speedKts; etaVal = kinFmtEta(etaHrs); }
         if (kinCalloutDist) { const vr = window.CIPS_VESSEL && window.CIPS_VESSEL.route, dt = vr && vr.departure === window.CIPS_VESSEL.departure ? vr.nmText + ' from ' + vr.from : ''; if (kinCalloutDist.textContent !== dt) kinCalloutDist.textContent = dt; }
-        co.content.rows.forEach((r, idx) => kinTypeRow(kinCalloutRows[idx], r[0], r[0] === 'ETA' ? etaVal : r[1], (typeU - co.in[0] - step * (idx + 1)) / step));
+        const runVal = kinRoute ? kinFmtRun(kinRoute.total * (1 - kinRouteProgress(kinRoute, p))) : '';   // 20 Nov 2026, Simon: distance still to run, counting down as the vessel sails
+        co.content.rows.forEach((r, idx) => kinTypeRow(kinCalloutRows[idx], r[0], r[0] === 'ETA' ? etaVal : r[0] === 'Distance to run' ? runVal : r[1], (typeU - co.in[0] - step * (idx + 1)) / step));
       } else { kinCalloutLine.style.opacity = '0'; }
     }
   }
