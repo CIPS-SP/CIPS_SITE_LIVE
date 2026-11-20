@@ -122,8 +122,7 @@ export function installGlobeEnhancements(root = '#beats') {
       stage.__newGesture = fresh;
       if (!fresh || !ctaShowing()) return;
       attempts += 1;
-      if (attempts >= 2) { attempts = 0; autoOpen(); return; }
-      voyageButton.classList.remove('pulse'); void voyageButton.offsetWidth; voyageButton.classList.add('pulse');   // three pulses (voyageNudge; Simon 6 Nov, was two)
+      if (attempts >= 1) { attempts = 0; autoOpen(); return; }   // 20 Nov 2026, Simon: the first scroll opens the picker straight away (was: the first pulsed the button, the second opened)
     };
     const onScroll = () => { const now = performance.now(), fresh = now - lastAt > 700; lastAt = now; attempt(fresh); };
     addEventListener('wheel', e => { if (e.deltaY > 0) onScroll(); }, { capture: true, passive: true });
@@ -209,7 +208,7 @@ function arrangeDeparture(stage, S) {
   const dpTitle = preview.querySelector('.dp-title'), dpDist = preview.querySelector('.dp-dist'), dpRows = preview.querySelector('.dp-rows');
   const renderPreview = () => {
     const r = V.route && V.route.departure === V.departure ? V.route : null;
-    dpTitle.textContent = V.title;
+    dpTitle.textContent = '';   // 20 Nov 2026, Simon: no vessel name on the preview card (was V.title, M/Y KINSHIP)
     dpDist.textContent = r ? r.nmText + ' from ' + V.dep.place : 'From ' + V.dep.place;
     dpRows.replaceChildren(...(r ? r.rows : []).map(([k, v]) => {
       const row = document.createElement('div'); row.className = 'dp-row';
@@ -226,18 +225,27 @@ function arrangeDeparture(stage, S) {
   // 4 Nov 2026, Simon: no separate "Start the journey" press: the button reads "Scroll to start the journey" and the first scroll gesture (wheel, swipe, arrow / page keys)
   // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
   const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0
-    && (!stage.dataset.autoOpened || (performance.now() - +stage.dataset.autoOpened > 900 && stage.__newGesture));   // 6 Nov 2026: when the picker opened by itself (Scroll the journey), only a new, separate scroll starts the journey, so the picker is seen first
+    && (!stage.dataset.autoOpened || performance.now() - +stage.dataset.autoOpened > 900);   // the scroll that opened the picker does not count
+  // 20 Nov 2026, Simon: two scroll checks on the picker: the first separate scroll (after a pause of 0.7 s) pulses Scroll to start the journey, the second starts it
+  let pickLast = 0, pickN = 0, pickWas = false;
+  const pickScroll = () => {
+    const open = pickerOpen(); if (open !== pickWas) { pickWas = open; pickN = 0; } if (!open) return;
+    const now = performance.now(), fresh = now - pickLast > 700; pickLast = now; if (!fresh) return;
+    pickN += 1;
+    if (pickN >= 2) { pickN = 0; start.click(); return; }
+    start.classList.remove('gate-pulse'); void start.offsetWidth; start.classList.add('gate-pulse');
+  };
   let pty = null, ptx = 0;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026); a sideways drag on the globe does not (14 Nov 2026)
   window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; ptx = e.touches.length === 1 ? e.touches[0].clientX : 0; }, { passive: true });
-  window.addEventListener('touchmove', e => { if (pty === null || e.touches.length !== 1) return; const k = swipeUp(ptx, pty, e.touches[0]); if (k < 0) { pty = null; return; } if (k && pickerOpen()) { pty = null; start.click(); } }, { passive: true });
-  window.addEventListener('wheel', e => { if (e.deltaY > 0 && pickerOpen()) start.click(); }, { capture: true, passive: true });
+  window.addEventListener('touchmove', e => { if (pty === null || e.touches.length !== 1) return; const k = swipeUp(ptx, pty, e.touches[0]); if (k < 0) { pty = null; return; } if (k) { pty = null; pickScroll(); } }, { passive: true });
+  window.addEventListener('wheel', e => { if (e.deltaY > 0) pickScroll(); }, { capture: true, passive: true });
   window.addEventListener('keydown', e => {
     if (!['ArrowDown', 'PageDown', 'End', ' '].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey) return;
     const t = e.target; if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(t.tagName))) return;   // typing a name, or pressing a focused button, is not a scroll
-    if (pickerOpen()) start.click();
+    pickScroll();
   });
   start.before(group);
-  start.before(nameBox);
+  // start.before(nameBox);   // 20 Nov 2026, Simon: no vessel name on the computer either (as on a phone since 14 Nov): the name field is not shown
   start.before(preview);
   const style = document.createElement('style');
   style.textContent = `
