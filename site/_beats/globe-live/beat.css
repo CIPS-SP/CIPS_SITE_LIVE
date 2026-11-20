@@ -446,6 +446,7 @@
 }
 /* 14 Nov 2026, Simon: on a phone no vessel name: the name field and the name on the preview card are not shown; 20 Nov 2026, Simon: on the computer too */
 :is(#beats,body) .beat-globe-live .depart-name{display:none !important}   /* the preview's heading is back, as DESTINATION JERSEY (20 Nov 2026) */
-:is(#beats,body) .beat-globe-live .kin-callout-row:empty{display:none}   /* the card has three rows now (Destination moved up to the heading) */
+:is(#beats,body) .beat-globe-live .kin-callout-row:empty{display:none}
+.beat-globe-live .kin-callout-title .kt-l, .beat-globe-live .dp-title .kt-l{font-weight:400}   /* DESTINATION: in regular weight, JERSEY bold (20 Nov 2026, Simon) */   /* the card has three rows now (Destination moved up to the heading) */
 /* 14 Nov 2026, Simon: the phone opening was too busy: no intro line ("The Channel Islands sit at..."), so Scroll the journey sits under the heading */
 @media (max-width:760px){ :is(#beats,body) .beat-globe-live > .beat-stage .globeCopy:not(.globeCopy2) .gsub{ display:none !important; } }

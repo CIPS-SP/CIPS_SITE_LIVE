@@ -211,7 +211,7 @@ function arrangeDeparture(stage, S) {
   const dpTitle = preview.querySelector('.dp-title'), dpDist = preview.querySelector('.dp-dist'), dpRows = preview.querySelector('.dp-rows');
   const renderPreview = () => {
     const r = V.route && V.route.departure === V.departure ? V.route : null;
-    dpTitle.textContent = 'DESTINATION JERSEY';   // 20 Nov 2026, Simon: no vessel name on the preview card (was V.title, M/Y KINSHIP); the destination is its heading, as on the voyage card
+    { const a = document.createElement('span'); a.className = 'kt-l'; a.textContent = 'DESTINATION:'; dpTitle.replaceChildren(a, ' JERSEY'); }   // 20 Nov 2026, Simon: no vessel name on the preview card (was V.title, M/Y KINSHIP); the destination is its heading, as on the voyage card
     dpDist.textContent = r ? r.nmText + ' from ' + V.dep.place : 'From ' + V.dep.place;
     dpRows.replaceChildren(...(r ? r.rows : []).map(([k, v]) => {
       const row = document.createElement('div'); row.className = 'dp-row';

@@ -587,7 +587,7 @@ export async function mount(stage, o, ctx){
      screen-space path; the old path was 5 waypoints hand-calibrated from Simon's marked screenshots for her old
      short Biscay track and can't generalise to the much longer Monaco route). Her branded content is unchanged. */
   const KIN_CALLOUT = { in: [0, 0.24], fadeOut: [0.97, 1.0],
-    content: { title: 'DESTINATION JERSEY', speedKts: 14,   // 20 Nov 2026, Simon: no vessel name; the destination is the heading (was M/Y KINSHIP)
+    content: { title: 'DESTINATION: JERSEY', speedKts: 14,   // 20 Nov 2026, Simon: no vessel name; the destination is the heading (was M/Y KINSHIP)
                destination: { lat: 49.1869, lng: -2.1045 },   // St Helier
                rows: [['For', 'Bunkers · Provisions · Crew change'], ['Speed', '14 kts'], ['ETA', '']] } };   // ETA filled in live in placeKinship(), matched by label
 
@@ -611,6 +611,9 @@ export async function mount(stage, o, ctx){
   // both skip the DOM write once the text is already showing what it should — Simon, 15 Sep: these were rewriting
   // innerHTML/textContent every single frame even once fully typed, for the rest of the scroll
   const kinTypeText = (el, s, t) => { const v = s.slice(0, Math.round(s.length * Math.max(0, Math.min(1, t)))); if (el.textContent !== v) el.textContent = v; };
+  // 20 Nov 2026, Simon: the card's heading 'DESTINATION: JERSEY' with only the place in bold (the label part before ': ' is drawn in .kt-l, regular weight)
+  const kinTypeTitle = (el, s, t) => { const i = s.indexOf(': '); if (i < 0) return kinTypeText(el, s, t); const v = s.slice(0, Math.round(s.length * Math.max(0, Math.min(1, t)))); if (el.textContent === v) return;
+    const a = document.createElement('span'); a.className = 'kt-l'; a.textContent = v.slice(0, i + 1); el.replaceChildren(a); if (v.length > i + 1) el.append(v.slice(i + 1)); };
   const kinTypeRow = (el, label, value, t) => {   // colon is CSS (.k::after), same hanging-indent trick as channel-night
     const tt = Math.max(0, Math.min(1, t)), total = label.length + value.length, n = Math.round(total * tt);
     const la = Math.min(label.length, n), va = Math.max(0, n - label.length);
@@ -899,7 +902,7 @@ export async function mount(stage, o, ctx){
         const lx = Math.max(tx, Math.min(tx + cw, sp.x)), ly = Math.max(ty, Math.min(ty + ch, sp.y));   // nearest point of the card to her
         kinCalloutLine.setAttribute('d', `M${lx.toFixed(1)},${ly.toFixed(1)} L${sp.x.toFixed(1)},${sp.y.toFixed(1)}`);
         kinCalloutLine.style.opacity = (coOp * 0.7).toFixed(3);
-        kinTypeText(kinCalloutTitle, co.content.title, (typeU - co.in[0]) / step);
+        kinTypeTitle(kinCalloutTitle, co.content.title, (typeU - co.in[0]) / step);
         // ETA — live, from her real distance-to-go (great-circle) at 14kts, not a fixed placeholder; counts down as
         // she closes in. Was kinAlongTrackLL(u) (walked the old fixed KIN_TRACK by index) — now her actual sampled
         // position (n), same technique placeVoyageRoute uses for its own Position row (vec3ToLonLat returns {lat,lon}).
