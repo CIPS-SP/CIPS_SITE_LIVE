@@ -192,6 +192,7 @@ function arrangeDeparture(stage, S) {
     b.setAttribute('aria-pressed', d.key === V.departure ? 'true' : 'false');
     b.addEventListener('click', () => {
       V.set({ departure: d.key }, { focus: true });
+      pickN = 1; pickWas = true; pickLast = 0;   // 20 Nov 2026, Simon: choosing a departure counts as the first scroll check, so the next separate scroll starts the journey (it did nothing, which looked broken)
       for (const o of group.querySelectorAll('.depart-opt')) o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
     });
     group.appendChild(b);
