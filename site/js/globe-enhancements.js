@@ -34,8 +34,8 @@ export function installGlobeEnhancements(root = '#beats') {
     /* 25 Oct 2026, Simon: a bolder nudge when someone tries to scroll the locked globe (beat.js adds .pulse): glow, ripple and swell (no bottom line: Simon, too much) */
     @keyframes voyageNudge{0%{box-shadow:0 0 0 0 rgba(255,138,30,.8),0 0 0 0 rgba(255,138,30,0);transform:scale(1)}40%{box-shadow:0 0 0 0 rgba(255,138,30,.55),0 0 38px 12px rgba(255,138,30,.8);transform:scale(1.07)}100%{box-shadow:0 0 0 22px rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0);transform:scale(1)}}
     ${R} [data-g="voyageCta"] .gcta-btn.pulse{animation:voyageNudge 1s ease-out 3}   /* 6 Nov 2026, Simon: three pulses (was two) */
-    ${R} [data-g="voyageCta"] .gcta-btn{animation:ctaBreath 2.6s ease-in-out infinite!important}   /* 20 Nov 2026, Simon: Scroll the journey pulses gently all the time, like the picker's Scroll to start the journey (the first scroll now opens the picker, so the scroll-set nudge above never shows) */
-    @keyframes ctaBreath{0%,100%{box-shadow:0 0 0 0 rgba(255,138,30,0)}50%{box-shadow:0 0 18px 3px rgba(255,138,30,.6)}}
+    ${R} [data-g="voyageCta"] .gcta-btn{animation:ctaBreath 2.2s ease-in-out infinite!important}   /* 20 Nov 2026, Simon: Scroll the journey pulses gently all the time, like the picker's Scroll to start the journey (the first scroll now opens the picker, so the scroll-set nudge above never shows) */
+    @keyframes ctaBreath{0%,100%{box-shadow:0 0 0 0 rgba(255,138,30,0),0 0 0 0 rgba(255,138,30,0);transform:scale(1)}50%{box-shadow:0 0 0 2px #FF8A1E,0 0 34px 10px rgba(255,138,30,.85);transform:scale(1.04)}}   /* 20 Nov 2026, Simon: brighter and bolder (an orange ring, a wider glow and a slight swell) */
     @media (prefers-reduced-motion:reduce){${R} [data-g="voyageCta"] .gcta-btn{animation:none!important}}
       /* no box-shadow override: Simon's orange glow and scroll-nudge pulse (voyageCtaPulse, beat.css) must show through */
     /* Observe the Channel Islands caps the scroll; its two exits ("Jump to the approaches", "Find a ship to take in")
