@@ -123,7 +123,7 @@ export function installGlobeEnhancements(root = '#beats') {
     };
     const attempt = fresh => {
       stage.__newGesture = fresh;
-      if (!fresh || !ctaShowing()) return;
+      if (!ctaShowing()) return;   // 20 Nov 2026: any scroll counts here too, no pause needed (a steady scroll never paused, so it could be ignored)
       attempts += 1;
       if (attempts >= 1) { attempts = 0; autoOpen(); return; }   // 20 Nov 2026, Simon: the first scroll opens the picker straight away (was: the first pulsed the button, the second opened)
     };
@@ -192,7 +192,6 @@ function arrangeDeparture(stage, S) {
     b.setAttribute('aria-pressed', d.key === V.departure ? 'true' : 'false');
     b.addEventListener('click', () => {
       V.set({ departure: d.key }, { focus: true });
-      pickN = 1; pickWas = true; pickLast = 0;   // 20 Nov 2026, Simon: choosing a departure counts as the first scroll check, so the next separate scroll starts the journey (it did nothing, which looked broken)
       for (const o of group.querySelectorAll('.depart-opt')) o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
     });
     group.appendChild(b);
@@ -228,16 +227,14 @@ function arrangeDeparture(stage, S) {
   stage.querySelector('[data-g="voyageCtaBtn"]')?.addEventListener('click', () => V.set({}, { focus: true }));
   // 4 Nov 2026, Simon: no separate "Start the journey" press: the button reads "Scroll to start the journey" and the first scroll gesture (wheel, swipe, arrow / page keys)
   // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
-  const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0
-    && (!stage.dataset.autoOpened || performance.now() - +stage.dataset.autoOpened > 900);   // the scroll that opened the picker does not count
-  // 20 Nov 2026, Simon: two scroll checks on the picker: the first separate scroll (after a pause of 0.7 s) does nothing, the second starts the journey.
-  // Scroll to start the journey pulses gently all the time while the picker is up (startBreath, below), not on a scroll.
-  let pickLast = 0, pickN = 0, pickWas = false;
+  const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0;
+  // 20 Nov 2026, Simon: one scroll on the picker starts the journey (no second check). Any downward scroll counts, with no pause needed: a steady
+  // wheel or trackpad scroll never paused 0.7 s, so the old 'separate scroll' rule ignored it and the picker seemed stuck. Only the scroll that opened
+  // the picker by itself is let through for 1.2 s, so the picker is seen before the journey starts.
   const pickScroll = () => {
-    const open = pickerOpen(); if (open !== pickWas) { pickWas = open; pickN = 0; } if (!open) return;
-    const now = performance.now(), fresh = now - pickLast > 700; pickLast = now; if (!fresh) return;
-    pickN += 1;
-    if (pickN >= 2) { pickN = 0; start.click(); }
+    if (!pickerOpen()) return;
+    if (stage.dataset.autoOpened && performance.now() - +stage.dataset.autoOpened < 1200) return;
+    start.click();
   };
   let pty = null, ptx = 0;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026); a sideways drag on the globe does not (14 Nov 2026)
   window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; ptx = e.touches.length === 1 ? e.touches[0].clientX : 0; }, { passive: true });
