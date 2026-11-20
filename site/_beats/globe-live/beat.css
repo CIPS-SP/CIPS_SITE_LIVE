@@ -367,7 +367,7 @@
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-title{font:700 18px/1.2 'Jost',system-ui,sans-serif;color:#FF8A1E;letter-spacing:-.01em;white-space:normal;margin:0 0 2px;padding-right:26px}
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-dist{font:300 12px 'Jost',system-ui,sans-serif;color:#a9cfca;margin:0 0 8px}
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-row{font:400 12px/1.5 'Jost',system-ui,sans-serif;padding:2px 0}
-:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-row .k{flex:0 0 92px;font-size:10px;padding-top:2px}
+:is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .kin-callout-row .k{flex:0 0 100px;white-space:nowrap;font-size:10px;padding-top:2px}
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .lvtoggle{position:absolute;top:6px;right:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:50%;color:#7fb2ab;font-size:13px;line-height:1;cursor:pointer;padding:0;transition:transform .2s;z-index:1}
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage .lvtoggle:hover{color:#fff;background:rgba(255,255,255,.1)}
 :is(#beats,body) .beat-globe-live .beat-stage.vcard-panel .lvoyage.compact .lvtoggle{transform:rotate(-90deg)}

@@ -265,7 +265,7 @@ function arrangeDeparture(stage, S) {
     ${S} .dp-title{font:700 18px/1.2 'Jost',system-ui,sans-serif;color:#FF8A1E;letter-spacing:-.01em;margin:0 0 2px;overflow-wrap:anywhere}
     ${S} .dp-dist{font:300 12px 'Jost',system-ui,sans-serif;color:#a9cfca;margin:0 0 8px}
     ${S} .dp-row{display:flex;font:400 12px/1.5 'Jost',system-ui,sans-serif;padding:2px 0;color:rgba(230,238,246,.9)}
-    ${S} .dp-row .k{flex:0 0 92px;color:#9fb1c4;text-transform:uppercase;letter-spacing:.05em;font-size:10px;padding-top:2px}
+    ${S} .dp-row .k{flex:0 0 100px;white-space:nowrap;color:#9fb1c4;text-transform:uppercase;letter-spacing:.05em;font-size:10px;padding-top:2px}
     ${S} .dp-row .k::after{content:':'}
     ${S} .dp-row .v{flex:1 1 auto;min-width:0;color:#fff}
     ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name,${S}.voyage-mode .depart-preview{display:none!important}
