@@ -587,8 +587,9 @@ export async function mount(stage, o, ctx){
      screen-space path; the old path was 5 waypoints hand-calibrated from Simon's marked screenshots for her old
      short Biscay track and can't generalise to the much longer Monaco route). Her branded content is unchanged. */
   const KIN_CALLOUT = { in: [0, 0.24], fadeOut: [0.97, 1.0],
-    content: { title: 'M/Y KINSHIP', speedKts: 14, destination: { lat: 49.1869, lng: -2.1045 },   // St Helier
-               rows: [['Destination', 'St Helier, Jersey'], ['For', 'Bunkers · Provisions · Crew change'], ['Speed', '14 kts'], ['ETA', '']] } };   // ETA filled in live in placeKinship(), matched by label
+    content: { title: 'DESTINATION JERSEY', speedKts: 14,   // 20 Nov 2026, Simon: no vessel name; the destination is the heading (was M/Y KINSHIP)
+               destination: { lat: 49.1869, lng: -2.1045 },   // St Helier
+               rows: [['For', 'Bunkers · Provisions · Crew change'], ['Speed', '14 kts'], ['ETA', '']] } };   // ETA filled in live in placeKinship(), matched by label
 
   const SVGNS = 'http://www.w3.org/2000/svg';
   const svgEl = (t, attrs) => { const e = document.createElementNS(SVGNS, t); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
@@ -656,7 +657,7 @@ export async function mount(stage, o, ctx){
   let vesselDep = null;
   function syncVesselFields() {
     const v = window.CIPS_VESSEL; if (!v || !v.dep) return false;
-    KIN_ORIGIN.lat = v.dep.lat; KIN_ORIGIN.lng = v.dep.lng; KIN_ORIGIN.name = v.dep.place; KIN_CALLOUT.content.title = v.title;
+    KIN_ORIGIN.lat = v.dep.lat; KIN_ORIGIN.lng = v.dep.lng; KIN_ORIGIN.name = v.dep.place;   // (the card's title no longer follows the vessel name: 20 Nov 2026, Simon)
     const changed = vesselDep !== v.departure; vesselDep = v.departure; return changed;
   }
   // 4 Nov 2026, Simon: the picker shows a preview of the journey card before "Start the journey" (globe-enhancements.js, arrangeDeparture). The numbers

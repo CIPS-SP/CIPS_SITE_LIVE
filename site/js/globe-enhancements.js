@@ -208,7 +208,7 @@ function arrangeDeparture(stage, S) {
   const dpTitle = preview.querySelector('.dp-title'), dpDist = preview.querySelector('.dp-dist'), dpRows = preview.querySelector('.dp-rows');
   const renderPreview = () => {
     const r = V.route && V.route.departure === V.departure ? V.route : null;
-    dpTitle.textContent = '';   // 20 Nov 2026, Simon: no vessel name on the preview card (was V.title, M/Y KINSHIP)
+    dpTitle.textContent = 'DESTINATION JERSEY';   // 20 Nov 2026, Simon: no vessel name on the preview card (was V.title, M/Y KINSHIP); the destination is its heading, as on the voyage card
     dpDist.textContent = r ? r.nmText + ' from ' + V.dep.place : 'From ' + V.dep.place;
     dpRows.replaceChildren(...(r ? r.rows : []).map(([k, v]) => {
       const row = document.createElement('div'); row.className = 'dp-row';
@@ -269,7 +269,7 @@ function arrangeDeparture(stage, S) {
     ${S} .dp-row .v{flex:1 1 auto;min-width:0;color:#fff}
     ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name,${S}.voyage-mode .depart-preview{display:none!important}
     @media(max-width:820px){
-      ${S} .depart{margin-top:10px}${S} .depart-name{margin:10px 0}${S} .depart-preview{margin-top:10px}${S} .dp-rows .dp-row:nth-child(2){display:none}
+      ${S} .depart{margin-top:10px}${S} .depart-name{margin:10px 0}${S} .depart-preview{margin-top:10px}${S} .dp-rows .dp-row:nth-child(1){display:none}
       ${S}:not(.globe-intro):not(.following) [data-live="panel"]{top:calc(env(safe-area-inset-top) + 160px)!important;max-height:calc(100vh - 190px);max-height:calc(100dvh - 190px)}
     }
   `;

@@ -547,9 +547,9 @@ const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2,
    pilotage directions: Ch 82 or 25, at least an hour before arrival), then the report to St Helier VTS on 14 inside the reporting
    line; and CIPS — Simon — for the pilot, the water taxi, the crew change, fuel, and the stores (with the Captain's Hamper). */
 const CM = { log: $('[data-comms="log"]'), ch: $('[data-comms="ch"]'), menu: $('[data-comms="menu"]'), stores: $('[data-comms="stores"]'), storesHead: $('[data-comms="storeshead"]'), vtsBtn: $('[data-act="vts"]'), vtsLabel: $('[data-comms="vtslabel"]') };
-const YACHT = { name: 'Kinship', len: 70, draught: 3.8, pob: 12, from: 'St Malo' };
+const YACHT = { name: 'Captain', call: 'CIPS Client', len: 70, draught: 3.8, pob: 12, from: 'St Malo' };   // 20 Nov 2026, Simon: no vessel name: the Pilots, VTS and the Coastguard call you Captain; your own calls go out as CIPS Client (was Kinship, or the name typed on the globe)
 // 4 Nov 2026, Simon: the visitor's vessel name and departure (js/vessel.js, set on the home page; this game runs in an overlay frame of it) carry through: the pilot, the Coastguard and VTS use the name
-try { const v = (window.parent !== window && window.parent.CIPS_VESSEL) || JSON.parse(sessionStorage.getItem('cips.vessel') || 'null'); if (v && v.name) { YACHT.name = v.name; if (v.dep && v.dep.place) YACHT.from = v.dep.place; } } catch (_) {}
+try { const v = (window.parent !== window && window.parent.CIPS_VESSEL) || JSON.parse(sessionStorage.getItem('cips.vessel') || 'null'); if (v && v.dep && v.dep.place) YACHT.from = v.dep.place; } catch (_) {}
 document.querySelectorAll('[data-vessel]').forEach(el => { el.textContent = YACHT.name; });
 const commsFilter=createCommsFilter();
 let voiceStatus='Sound is off. VHF text is always available.';
@@ -585,12 +585,12 @@ const CALLS = { coastguard: false, vts: false, pilot: false, taxi: false, crew: 
 function callVts() {
   if (!S.playing || S.done) return;
   if (!CALLS.coastguard) { CALLS.coastguard = true; S.noticeAt=S.t; star('notice'); CM.ch.textContent = 'CH 82';
-    comms('You', `Jersey Coastguard, ${YACHT.name}. One hour's notice, inbound for pilotage.`, 'me', 82);
+    comms('You', `Jersey Coastguard, ${YACHT.call}. One hour's notice, inbound for pilotage.`, 'me', 82);
     later(2.5, () => comms('Jersey Coastguard', `${YACHT.name}, Coastguard. Notice received. Report to VTS on channel one four.`, '',82,{essential:true,priority:2}));
     CM.vtsLabel.textContent = 'Report inside the line · Ch 14'; return; }
   if (!CALLS.vts) { CALLS.vts = true; S.vtsAt=S.t; CM.ch.textContent = 'CH 14';
     const me = shipGeo(); const nm = gDist(me, GEO.corbiere.at).toFixed(1); const brg = Math.round(gBearing(GEO.corbiere.at, me));
-    comms('You', `St Helier VTS, ${YACHT.name}. Approaching the pilot station.`, 'me', 14);
+    comms('You', `St Helier VTS, ${YACHT.call}. Approaching the pilot station.`, 'me', 14);
     later(2.5, () => comms('St Helier VTS', `${YACHT.name}, VTS. Report received. Pilots will call when ready for boarding.`, '',14,{essential:true,priority:2}));
     CM.vtsBtn.disabled = true; CM.vtsLabel.textContent = 'Reported · Ch 14'; return; }
 }

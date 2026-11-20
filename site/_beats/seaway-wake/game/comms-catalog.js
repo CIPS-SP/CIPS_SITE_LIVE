@@ -34,7 +34,7 @@ export function validateMessageTemplate(id,text){
 }
 export function formatMessage(id,values={},overrides={}){
  const spec=Object.hasOwn(MESSAGES,id)?MESSAGES[id]:null;if(!spec)throw new Error(`Unknown VHF message ${id}`);
- const text=overrides[id]??spec.text;const vars={vessel:'Kinship',boardingSpeed:BOARDING_TARGET_KNOTS,target:'Traffic',...values};
+ const text=overrides[id]??spec.text;const vars={vessel:'Captain',boardingSpeed:BOARDING_TARGET_KNOTS,target:'Traffic',...values};
  // The configured game rule, not an edited value, always supplies boarding speed.
  vars.boardingSpeed=BOARDING_TARGET_KNOTS;
  return {...spec,id,text:text.replace(/\{(\w+)\}/g,(_,key)=>String(vars[key]??''))};
