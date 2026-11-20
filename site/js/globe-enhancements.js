@@ -226,14 +226,14 @@ function arrangeDeparture(stage, S) {
   // presses it, so the passage begins as the page starts to move. The button still works by click or Enter for anyone who does not scroll.
   const pickerOpen = () => !stage.classList.contains('voyage-gate') && !stage.classList.contains('globe-intro') && !stage.classList.contains('voyage-mode') && !start.classList.contains('armed') && panel.getClientRects().length > 0
     && (!stage.dataset.autoOpened || performance.now() - +stage.dataset.autoOpened > 900);   // the scroll that opened the picker does not count
-  // 20 Nov 2026, Simon: two scroll checks on the picker: the first separate scroll (after a pause of 0.7 s) pulses Scroll to start the journey, the second starts it
+  // 20 Nov 2026, Simon: two scroll checks on the picker: the first separate scroll (after a pause of 0.7 s) does nothing, the second starts the journey.
+  // Scroll to start the journey pulses gently all the time while the picker is up (startBreath, below), not on a scroll.
   let pickLast = 0, pickN = 0, pickWas = false;
   const pickScroll = () => {
     const open = pickerOpen(); if (open !== pickWas) { pickWas = open; pickN = 0; } if (!open) return;
     const now = performance.now(), fresh = now - pickLast > 700; pickLast = now; if (!fresh) return;
     pickN += 1;
-    if (pickN >= 2) { pickN = 0; start.click(); return; }
-    start.classList.remove('gate-pulse'); void start.offsetWidth; start.classList.add('gate-pulse');
+    if (pickN >= 2) { pickN = 0; start.click(); }
   };
   let pty = null, ptx = 0;   // a finger swipe up starts the journey too, as the wheel does (6 Nov 2026); a sideways drag on the globe does not (14 Nov 2026)
   window.addEventListener('touchstart', e => { pty = e.touches.length === 1 ? e.touches[0].clientY : null; ptx = e.touches.length === 1 ? e.touches[0].clientX : 0; }, { passive: true });
@@ -268,6 +268,9 @@ function arrangeDeparture(stage, S) {
     ${S} .dp-row .k::after{content:':'}
     ${S} .dp-row .v{flex:1 1 auto;min-width:0;color:#fff}
     ${S}.voyage-mode .depart,${S}.voyage-mode .depart-name,${S}.voyage-mode .depart-preview{display:none!important}
+    ${S}:not(.voyage-mode) [data-g="voyageExample"]:not(.armed){animation:startBreath 2.6s ease-in-out infinite!important}   /* 20 Nov 2026, Simon: a gentle pulse all the time, not set off by a scroll */
+    @keyframes startBreath{0%,100%{box-shadow:0 0 0 0 rgba(255,138,30,0)}50%{box-shadow:0 0 18px 3px rgba(255,138,30,.6)}}
+    @media (prefers-reduced-motion:reduce){${S} [data-g="voyageExample"]{animation:none!important}}
     @media(max-width:820px){
       ${S} .depart{margin-top:10px}${S} .depart-name{margin:10px 0}${S} .depart-preview{margin-top:10px}${S} .dp-rows .dp-row:nth-child(1){display:none}
       ${S}:not(.globe-intro):not(.following) [data-live="panel"]{top:calc(env(safe-area-inset-top) + 160px)!important;max-height:calc(100vh - 190px);max-height:calc(100dvh - 190px)}
