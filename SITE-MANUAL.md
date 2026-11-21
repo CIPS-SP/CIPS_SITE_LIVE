@@ -198,7 +198,7 @@ The picker code is `tools/image-picker.py` (it needs Python with Pillow and pill
 
 **Something to count on the journey:** add the word in `review-drop-box/src/counts.js` (`EVENTS`) and in `site/js/journey-counts.js`, deploy the drop box, then release the site.
 
-**Old addresses that should redirect:** `site/_redirects`. The old Wix pages all go to the home page.
+**Old addresses that should redirect:** `site/_redirects`. The old Wix pages all go to the home page. Short desk addresses (21 Nov 2026): www.cips.agency/shipping, /yachting, /offshore and /cruise go to the desk pages, and /blog (an old Wix menu link) to the home page. Redirects only work on the live site, not on localhost.
 
 ## 7. Releasing a change
 

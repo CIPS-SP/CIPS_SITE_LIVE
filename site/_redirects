@@ -3,3 +3,9 @@
 /cookie-policy   /  301
 /terms-of-use    /  301
 /gallery         /  301
+# Short addresses for the four desks (Simon, 21 Nov 2026): www.cips.agency/shipping and so on. /blog: the old Wix menu had a Blog link (Google still shows it); it goes to the home page.
+/shipping        /sectors/shipping   301
+/yachting        /sectors/yachting   301
+/offshore        /sectors/offshore   301
+/cruise          /sectors/cruise     301
+/blog            /                   301
