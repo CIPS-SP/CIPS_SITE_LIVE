@@ -1,11 +1,10 @@
-# Cloudflare Pages reads this file. The old Wix site's pages (cips.agency until go-live, see GO-LIVE.md) all go to the new home page (Simon, 17 Nov 2026), so old links and search results keep working.
+# Cloudflare Pages reads this file. The old Wix site's pages (cips.agency until go-live, see GO-LIVE.md) go to the new home page (Simon, 17 Nov 2026), except /gallery (see below), so old links and search results keep working.
 /privacy         /  301
 /cookie-policy   /  301
 /terms-of-use    /  301
-/gallery         /  301
-# Short addresses for the four desks (Simon, 21 Nov 2026): www.cips.agency/shipping and so on. /blog: the old Wix menu had a Blog link (Google still shows it); it goes to the home page.
+# Short addresses for the four desks (Simon, 21 Nov 2026): www.cips.agency/shipping and so on.
+# No /gallery or /blog (Simon, 21 Nov 2026: they should not exist): both show the Not found page, so Google drops them.
 /shipping        /sectors/shipping   301
 /yachting        /sectors/yachting   301
 /offshore        /sectors/offshore   301
 /cruise          /sectors/cruise     301
-/blog            /                   301
