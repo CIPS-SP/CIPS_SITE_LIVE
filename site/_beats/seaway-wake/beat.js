@@ -173,9 +173,12 @@ export async function mount(stage, o, ctx){
       // matter how many times the server restarted or the page reopened. ctx.ver is the same catalogue-generated
       // stamp beat.html/js/css already carry.
       const fr=document.createElement('iframe'); fr.src=ctx.base+'game.html'+(ctx.ver||''); fr.allow='autoplay'; fr.title='Mini-game: the approaches'; overlay.appendChild(fr);
-      const x=document.createElement('button'); x.type='button'; x.className='splay-close'; x.textContent='Back to the journey ×'; x.addEventListener('click',closeGame); overlay.appendChild(x);
+      const x=document.createElement('button'); x.type='button'; x.className='splay-close'; x.textContent='Back to the journey ×'; x.addEventListener('click',()=>{ let done=false; try{ done=!!(fr.contentWindow&&fr.contentWindow.__crossingDone&&fr.contentWindow.__crossingDone()); }catch(_){} if(done) dispatchEvent(new MessageEvent('message',{data:'crossing:done'})); else closeGame(); });   /* 23 Nov 2026: with the pilot aboard, on past the pilot station */ overlay.appendChild(x);
       document.body.appendChild(overlay); document.documentElement.style.overflow='hidden'; document.body.style.overflow='hidden'; fr.focus(); });
-    addEventListener('keydown',e=>{ if(e.key==='Escape') closeGame(); }); addEventListener('message',e=>{ if(e.data==='crossing:close') closeGame(); }); }
+    addEventListener('keydown',e=>{ if(e.key==='Escape') closeGame(); }); addEventListener('message',e=>{ if(e.data==='crossing:close') closeGame();
+      // 23 Nov 2026, Simon: after the game with the pilot aboard, the journey went back to where the door was, BEFORE the pilot station, which looked odd. Finished
+      // (crossing:done, from game.js), it now carries on from just past the pilot station, where the launch heads home (o.pilot.home), as the game left off.
+      else if(e.data==='crossing:done'){ const open=!!overlay; closeGame(); if(open&&window.__cipsSeekBeat) requestAnimationFrame(()=>window.__cipsSeekBeat('seaway-wake', (o.pilot&&o.pilot.home ? o.pilot.home[0] : 0.87)+0.03)); } }); }
   // a rotating wrapper for everything that must turn together (sea, islands, hull) — the yaw is a camera move, so it is one CSS transform
   const rot=document.createElement('div'); rot.className='srot'; stage.insertBefore(rot, stage.querySelector('.sscrim')||null);
   [canvas, stage.querySelector('.sfallback'), islandsEl].forEach(el=>{ if(el) rot.appendChild(el); });

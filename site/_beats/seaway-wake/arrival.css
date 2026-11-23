@@ -173,3 +173,5 @@
 }
 
 .contact-dialog strong{user-select:text}
+/* 23 Nov 2026, Simon: no 'Call Simon for real' in the game: the Simon card is Call Simon and opens the provisions and bunkers order (the real-contact dialog stays, unused) */
+.real-call{display:none!important}.simon-contact{padding-right:12px!important}

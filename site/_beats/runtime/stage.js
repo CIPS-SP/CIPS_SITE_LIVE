@@ -141,6 +141,8 @@ export async function run(list, opts = {}) {
   const goto = qs.get('goto');
   if (goto) { const [gname, gp] = goto.split(':'); const b = beats.find(x => x.name === gname);
     if (b) setTimeout(() => { layoutGroups(); scrollTo({ top: scrollTargetFor(b, Math.min(1, Math.max(0, parseFloat(gp) || 0))), behavior: 'auto' }); }, 400); }
+  // 23 Nov 2026, Simon: a scene can send the page to a point of its own (the arrival game, once finished, carries the journey on past the pilot station)
+  window.__cipsSeekBeat = (name, p) => { const b = beats.find(x => x.name === name); if (!b) return false; layoutGroups(); scrollTo({ top: scrollTargetFor(b, Math.min(1, Math.max(0, p))), behavior: 'instant' }); return true; };
 
   // visibility
   const io = new IntersectionObserver(es => { for (const e of es) beats.filter(x => x.section === e.target).forEach(b => b.visible = e.isIntersecting); }, { rootMargin: '25% 0px' });

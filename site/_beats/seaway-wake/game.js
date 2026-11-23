@@ -402,6 +402,7 @@ const flights = [];
    centreline (258° from the threshold) at 2,000 ft and comes down to the ground. Real airlines only, our own drawing. */
 const RUNWAY = { thr08: [49.2005, -2.2110], hdg: 78 };   // the threshold nudged 0.35 M south of true so the approach reads over the sea beside the game (representative, not accurate — as the whole picture is)
 function spawnOverflight(opt = {}) {
+  if (CFG.overflight.on === false && S.flightN) return;   // 23 Nov 2026, Simon: no planes (the first call still goes to flyPass, which only says the crew have landed)
   if (!S.flightN) { S.flightN = 1; flyPass({ name: 'easyJet', color: '#ff6a13', dir: RUNWAY.hdg, size: 0.6, y: 0.5, dur: 5.5, onGone: () => { if (!S.landedSaid) { S.landedSaid = true; transmit('ambient.airport'); } } }); return; }   // the crew's easyJet, MUCH larger, across the screen (Howard, 20 Sep)
   const iata = opt.iata || (S.flightN ? 'BA' : 'U2'), name = iata === 'BA' ? 'British Airways' : 'easyJet'; S.flightN = (S.flightN || 0) + 1;
   const el = document.createElement('div'); el.className = 'ob plane'; el.innerHTML = `<img alt="" src="${SPRITES.plane.src}">`;
@@ -651,10 +652,11 @@ const STARS=arrivalNotes().map(note=>[note.id,note.label,()=>arrivalNotes().find
 function starCount() { return STARS.filter(x => x[2]()).length; }
 function star(k) { const x = STARS.find(x => x[0] === k); if (!x || !x[2]() || S.starred?.[k]) return; (S.starred ||= {})[k] = true; later(0.6, () => { toast(`★ ${x[1]} — ${starCount()} of 5`, 'good'); sndBlip('star'); }); }
 // Exit back to the scrolled story: from the start card (any time), and, when the game is the whole page (not inside the beat's overlay, which has its own pill), a pill in the top-left. Inside the overlay: tell the parent; on its own: the site.
-const leaveGame = () => { if (window.parent !== window) { try { window.parent.postMessage('crossing:close', '*'); return; } catch (_) {} } location.href = '/'; };
+window.__crossingDone = () => !!S.pilotBoarded;   // read by the overlay's Back to the journey pill (beat.js)
+const leaveGame = () => { if (window.parent !== window) { try { window.parent.postMessage(S.pilotBoarded ? 'crossing:done' : 'crossing:close', '*'); return; } catch (_) {} } location.href = '/'; };   // 23 Nov 2026: with the pilot aboard, the journey carries on past the pilot station (crossing:done)
 $('[data-act="exit"]').addEventListener('click', leaveGame);
 if (window.parent === window) { const pill = document.createElement('button'); pill.type = 'button'; pill.className = 'exitpill'; pill.textContent = 'Back to the journey ×'; pill.addEventListener('click', leaveGame); document.body.appendChild(pill); }
-$('[data-act="handover"]').addEventListener('click', () => { if (window.parent !== window) { try { window.parent.postMessage('crossing:close', '*'); return; } catch (_) {} } location.href = '/'; });   // back to the journey off Corbière; the pilot takes her in
+$('[data-act="handover"]').addEventListener('click', () => { if (window.parent !== window) { try { window.parent.postMessage(S.pilotBoarded ? 'crossing:done' : 'crossing:close', '*'); return; } catch (_) {} } location.href = '/'; });   // back to the journey off Corbière; the pilot takes her in
 function finish() {
   if(S.done||!S.pilotBoarded)return false;
   radioVoice.cancel();S.playing=false;S.done=true;game.classList.remove('playing');replayPolicy.complete(S.replay);
@@ -708,7 +710,7 @@ addEventListener('keydown', e => { if(uiPaused||e.target?.closest?.('.game-direc
   if (S.playing && (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W')) stickSet(STICK.x, STICK.y + 0.125); if (S.playing && (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S')) stickSet(STICK.x, STICK.y - 0.125);
   if ((e.key === ' ' || e.key === 'Enter') && !S.playing) reset();
   else if (e.key === ' ' && S.playing) pilotAttempt();
-  if (e.key === 'Escape' && window.parent !== window) { try { window.parent.postMessage('crossing:close', '*'); } catch (_) {} } });   // inside the beat's overlay: Esc goes back to the journey
+  if (e.key === 'Escape' && window.parent !== window) { try { window.parent.postMessage(S.pilotBoarded ? 'crossing:done' : 'crossing:close', '*'); } catch (_) {} } });   // inside the beat's overlay: Esc goes back to the journey
 addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
 game.addEventListener('pointerdown', e => { if(uiPaused||e.target.closest('button, .card, label, input, [data-comms], .bridge, .plotter-box, [data-stick], [data-pilotxfer], [data-arrival-ui], dialog, .game-director')) return; S.dragX = e.clientX; S.dragLat = S.lat; game.setPointerCapture?.(e.pointerId); });
 game.addEventListener('pointermove', e => { if (uiPaused||S.dragX == null) return; S.dragTarget = clamp((e.clientX - S.dragX) / (W * 0.18), -1, 1); });   // a drag is the wheel: how far you have pulled it over
@@ -1147,6 +1149,7 @@ function sndTick() { if (!SND.ctx || !SND.on) return; const C = SND.ctx;
    being north-up) and the British Airways finale before the end card. Drawn over the scene in screen space so they always cross
    the picture; the jet is heard as she comes in and panned with her across the screen. */
 function flyPass({ name, color, dir, size = 0.5, y = 0.42, dur = 4.5, onGone }) {
+  if (CFG.overflight.on === false) { if (onGone) setTimeout(onGone, 600); return; }   // 23 Nov 2026, Simon: no planes (the radio messages stay)
   const el = document.createElement('div'); el.className = 'pass-jet'; el.innerHTML = `<img alt="" src="${SPRITES.plane.src}"><b style="color:${color}">${name}</b>`;
   const sh = document.createElement('div'); sh.className = 'pass-jet-shadow'; game.appendChild(sh); game.appendChild(el);
   const W = innerWidth, H = innerHeight, len = Math.min(W * size, 820), cx = W * 0.5, cy = H * y, a = dir * Math.PI / 180, ux = Math.sin(a), uy = -Math.cos(a);
@@ -1484,6 +1487,16 @@ function tick(dtForce,renderFrame=true) {   // dtForce: only the debug hook pass
         let hit = false; for (const hz of [-4.2, -1.4, 1.4, 4.2]) { if (Math.hypot(cx, cz - hz) < c.r + 1.25 + margin) { hit = true; break; } }
         if (hit) { o.hit = true; if (DEBUG) console.log('[close]', o.kind, 'lane', o.lane.toFixed(1), 'z', o.z.toFixed(1), 'lat', S.lat.toFixed(1), 'circle', c);
           avoided(o); break; } }
+    }
+    /* 23 Nov 2026, Simon (a friend ran into the tuna boat): the game stepped in once per boat (o.hit), so a player who kept steering at a boat after it had moved aside
+       could still end up on top of it. Now a boat the game may move is never let overlap the hull (pushed clear sideways by however much it would overlap, plus a little),
+       and once it is well clear again it can be stepped in on again (the 2.5 s grace still stops a second penalty for the same encounter). */
+    if (S.playing && !S.done && o.hit && o.kind !== 'dolphin' && mayDisplaceTarget(o)) {
+      let worst = Infinity; for (const c of o.circles) { const cx = o.x - Math.sin(hr) * c.dz, cz = o.z + Math.cos(hr) * c.dz;
+        for (const hz of [-4.2, -1.4, 1.4, 4.2]) worst = Math.min(worst, Math.hypot(cx, cz - hz) - c.r - 1.25); }
+      if (worst < 0.6) { const dir = Math.sign(o.lane - S.lat || 1); o.g = gMove(o.g, S.hdg + 90 * dir, (0.6 - worst) * NM_PER_UNIT);
+        const [gx, gz] = geoToSim(o.g); o.x = gx; o.z = gz; o.lane = -gx; }
+      else if (!o.evade && worst > safetyMargin(CFG) * 2) o.hit = false;
     }
   }
   // overflights: high and fast; the shadow runs on the water well to the left of the aircraft (sun from the right)
