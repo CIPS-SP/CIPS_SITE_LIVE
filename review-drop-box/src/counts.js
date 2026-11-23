@@ -23,6 +23,22 @@ export const EVENTS = {
 };
 const ORDER = Object.keys(EVENTS);
 
+// Problem reports (21 Nov 2026, Simon: a friend's Chrome sat on "Loading the globe" for ever; Edge worked). When the globe cannot start, the home page
+// sends what went wrong, the browser's name and version and the system (e.g. "Chrome 131 · Windows"), and the first line of the error. Nothing about
+// the visitor: no address, no identifier. The box keeps a count per day for each different report, shown under the journey counts at /stats.
+//   POST /api/problem   public   JSON {"kind":"no_webgl","browser":"Chrome 131 · Windows","err":"..."} (from the site's own addresses only)
+export const PROBLEMS = {
+  no_webgl: 'The browser cannot draw 3D (WebGL off or blocked)',
+  globe_error: 'The globe failed while starting',
+  slow: 'The globe was still not ready after 40 s',
+};
+const clean = (s, n) => String(s || '').replace(/[^\w .,:;()/'"+#·-]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+export function parseProblem(text) {
+  let o; try { o = JSON.parse(String(text || '').slice(0, 1000)); } catch (e) { return null; }
+  if (!o || !Object.prototype.hasOwnProperty.call(PROBLEMS, o.kind)) return null;
+  return { kind: o.kind, browser: clean(o.browser, 60) || 'unknown', err: clean(o.err, 160) };
+}
+
 // the day in Jersey (the same as London's)
 export function dayOf(ms) { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)); }
 
@@ -33,6 +49,7 @@ export class Counter {
   constructor(state) {
     this.sql = state.storage.sql;
     this.sql.exec('CREATE TABLE IF NOT EXISTS c (day TEXT NOT NULL, ev TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, ev))');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS p (day TEXT NOT NULL, kind TEXT NOT NULL, browser TEXT NOT NULL, err TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, kind, browser, err))');
   }
   async fetch(request) {
     const u = new URL(request.url);
@@ -41,6 +58,16 @@ export class Counter {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return new Response('bad day', { status: 400 });
       for (const ev of parseEvents(u.searchParams.get('evs'))) this.sql.exec('INSERT INTO c (day, ev, n) VALUES (?, ?, 1) ON CONFLICT (day, ev) DO UPDATE SET n = n + 1', day, ev);
       return new Response('ok');
+    }
+    if (u.pathname === '/problem') {
+      const day = u.searchParams.get('day') || '', pr = parseProblem(u.searchParams.get('p'));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !pr) return new Response('bad', { status: 400 });
+      this.sql.exec('INSERT INTO p (day, kind, browser, err, n) VALUES (?, ?, ?, ?, 1) ON CONFLICT (day, kind, browser, err) DO UPDATE SET n = n + 1', day, pr.kind, pr.browser, pr.err);
+      return new Response('ok');
+    }
+    if (u.pathname === '/problems') {
+      const since = u.searchParams.get('since') || '0000-00-00';
+      return Response.json(this.sql.exec('SELECT day, kind, browser, err, n FROM p WHERE day >= ? ORDER BY day DESC, n DESC LIMIT 200', since).toArray());
     }
     if (u.pathname === '/list') {
       const since = u.searchParams.get('since') || '0000-00-00';
@@ -54,7 +81,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 // the totals page: today, the last 7, 30, 90 and 365 days and all time per milestone (with the share of everyone who saw the globe), then day by day.
 // Nothing is ever deleted: every day's totals are kept (a row per milestone per day, a few kilobytes a year).
-export function statsPage(rows, now) {
+export function statsPage(rows, now, problems = []) {
   const days = [...new Set(rows.map((r) => r.day))].sort().reverse();
   const get = {}; for (const r of rows) (get[r.day] || (get[r.day] = {}))[r.ev] = r.n;
   const sum = (n, ev) => { const from = n ? dayOf(now - (n - 1) * 86400000) : ''; return rows.filter((r) => r.ev === ev && r.day >= from).reduce((a, r) => a + r.n, 0); };
@@ -70,5 +97,9 @@ export function statsPage(rows, now) {
     'table{border-collapse:collapse;margin:0 0 28px;font-variant-numeric:tabular-nums}th,td{border-bottom:1px solid #e3e6ea;padding:7px 12px;text-align:right}th:first-child,td:first-child{text-align:left}' +
     'th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#56636e}small{color:#8a95a0}.wrap{overflow-x:auto}</style>' +
     '<h1>CIPS journey counts</h1><p>Each milestone counts once per visit (a browser tab). Percentages are of everyone who saw the globe. Days are Jersey time. No cookies, nothing about the visitor is kept.' + (first ? ' Counting since ' + first + '.' : '') + '</p>' +
-    '<div class="wrap"><table>' + head + body + '</table></div><h1 style="font-size:18px">Day by day (last 30 days with visits)</h1><div class="wrap"><table>' + dhead + (dbody || '<tr><td colspan="14">Nothing yet.</td></tr>') + '</table></div></html>';
+    '<div class="wrap"><table>' + head + body + '</table></div><h1 style="font-size:18px">Day by day (last 30 days with visits)</h1><div class="wrap"><table>' + dhead + (dbody || '<tr><td colspan="14">Nothing yet.</td></tr>') + '</table></div>' +
+    '<h1 style="font-size:18px">Problems (last 90 days)</h1><p>Visits where the globe could not start. The site then took the visitor straight to the main site. Browser and system as the browser reports them; no visitor details.</p>' +
+    '<div class="wrap"><table><tr><th>Day</th><th>What happened</th><th>Browser</th><th>Error</th><th>Times</th></tr>' +
+    (problems.length ? problems.map((r) => '<tr><td>' + esc(r.day) + '</td><td>' + esc(PROBLEMS[r.kind] || r.kind) + '</td><td>' + esc(r.browser) + '</td><td style="text-align:left">' + esc(r.err) + '</td><td>' + r.n + '</td></tr>').join('') : '<tr><td colspan="5">None.</td></tr>') +
+    '</table></div></html>';
 }

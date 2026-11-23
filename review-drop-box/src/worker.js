@@ -15,7 +15,8 @@
 //   POST /api/brevo-webhook   Brevo   delivery reports (bearer token)
 //   GET  /api/enquiries Desk     the latest enquiries and whether each was delivered
 //   POST /api/count     public   journey milestones from the home page, counted per day (17 Nov 2026, src/counts.js)
-//   GET  /stats         Simon    the journey counts (password: the STATS_KEY secret)
+//   POST /api/problem   public   the globe could not start: what, browser, error, counted per day (21 Nov 2026, src/counts.js)
+//   GET  /stats         Simon    the journey counts and the problems (password: the STATS_KEY secret)
 //   (and every 5 minutes, on a schedule: resend what failed, alert on anything not delivered)
 //
 // Settings (Cloudflare dashboard, never in the page or the repo):
@@ -27,7 +28,7 @@ import { verifyLink, cleanPayload, isExpired } from './link.js';
 import { validateAnswers, sanitizePublic } from './validate.js';
 import { makeCode, normCode, slugFor } from './code.js';
 import { validateEnquiry, saveEnquiry, trySend, webhookAllowed, onReport, runSchedule, listEnquiries } from './enquiry.js';
-import { parseEvents, dayOf, statsPage } from './counts.js';
+import { parseEvents, parseProblem, dayOf, statsPage } from './counts.js';
 export { Counter } from './counts.js';
 
 const MAX_BODY = 16 * 1024; // review answers
@@ -141,6 +142,20 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     return new Response(null, { status: 204, headers: cors });
   }
 
+  // ---- public: the globe could not start (21 Nov 2026). Only from the site's own addresses; never an error the page has to handle. ----
+  if (path === '/api/problem' && method === 'POST') {
+    const cors = corsFor(request, env, 'POST'), origin = request.headers.get('Origin');
+    if (env.COUNTER && origin && origins(env).includes(origin)) {
+      const pr = parseProblem(await request.text());
+      if (pr) {
+        const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
+        const p = stub.fetch('https://counter/problem?day=' + dayOf(now) + '&p=' + encodeURIComponent(JSON.stringify(pr))).catch(() => {});
+        if (ctx && ctx.waitUntil) ctx.waitUntil(p); else await p;
+      }
+    }
+    return new Response(null, { status: 204, headers: cors });
+  }
+
   // ---- Simon: the journey counts, behind the browser's own password box ----
   if (path === '/stats' && method === 'GET') {
     if (!env.COUNTER || !env.STATS_KEY) return json({ error: 'not found' }, 404);
@@ -149,7 +164,8 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     if (!(await sameSecret(pass, env.STATS_KEY))) return new Response('Sign in to see the CIPS journey counts.', { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="CIPS journey counts", charset="UTF-8"', 'Cache-Control': 'no-store' } });
     const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
     const rows = await (await stub.fetch('https://counter/list?since=0000-00-00')).json();
-    return new Response(statsPage(rows, now), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
+    let problems = []; try { problems = await (await stub.fetch('https://counter/problems?since=' + dayOf(now - 89 * 86400000))).json(); } catch (e) { problems = []; }
+    return new Response(statsPage(rows, now, problems), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
   }
 
   // ---- public: what the review page shows for a short code (never the booking id) ----

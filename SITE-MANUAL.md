@@ -104,7 +104,7 @@ The ordinary settings are also in `review-drop-box/wrangler.toml`. **Keep the da
 |---|---|
 | **Visits:** how many people, which pages, where they came from, country, device | **Cloudflare Web Analytics** (Cloudflare menu > Web Analytics). Cookie-free. Switched on in the Pages project on 17 Nov 2026 and live since the release that day. |
 | **Search:** how often you appear in Google, for which searches, clicks | **Google Search Console** (search.google.com/search-console, under the Google account Simon used on 17 Nov 2026), domain property **cips.agency**, verified by the TXT record above. Sitemap submitted: `https://www.cips.agency/sitemap.xml`. |
-| **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time; shows today, 7, 30, 90 and 365 days and all time (nothing is ever deleted). |
+| **The journey:** how many started, reached the sea, harbour and quay, saw the film, skipped to CIPS, went on to the main site, sent an enquiry; and the problems (visits where the globe could not start) | **Journey counts:** https://cips-review-drop-box.simon-92c.workers.dev/stats (the browser asks for a password: any user name, the `STATS_KEY` secret as the password). Each milestone counts once per visit; totals per day, Jersey time; shows today, 7, 30, 90 and 365 days and all time (nothing is ever deleted). |
 | **Business listing** | Google Business Profile (business.google.com/locations shows the ones you manage). Two listings were found on 17 Nov 2026: A, "Channel Island Port Services" (07797 720723, 1 review, links to the site), and B, "... - CIPS (St Helier Port Services Ltd)" (01534 870300, 22 reviews, no website). The plan: claim or get access to B, bring it up to date (name, www.cips.agency, the 24/7 number, open 24 hours, the address exactly as on the site), then merge A into it or report A as a duplicate. |
 
 ### Monthly check (about 20 minutes)
@@ -135,6 +135,7 @@ Do this once a month. To have it read through, export or screenshot what you see
 - How far they got: sea, coast, harbour, quay, film.
 - How many skipped to CIPS, and where: at the globe, or during the journey.
 - How many sent an enquiry.
+- **Problems** (at the foot of the page, since 23 Nov 2026): visits where the 3D globe could not start, with the browser and system and the error. The site then took those visitors straight to the main site with a note to switch on graphics acceleration. A few are normal (old computers, work laptops). Many from one browser, or a new error after a release, need looking at: share a screenshot in a session.
 
 A sharp drop between two milestones shows where people lose interest.
 

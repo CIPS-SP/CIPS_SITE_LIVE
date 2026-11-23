@@ -36,6 +36,7 @@ node tools/fake-desk.mjs          # collects what was sent (add --keep to look w
 | `PUT /api/reviews` | Desk | Publishes the approved list. The box cuts it to the public fields. |
 | `GET /api/reviews` | public | That list, cached 5 minutes. Empty list until the Desk publishes. |
 | `GET /api/health` | public | `{ok:true}` |
+| `POST /api/problem` | public (site addresses only) | The globe could not start (23 Nov 2026): JSON `{kind, browser, err}`, kind `no_webgl`, `globe_error` or `slow`; browser like "Chrome 131 · Windows"; the first line of the error. Counted per day per different report in the `Counter` Durable Object (table `p`), listed under Problems on `/stats`. Nothing about the visitor. |
 | `POST /api/count` | public (site addresses only) | Journey milestones from the home page, plain text such as `open,start` (17 Nov 2026, `src/counts.js`). Counted per day in the `Counter` Durable Object, never in BOX. Always answers 204. |
 | `GET /stats` | Simon | The journey counts as a page (today, 7, 30, 90 and 365 days, all time, and day by day; every day's totals are kept). The browser asks for a password: any user name, the `STATS_KEY` secret as the password. 404 until `STATS_KEY` is set. |
 
