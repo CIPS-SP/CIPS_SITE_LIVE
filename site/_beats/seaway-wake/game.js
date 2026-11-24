@@ -731,7 +731,7 @@ function stickSet(x, y, fromKeys) { STICK.x = clamp(x, -1, 1); STICK.y = clamp(y
 function syncKnobFromThrottle(th) { STICK.y = clamp(th >= 0 ? th : th * 2, -1, 1); positionKnob(); }
 /* The bridge console (Simon, 23 Oct 2026: one console for every screen). The arrival has ONE throttle, so the engines are linked and UNLINK is greyed; the thrusters and HOLD POSITION are not for use at sea. The lever is stretched so the pilot boarding speed (7 knots)
    sits 40% of the way up the ahead stretch while full ahead stays what it was: below the mark the lever is 7/12 of the throttle over 40% of the throw, above it the rest. The rudder bar stays where it is set (it sets the same STICK.x the joystick did, and nothing lets it go). */
-const LEV_MARK = 0.4, T_MARK = BOARDING_TARGET_KNOTS / CFG.speed;
+const LEV_MARK = 0.3, T_MARK = BOARDING_TARGET_KNOTS / CFG.speed;
 const throttleOfLever = v => v < 0 ? v * 0.5 : v <= LEV_MARK ? T_MARK * v / LEV_MARK : T_MARK + (1 - T_MARK) * (v - LEV_MARK) / (1 - LEV_MARK);
 const leverOfThrottle = t => t < 0 ? t / 0.5 : t <= T_MARK ? LEV_MARK * t / T_MARK : LEV_MARK + (1 - LEV_MARK) * (t - T_MARK) / (1 - T_MARK);
 const bridgeHost = $('[data-bridge]'), bridge = bridgeHost ? createBridgeConsole(bridgeHost, {
@@ -739,7 +739,7 @@ const bridgeHost = $('[data-bridge]'), bridge = bridgeHost ? createBridgeConsole
   onLink(on) { if (uiPaused || !S.playing) return; engLink(on); },
   onRudder(deg) { if (uiPaused || !S.playing) return; stickSet(deg / 35, STICK.y); },
   onMidships() { if (uiPaused || !S.playing) return; stickSet(0, STICK.y); },
-}) : null;
+}, { leverH: 200, astern: 0.25 }) : null;   // 24 Nov 2026 (Simon, option C): a lever a third taller, astern a quarter of it, 7 kn 30% of the way up the ahead stretch, so 7 kn to full ahead is about half the throw
 function bridgeUpdate() {
   if (!bridge) return;   // the indicator lines are where the propellers actually are
   bridge.update({ lev: [leverOfThrottle(ENG.thP), leverOfThrottle(ENG.thS)], act: [leverOfThrottle(ENG.nP), leverOfThrottle(ENG.nS)], linked: ENG.linked, canUnlink: true, rudder: STICK.x * 35, rudderAct: S.rudder * 35, thr: [0, 0], thLocked: true, lockNote: ['THRUSTERS', 'NOT FOR USE AT SEA'], holdAvail: false, holding: false, mark: LEV_MARK, markLabel: BOARDING_TARGET_KNOTS + ' KN' });

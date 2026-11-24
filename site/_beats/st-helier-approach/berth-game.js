@@ -37,8 +37,11 @@ export const CFG = {
 
 // The console lever (-1 full astern .. +1 full ahead) is not the engine demand: the first 40% of the throw to ahead is the SLOW half-power range (Simon, 30 Oct 2026: "more space between stop and 5 kn"), so five knots sits 40% of the way up the ahead stretch,
 // as in Hold the Line. Lever 0.4 asks the propellers for 0.2 of their demand (about 5 knots through the water); the rest of the throw runs 0.2 to 1.
-export const demandOf = v => Math.sign(v) * (Math.abs(v) <= 0.4 ? Math.abs(v) * 0.5 : 0.2 + (Math.abs(v) - 0.4) * (0.8 / 0.6));
-export const leverOf = n => Math.sign(n) * (Math.abs(n) <= 0.2 ? Math.abs(n) / 0.5 : 0.4 + (Math.abs(n) - 0.2) * 0.75);
+// 24 Nov 2026 (Simon, option A): ahead, the fine low-power stretch ends a quarter of the way up (BK_AHEAD, the 5 kn mark), so the throw above it is longer; astern keeps its 40% knee
+export const BK_AHEAD = 0.25, BK_ASTERN = 0.4;
+const kOf = v => v >= 0 ? BK_AHEAD : BK_ASTERN;
+export const demandOf = v => { const a = Math.abs(v), k = kOf(v); return Math.sign(v) * (a <= k ? a * 0.2 / k : 0.2 + (a - k) * (0.8 / (1 - k))); };
+export const leverOf = n => { const a = Math.abs(n), k = kOf(n); return Math.sign(n) * (a <= 0.2 ? a * k / 0.2 : k + (a - 0.2) * ((1 - k) / 0.8)); };
 const D2R = Math.PI / 180, clampN = (v, a, b) => Math.max(a, Math.min(b, v)), wrap = a => ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
 const MX = P.mass * P.addX, MY = P.mass * P.addY, IZ = P.mass * (P.kyy * P.L) ** 2 * 1.3, VP = 1.35 * P.Vmax;
 

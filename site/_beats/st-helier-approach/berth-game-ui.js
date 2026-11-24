@@ -50,7 +50,7 @@ export function createBerthGame(o) {
   }
   function sync() {
     const m = G.model; if (!m) return; const st = m.st, h = st.h, inf = m.info(); if (G.phase === 'play') layoutRight(true);
-    cons.update({ lev: [st.levP, st.levS], act: [m.leverOf(h.np), m.leverOf(h.ns)], linked: st.linked, rudder: st.rud, rudderAct: h.rud, thr: [st.thB, st.thS], thLinked: st.thLinked, thLocked: st.thLocked, holdAvail: inf.holdAvail, holding: inf.holding, mark: 0.4, markLabel: '5 KN' });   // five knots 40% of the way up the ahead stretch, as in Hold the Line
+    cons.update({ lev: [st.levP, st.levS], act: [m.leverOf(h.np), m.leverOf(h.ns)], linked: st.linked, rudder: st.rud, rudderAct: h.rud, thr: [st.thB, st.thS], thLinked: st.thLinked, thLocked: st.thLocked, holdAvail: inf.holdAvail, holding: inf.holding, mark: 0.25, markLabel: '5 KN' });   // five knots a quarter of the way up the ahead stretch, as in Hold the Line (24 Nov 2026, Simon: option A)
   }
   // the pilot's calls: cards above the plotter, newest at the bottom (as in Hold the Line)
   function placeVhf() {

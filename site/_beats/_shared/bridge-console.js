@@ -12,14 +12,15 @@ const arcD = (cx, cy, r, a0, a1) => { const [x0, y0] = pol(cx, cy, r, a0), [x1, 
 const C = { edge: '#2a2d30', line: '#5d666e', dimLit: '#a2abb2', ink: '#e9ecef', dim: '#7f878e', glow: '#ffb347', track: '#050607', port: '#ff5a4d', stbd: '#43d17a' };
 let SEQ = 0;
 
-export function createBridgeConsole(host, handlers = {}) {
+export function createBridgeConsole(host, handlers = {}, opts = {}) {   // opts (24 Nov 2026, Simon): leverH (track length, default 150) and astern (share of the track below STOP, default 0.4)
+  const LH = opts.leverH || 150, AST = opts.astern ?? 0.4, EX = LH - 150;   // EX: how much taller than the standard console (the panel grows, the button row moves down)
   const H = Object.assign({ onLever() {}, onLink() {}, onThrLink() {}, onRudder() {}, onMidships() {}, onThruster() {}, onHold() {} }, handlers), id = 'bc' + (++SEQ);
   const mk = (tag, a = {}, parent = svg, text) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; };
-  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 620 270'); svg.setAttribute('class', 'bc'); svg.style.cssText = 'display:block;width:100%;height:auto;touch-action:none;user-select:none'; host.appendChild(svg);
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 620 ${270 + EX}`); svg.setAttribute('class', 'bc'); svg.style.cssText = 'display:block;width:100%;height:auto;touch-action:none;user-select:none'; host.appendChild(svg);
   const txt = (t, x, y, o = {}, parent = svg) => mk('text', { x, y, fill: o.fill || '#fff', 'font-size': +((o.size || 9) * 1.14).toFixed(1), 'font-weight': o.weight || 500, 'text-anchor': o.anchor || 'middle', 'letter-spacing': o.ls ?? 1.2, 'font-family': "Jost,system-ui,sans-serif" }, parent, t);
   const defs = mk('defs'); mk('linearGradient', { id: id + 'p', x1: 0, y1: 0, x2: 0, y2: 1 }, defs).innerHTML = '<stop offset="0" stop-color="#1b1d1f"/><stop offset="1" stop-color="#0f1011"/>';
   mk('linearGradient', { id: id + 'k', x1: 0, y1: 0, x2: 0, y2: 1 }, defs).innerHTML = '<stop offset="0" stop-color="#7d858c"/><stop offset=".5" stop-color="#3a3f44"/><stop offset="1" stop-color="#1f2326"/>';
-  mk('rect', { x: 4, y: 4, width: 612, height: 262, rx: 14, fill: `url(#${id}p)`, stroke: C.edge, 'stroke-width': 2 });
+  mk('rect', { x: 4, y: 4, width: 612, height: 262 + EX, rx: 14, fill: `url(#${id}p)`, stroke: C.edge, 'stroke-width': 2 });
   const pt = e => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const m = svg.getScreenCTM(); return m ? p.matrixTransform(m.inverse()) : { x: 0, y: 0 }; };
   const drag = (hit, onMove, onEnd) => hit.addEventListener('pointerdown', e => {
     if (hit.getAttribute('data-off')) return; try { hit.setPointerCapture(e.pointerId); } catch (_) { /* (a synthetic pointer in a test has no capture) */ } hit.style.cursor = 'grabbing'; onMove(pt(e)); e.preventDefault(); e.stopPropagation();   // (the game page has its own pointerdown handler that takes the pointer for steering: keep it out of this)
@@ -37,6 +38,7 @@ export function createBridgeConsole(host, handlers = {}) {
   };
 
   /* ---------- the rudder: dial and bar (middle) ---------- */
+  const n0 = svg.childNodes.length;   // (on a taller console the rudder and the thrusters move down by half the extra height: see 'centred' below)
   const DX = 326, DY = 112, DR = 76;
   mk('path', { d: arcD(DX, DY, DR, -70, 0), stroke: C.port, 'stroke-width': 6, fill: 'none', opacity: .9 }); mk('path', { d: arcD(DX, DY, DR, 0, 70), stroke: C.stbd, 'stroke-width': 6, fill: 'none', opacity: .9 });
   for (let a = -35; a <= 35; a += 5) { const long = a % 10 === 0, [x0, y0] = pol(DX, DY, DR - 4, a * 2), [x1, y1] = pol(DX, DY, DR - (long ? 16 : 10), a * 2); mk('line', { x1: f1(x0), y1: f1(y0), x2: f1(x1), y2: f1(y1), stroke: C.ink, 'stroke-width': long ? 1.6 : 1 }); if (long && a !== 0) { const [tx, ty] = pol(DX, DY, DR - 26, a * 2); txt(Math.abs(a), tx, ty + 3.4, { size: 9.5, fill: C.ink, ls: 0 }); } }
@@ -49,10 +51,11 @@ export function createBridgeConsole(host, handlers = {}) {
   txt('PORT', RX - 6, RY + 4, { size: 8.5, fill: C.port, anchor: 'end', weight: 700, ls: 1 }); txt('STBD', RX + RW + 6, RY + 4, { size: 8.5, fill: C.stbd, anchor: 'start', weight: 700, ls: 1 }); txt('STAYS WHERE SET', RC, RY + 31, { size: 8, fill: C.dim, ls: 1.4 });
   const rHit = mk('rect', { x: RX - 12, y: RY - 20, width: RW + 24, height: 40, fill: 'transparent', style: 'cursor:grab' });
   drag(rHit, p => { let d = clamp((p.x - RC) / rspan * 35, -35, 35); if (Math.abs(d) < 1.5) d = 0; H.onRudder(d); });
-  const bMid = button(281, 232, 90, 26, 'MIDSHIPS', () => H.onMidships()), bHold = button(49, 232, 118, 26, 'HOLD POSITION', () => H.onHold());   // one row at y 232: HOLD under the thrusters (centre 108), MIDSHIPS under the rudder (centre 326), LINK / UNLINK under the throttles (centre 519)
+  const n1 = svg.childNodes.length;
+  const bMid = button(281, 232 + EX, 90, 26, 'MIDSHIPS', () => H.onMidships()), bHold = button(49, 232 + EX, 118, 26, 'HOLD POSITION', () => H.onHold());   // one row at y 232: HOLD under the thrusters (centre 108), MIDSHIPS under the rudder (centre 326), LINK / UNLINK under the throttles (centre 519)
 
   /* ---------- the engines (right): two levers, ahead / stop / astern ---------- */
-  const LX = [486, 552], LY = 50, LH = 150, AST = 0.4;   // the stop detent sits 40% of the way up the track: 60% of the throw is ahead, 40% astern (Simon, 23 Oct 2026: 70/30, then 60/40)
+  const LX = [486, 552], LY = 50;   // LH and AST come from opts: by default the stop detent sits 40% of the way up the track: 60% of the throw is ahead, 40% astern (Simon, 23 Oct 2026: 70/30, then 60/40); the Approaches: a taller lever, 25% astern (24 Nov 2026)
   const ly = v => LY + LH * (1 - (v < 0 ? (1 + v) * AST : AST + v * (1 - AST)));   // lever value (-1 full astern .. +1 full ahead) -> y
   const fromY = y => { const f = clamp(1 - (y - LY) / LH, 0, 1); return f < AST ? f / AST - 1 : (f - AST) / (1 - AST); };
   mk('line', { x1: LX[0] - 22, x2: LX[1] + 22, y1: f1(ly(0)), y2: f1(ly(0)), stroke: C.glow, 'stroke-width': 1.4, opacity: .45 });   // the neutral (stop) line, across both levers (Simon, 23 Oct 2026)
@@ -69,11 +72,12 @@ export function createBridgeConsole(host, handlers = {}) {
     return { mark, fill, actual, knob };
   });
   const linkBar = mk('rect', { x: LX[0], width: LX[1] - LX[0], height: 6, rx: 3, fill: C.glow, opacity: .55 }); linkBar.setAttribute('pointer-events', 'none');
-  txt('ENGINES', 519, 38, { size: 8.5, fill: C.dim, ls: 1.6 }); txt('AHEAD', 416, LY + 10, { size: 7, fill: C.dim, anchor: 'start', ls: 1 }); txt('STOP', 416, ly(0) + 3, { size: 7.5, fill: C.glow, anchor: 'start', ls: 1, weight: 700 }); txt('ASTERN', 416, LY + LH - 2, { size: 7, fill: C.dim, anchor: 'start', ls: 1 });
+  txt('ENGINES', 519, 38, { size: 8.5, fill: C.dim, ls: 1.6 }); txt('AHEAD', 416, LY + 10, { size: 7, fill: C.dim, anchor: 'start', ls: 1 }); txt('STOP', 416, ly(0) + 3, { size: 7.5, fill: C.glow, anchor: 'start', ls: 1, weight: 700 }); txt('ASTERN', 416, LY + LH + 12, { size: 7, fill: C.dim, anchor: 'start', ls: 1 });
   const markTxt = txt('5 KN', 462, 0, { size: 8.5, fill: C.stbd, anchor: 'end', weight: 700, ls: 1 });
-  let engLinked = true; const bLink = button(452, 232, 134, 26, 'ENGINES LINKED', () => H.onLink(!engLinked));   // one toggle for the two engine levers (Simon, 30 Oct 2026; there were two buttons, LINKED and UNLINK)
+  let engLinked = true; const bLink = button(452, 232 + EX, 134, 26, 'ENGINES LINKED', () => H.onLink(!engLinked));   // one toggle for the two engine levers (Simon, 30 Oct 2026; there were two buttons, LINKED and UNLINK)
 
   /* ---------- the thrusters (left): bow and stern sliders that spring back to centre ---------- */
+  const n2 = svg.childNodes.length;
   const TX = 38, TW = 140, TC = TX + TW / 2, thGroup = mk('g'), thr = [['BOW THRUSTER', 94, 'b'], ['STERN THRUSTER', 162, 'sx']].map(([label, y, key], i) => {
     const g = mk('g', {}, thGroup); txt(label, TC, y - 17, { size: 9, fill: C.dim, ls: 1.5 }, g); mk('rect', { x: TX, y: y - 7, width: TW, height: 14, rx: 7, fill: C.track, stroke: C.edge }, g); mk('line', { x1: TC, y1: y - 12, x2: TC, y2: y + 12, stroke: C.dim, 'stroke-width': 1.4 }, g);
     [-1, -.5, .5, 1].forEach(d => mk('line', { x1: f1(TC + d * TW / 2), y1: y + 10, x2: f1(TC + d * TW / 2), y2: y + 16, stroke: C.dim }, g));
@@ -89,6 +93,10 @@ export function createBridgeConsole(host, handlers = {}) {
   const lockT1 = txt('THRUSTERS LOCKED', TC, 140, { size: 9.5, fill: C.dim, ls: 1.6, weight: 700 }, lock), lockT2 = txt('AVAILABLE BELOW 5 KN', TC, 154, { size: 8, fill: C.stbd, ls: 1.4 }, lock);
 
   svg.appendChild(bThr.g);   // (above the padlock's shading: it stays readable while the thrusters are locked)
+  if (EX) {   // centred: the rudder and the thrusters sit lower in the taller panel, the rudder's STBD clear of STOP (their drags read only x, so moving them down changes nothing else)
+    const kids = [...svg.childNodes], n3 = kids.length - 1, g = mk('g', { transform: `translate(0,${EX * 0.6})` });
+    kids.slice(n0, n1).concat(kids.slice(n2, n3 + 1)).forEach(k => g.appendChild(k));
+  }
   let lastKey = '';
   function update(s) {
     const key = JSON.stringify(s, (k, v) => typeof v === 'number' ? Math.round(v * 200) / 200 : v); if (key === lastKey) return; lastKey = key;   // nothing moved: leave the SVG alone

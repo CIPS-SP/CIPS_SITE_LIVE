@@ -29,7 +29,7 @@ function pointsRows(P) {
 
 export const CFG = {
   shipLen: 24, shipBeam: 5,
-  startKn: 8, maxKn: 10, leverKn: 12.5, limitKn: 5, speedLag: 4, speedLagDown: 1.6,   // leverKn: knots per unit of lever, so the five knot mark sits 40% of the way up the ahead stretch (Simon, 23 Oct 2026); maxKn is the speed the other numbers were tuned to
+  startKn: 8, maxKn: 10, leverKn: 12.5, markLev: 0.25, limitKn: 5, speedLag: 4, speedLagDown: 1.6,   // leverKn: knots at full ahead; markLev: where five knots sits on the ahead stretch (40% from 23 Oct 2026, a quarter from 24 Nov 2026, Simon: a longer throw from 5 kn to full); maxKn is the speed the other numbers were tuned to
   rudderLag: 0.7, rudderEffect: 0.26, yawDamp: 0.6,        // rudderEffect 0.16 -> 0.26: the prototype road was straight; here the turns ask for about 60% rudder at five knots
   pushStart: 1.0, pushEnd: 2.0,
   sheer: 0.001, gustYaw: 0.005, headStab: 0.10,
@@ -47,7 +47,10 @@ export const CFG = {
    x is metres to starboard of the path centre line, psi the bow's angle to starboard of the path (radians), s the distance run along the path. */
 export function createModel(path, opt = {}) {
   const c = Object.assign({}, CFG, opt);
-  const st = { t: 0, s: 0, x: 0, psi: 0, u: c.startKn, r: 0, dA: 0, cmd: 0, T: c.startKn / c.leverKn, levP: c.startKn / c.leverKn, levS: c.startKn / c.leverKn, np: c.startKn / c.leverKn, ns: c.startKn / c.leverKn, linked: true, thLinked: false, thB: 0, thS: 0, thBa: 0, thSa: 0, thLocked: false, drift: 0, gust: 0, pushK: 1,
+  // 24 Nov 2026 (Simon, option A): five knots sits a quarter of the way up the ahead stretch (markLev), full ahead is still leverKn knots, so the throw from 5 kn to full is longer
+  const knOf = v => v <= c.markLev ? c.limitKn * v / c.markLev : c.limitKn + (c.leverKn - c.limitKn) * (v - c.markLev) / (1 - c.markLev);
+  const levOf = kn => kn <= c.limitKn ? c.markLev * kn / c.limitKn : c.markLev + (1 - c.markLev) * (kn - c.limitKn) / (c.leverKn - c.limitKn);
+  const st = { t: 0, s: 0, x: 0, psi: 0, u: c.startKn, r: 0, dA: 0, cmd: 0, T: levOf(c.startKn), levP: levOf(c.startKn), levS: levOf(c.startKn), np: levOf(c.startKn), ns: levOf(c.startKn), linked: true, thLinked: false, thB: 0, thS: 0, thBa: 0, thSa: 0, thLocked: false, drift: 0, gust: 0, pushK: 1,
     inTime: 0, said: {}, prompted: false, crossed: false, speedOK: null, penalty: 0, rescues: 0, rescueT: -9, rescueUntil: 0, maxLat: 0, done: false, eased: false, pilotCon: false, msgs: [] };
   const say = (who, msg, key) => { if (key) { if (st.said[key]) return; st.said[key] = 1; } st.msgs.push({ who, msg }); };
   const prog = () => Math.max(0, Math.min(1, st.s / path.length));
@@ -66,7 +69,7 @@ export function createModel(path, opt = {}) {
     const auth = c.rudderEffect * (0.3 + 0.7 * st.u / 10) / c.yawDamp, ff = auth > 0 ? kap * st.u / auth : 0;
     const rud = clampN(ff - (0.09 * x + 0.32 * vx + 0.75 * st.psi + 0.6 * st.r), -1, 1);
     const wantKn = st.s > path.zoneS - 45 ? c.limitKn - 0.4 : c.startKn;
-    return { rud, T: Math.min(1, wantKn / c.leverKn) };
+    return { rud, T: Math.min(1, levOf(wantKn)) };
   }
   // The wall (23 Oct 2026, Simon): she cannot stand more than a vessel's width outside the lane edge, so a player who lets go of everything ends up riding one width outside it and carrying on along a safe course, never into a pier or the land.
   // At the pier heads the port side is tighter: the Albert Pier head is only about 20 m off the path there, so the wall closes in to keep her hull inside the lane edge.
@@ -77,7 +80,7 @@ export function createModel(path, opt = {}) {
     const lag = (n, lev) => n + (lev - n) * Math.min(1, dt / ((Math.sign(n) !== Math.sign(lev) && Math.abs(n) > 0.05 && Math.abs(lev) > 0.02) ? c.engineLagRev : c.engineLagUp));
     st.np = lag(st.np, st.levP); st.ns = lag(st.ns, st.levS);
     const th = n => n >= 0 ? n : c.astern * n, tp = th(st.np), ts = th(st.ns), Tm = (tp + ts) / 2, dTh = tp - ts;   // mean thrust drives her speed; the DIFFERENCE turns her (port pulling more = bow to starboard)
-    const uT = Tm >= 0 ? Tm * c.leverKn : Tm * c.leverKn * 0.4;   // astern only brakes her: the game has no sternway
+    const uT = Tm >= 0 ? knOf(Tm) : Tm * c.leverKn * 0.4;   // astern only brakes her: the game has no sternway
     st.u += (uT - st.u) * Math.min(1, dt / (uT < st.u ? (Tm < 0 ? c.speedLagDown * 0.6 : c.speedLagDown) : c.speedLag)); st.u = Math.max(0, st.u);
     // the thrusters are a low-speed tool: they fade with speed (half force at thrU0 knots) and lock above thrLockKn
     st.thLocked = st.thLocked ? st.u > c.thrUnlockKn : st.u > c.thrLockKn;
@@ -100,7 +103,7 @@ export function createModel(path, opt = {}) {
     if (st.pilotCon || st.settling || st.t < st.rescueUntil) { const h = pilotHelm(); cmd = h.rud; if (st.pilotCon || st.settling) { T = h.T; st.linked = true; } st.T = T; st.cmd = cmd; }
     if (st.linked) st.levP = st.levS = st.T; else st.T = T = (st.levP + st.levS) / 2;   // linked: one demand, both levers; unlinked: st.T is just their mean
     physics(dt, cmd, T);
-    if (st.done) { st.s = Math.min(st.s, path.length + 30); capT(0.35); return; }   // after the run she settles onto the line on the pilot's hands and slows, but does not run on into the channel
+    if (st.done) { st.s = Math.min(st.s, path.length + 30); capT(levOf(4.4)); return; }   // after the run she settles onto the line on the pilot's hands and slows, but does not run on into the channel
     const L = path.laneAt(st.s);
     if (Math.abs(st.x) + c.shipBeam / 2 <= L) st.inTime += dt;
     st.maxLat = Math.max(st.maxLat, Math.abs(st.x));
@@ -121,7 +124,7 @@ export function createModel(path, opt = {}) {
       else st.speedOK = false;
     }
     if (st.speedOK === true && st.u > c.limitKn + c.limitTol + 0.5 && !st.eased && !st.pilotCon) { st.speedOK = false; st.eased = true; say('Pilot', 'Too fast, Captain. I will ease us down.'); }
-    if (st.eased) capT((c.limitKn - 0.3) / c.leverKn);
+    if (st.eased) capT(levOf(c.limitKn - 0.3));
     if (st.crossed && st.speedOK === true && !st.said.well && !st.pilotCon) say('Pilot', 'Well done, five knots. Hold it there.', 'well');
     if (st.s >= path.length) {
       st.done = true; st.settling = true; const pct = st.inTime / Math.max(0.1, st.t);
@@ -180,7 +183,7 @@ export function createHoldTheLine(o) {
   }
   function sync() {
     const st = G.model && G.model.st; if (!st) return; if (G.phase === 'play') layoutRight(true);
-    cons.update({ lev: [st.levP, st.levS], act: [st.np, st.ns], linked: st.linked, rudder: st.cmd * 35, rudderAct: st.dA * 35, thr: [st.thB, st.thS], thLinked: st.thLinked, thLocked: st.thLocked, holdAvail: false, holding: false, mark: G.model.cfg.limitKn / G.model.cfg.leverKn, markLabel: '5 KN' });
+    cons.update({ lev: [st.levP, st.levS], act: [st.np, st.ns], linked: st.linked, rudder: st.cmd * 35, rudderAct: st.dA * 35, thr: [st.thB, st.thS], thLinked: st.thLinked, thLocked: st.thLocked, holdAvail: false, holding: false, mark: G.model.cfg.markLev, markLabel: '5 KN' });
   }
   function placeVhf() {   // the pilot's calls (the same width as the plotter) stack up from just above the chart plotter (left edge on its left edge), newest at the bottom
     const pl = o.stage.querySelector('.plotter-box'), sr = o.stage.getBoundingClientRect(); if (!pl) { V.vhf.style.left = '24px'; V.vhf.style.bottom = '24px'; return; }
