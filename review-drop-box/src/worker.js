@@ -16,7 +16,9 @@
 //   GET  /api/enquiries Desk     the latest enquiries and whether each was delivered
 //   POST /api/count     public   journey milestones from the home page, counted per day (17 Nov 2026, src/counts.js)
 //   POST /api/problem   public   the globe could not start: what, browser, error, counted per day (21 Nov 2026, src/counts.js)
-//   GET  /stats         Simon    the journey counts and the problems (password: the STATS_KEY secret)
+//   POST /api/score     public   a mini-game score for the leaderboard: initials, vessel type (24 Nov 2026, src/board.js)
+//   GET  /api/leaderboard public  ?game=… the top 10 this week and all time
+//   GET  /stats         Simon    the journey counts, the problems and the leaderboard entries (password: the STATS_KEY secret); /stats/hide?id=N hides one
 //   (and every 5 minutes, on a schedule: resend what failed, alert on anything not delivered)
 //
 // Settings (Cloudflare dashboard, never in the page or the repo):
@@ -29,6 +31,7 @@ import { validateAnswers, sanitizePublic } from './validate.js';
 import { makeCode, normCode, slugFor } from './code.js';
 import { validateEnquiry, saveEnquiry, trySend, webhookAllowed, onReport, runSchedule, listEnquiries } from './enquiry.js';
 import { parseEvents, parseProblem, dayOf, statsPage } from './counts.js';
+import { GAMES, parseScore } from './board.js';
 export { Counter } from './counts.js';
 
 const MAX_BODY = 16 * 1024; // review answers
@@ -156,16 +159,41 @@ export async function handle(request, env, now = Date.now(), ctx = null) {
     return new Response(null, { status: 204, headers: cors });
   }
 
+  // ---- public: the mini-games' leaderboard (24 Nov 2026, src/board.js) ----
+  if (path === '/api/score' && method === 'POST') {
+    const cors = corsFor(request, env, 'POST'), origin = request.headers.get('Origin');
+    if (!env.COUNTER || !origin || !origins(env).includes(origin)) return json({ error: 'not allowed' }, 403, cors);
+    const text = await request.text(), sc = parseScore(text);
+    if (sc.error) return json({ error: sc.error }, 400, cors);
+    const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
+    const add = await stub.fetch('https://counter/score/add?s=' + encodeURIComponent(text.slice(0, 500)) + '&k=' + (await ipHash(request, env)) + '&at=' + now);
+    const res = await add.json(); if (!add.ok) return json({ error: res.error || 'bad' }, add.status, cors);
+    const top = await (await stub.fetch('https://counter/score/top?game=' + sc.game + '&since=' + dayOf(now - 6 * 86400000))).json();
+    return json({ ok: true, id: res.id, ...top }, 200, cors);
+  }
+  if (path === '/api/leaderboard' && method === 'GET') {
+    const cors = corsFor(request, env, 'GET'), game = url.searchParams.get('game');
+    if (!env.COUNTER || !GAMES[game]) return json({ error: 'game' }, 400, cors);
+    const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
+    const top = await (await stub.fetch('https://counter/score/top?game=' + game + '&since=' + dayOf(now - 6 * 86400000))).json();
+    return json(top, 200, { ...cors, 'Cache-Control': 'no-store' });
+  }
+
   // ---- Simon: the journey counts, behind the browser's own password box ----
-  if (path === '/stats' && method === 'GET') {
+  if ((path === '/stats' || path === '/stats/hide') && method === 'GET') {
     if (!env.COUNTER || !env.STATS_KEY) return json({ error: 'not found' }, 404);
     const h = request.headers.get('Authorization') || '';
     let pass = ''; try { pass = h.startsWith('Basic ') ? atob(h.slice(6)).split(':').slice(1).join(':') : ''; } catch (e) { pass = ''; }
     if (!(await sameSecret(pass, env.STATS_KEY))) return new Response('Sign in to see the CIPS journey counts.', { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="CIPS journey counts", charset="UTF-8"', 'Cache-Control': 'no-store' } });
     const stub = env.COUNTER.get(env.COUNTER.idFromName('journey'));
     const rows = await (await stub.fetch('https://counter/list?since=0000-00-00')).json();
+    if (path === '/stats/hide') {   // 24 Nov 2026: hide (or, with undo=1, show again) a leaderboard entry, then back to the page
+      await stub.fetch('https://counter/score/hide?id=' + (Number(url.searchParams.get('id')) || 0) + (url.searchParams.get('undo') ? '&undo=1' : ''));
+      return new Response(null, { status: 303, headers: { Location: '/stats', 'Cache-Control': 'no-store' } });
+    }
     let problems = []; try { problems = await (await stub.fetch('https://counter/problems?since=' + dayOf(now - 89 * 86400000))).json(); } catch (e) { problems = []; }
-    return new Response(statsPage(rows, now, problems), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
+    let scores = []; try { scores = await (await stub.fetch('https://counter/score/recent')).json(); } catch (e) { scores = []; }
+    return new Response(statsPage(rows, now, problems, scores), { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" } });
   }
 
   // ---- public: what the review page shows for a short code (never the booking id) ----

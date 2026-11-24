@@ -11,6 +11,16 @@
 import { P, newState, step as hullStep, KN, cR } from '../_shared/twin-screw.js';
 import { OBSTACLES, HULL, HULL_OUTLINE, START, BERTH, KIN_S, KIN_HDG, alongOut } from './berth-geo.js';
 
+/* Points (24 Nov 2026, Simon): stars stay the main measure; the points (out of 1,000) are hard to max out and feed the leaderboard.
+   Alongside 400: 100 less for each extra attempt, never below 200. Soft landing 400: full for a first touch at 0.15 knots or less (or none), down to 0 at 0.6 knots
+   (the star is still 0.3 knots). Lines 200: both by you 200, one 100, 25 less for each missed throw. */
+export function berthPoints(r) {
+  const along = Math.max(200, 400 - 100 * Math.max(0, (r.attempts || 1) - 1));
+  const t = r.firstTouchKn, soft = t == null || t <= 0.15 ? 400 : Math.max(0, Math.round(400 * (0.6 - t) / 0.45));
+  const lines = Math.max(0, (r.playerLines || 0) * 100 - 25 * (r.misses || 0));
+  return { total: along + soft + lines, max: 1000, rows: [['Alongside', along, 400], ['Soft landing', soft, 400], ['Lines', lines, 200]] };
+}
+
 export const CFG = {
   windKn: 12, windFromDeg: 250, setKn: 0.2, setDirDeg: 100,   // a 12 knot WSW wind (as in Hold the Line) and a 0.2 knot set towards the east (Hold the Line has 0.4 in the approaches; inside the harbour it is gentler: 0.4 alone moves a stopped yacht 14 m a minute); from the plate both push the ship away from the pier
   windScale: 0.6,   // how much of the wind's force on the yacht is used: the first version is forgiving (Simon, 30 Oct); at 1.0 a yacht with engines stopped drifts off the pier at about 0.3 m/s (a metre in three seconds)
@@ -238,6 +248,7 @@ export function createBerthModel(opt = {}) {
     if (k >= 1) {
       st.phase = 'done'; const L = st.lines, byPlayer = L.bow.by === 'player' && L.stern.by === 'player';
       st.result = { alongside: true, soft: st.firstTouchKn == null || st.firstTouchKn <= c.softKn, lines: byPlayer, attempts: st.attempts, firstTouchKn: st.firstTouchKn, misses: L.bow.misses + L.stern.misses, crew: [L.bow.by, L.stern.by].filter(b => b === 'crew').length };
+      st.result.playerLines = [L.bow.by, L.stern.by].filter(b => b === 'player').length; st.result.points = berthPoints(st.result);
       say('Pilot', 'Welcome to the Albert Pier, Captain.');
     }
   }

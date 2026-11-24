@@ -38,6 +38,7 @@ import { mountDirector } from './game/director.js';
 import {mountArrivalUI} from './game/arrival-ui.js';
 import {ARRIVAL_LIMITS,arrivalChecklist,validateOrder,orderAcknowledgement} from './game/arrival-rules.js';
 import {sceneScore,MAX_TASK_SCORE} from './game/scoring.js';
+import { mountLeaderboard } from '../_shared/leaderboard.js';   // 24 Nov 2026: the leaderboard on the end card
 let arrivalUi=null, uiPaused=false;const pausedLiveFixes=new Map();
 import { installWaterFrame } from './game/water-frame.js';
 import {createBoardingState,advanceBoarding,boardingSpeedSafe,boardingHeadingSafe,BOARDING_ZONE_UNITS,BOARDING_TARGET_KNOTS,attemptBoarding,armAutoBoard,pacePosition,inSafeZone,BOARDING_SAFE_FRAC,BOARDING_MISS_PENALTY_S,BOARDING_MISSES_FOR_AUTO,BOARDING_TRANSFER_S,BOARDING_CLOSE_S} from './game/pilot-boarding.js';
@@ -501,7 +502,7 @@ function placeCorbiere(brg) {
   // the commentary: what the pilot would say
   if (S.playing && !S.done) {
     if (!LH.said && S.t > 1.2) { LH.said = true; LH.sector = sector; later(6, () => transmit('ambient.corbiere')); toast(`Corbière in transit with her fixed red light, 079° — steer 110° · Iso WR 10s, 18 M, ${sector === 'W' ? 'white' : 'red'} sector`, 'good'); }
-    else if (!LH.vhf && S.t > 7) { LH.vhf = true; transmit('nav.report'); }
+    else if (!LH.vhf && S.t > 7) { LH.vhf = true; }   // (24 Nov 2026: no VTS position report any more: the one call is the notice)
     else if (LH.said && sector !== LH.sector) { LH.sector = sector; toast(sector === 'R' ? 'Corbière shows RED — her sector over the rocks south of the point. Hold the line.' : 'Corbière shows white again — the point is cleared', sector === 'R' ? 'bad' : 'good'); }
     const relDeg = ((brgTo - brg) + 360) % 360; if (!LH.abeam && relDeg > 265 && relDeg < 275 && nm < 1.2) { LH.abeam = true; toast(`La Corbière abeam to port · ${nm.toFixed(1)} M`, ''); }
   }
@@ -585,10 +586,11 @@ const LATER = []; const later = (sec, fn) => LATER.push({ at: S.t + sec, fn }); 
 const CALLS = { coastguard: false, vts: false, pilot: false, taxi: false, crew: false, fuel: false, stores: null, hamper: null };
 function callVts() {
   if (!S.playing || S.done) return;
-  if (!CALLS.coastguard) { CALLS.coastguard = true; S.noticeAt=S.t; star('notice'); CM.ch.textContent = 'CH 82';
-    comms('You', `Jersey Coastguard, ${YACHT.call}. One hour's notice, inbound for pilotage.`, 'me', 82);
-    later(2.5, () => comms('Jersey Coastguard', `${YACHT.name}, Coastguard. Notice received. Report to VTS on channel one four.`, '',82,{essential:true,priority:2}));
-    CM.vtsLabel.textContent = 'Report inside the line · Ch 14'; return; }
+  // 24 Nov 2026, Simon: ONE radio call: the hour's notice to St Helier VTS on 14, which stands up the pilots and the line handlers (no Coastguard call on 82, no report later). CALLS.coastguard keeps its name: it is "the notice has gone".
+  if (!CALLS.coastguard) { CALLS.coastguard = true; CALLS.vts = true; S.noticeAt=S.t; star('notice'); CM.ch.textContent = 'CH 14';
+    comms('You', `St Helier VTS, ${YACHT.call}. One hour's notice, inbound for pilotage. Please stand by pilots and line handlers.`, 'me', 14);
+    later(2.5, () => comms('St Helier VTS', `${YACHT.name}, VTS. Notice received. Pilots and line handlers standing by. Pilots will call when ready for boarding.`, '',14,{essential:true,priority:2}));
+    CM.vtsBtn.disabled = true; CM.vtsLabel.textContent = 'Notice given · Ch 14'; return; }
   if (!CALLS.vts) { CALLS.vts = true; S.vtsAt=S.t; CM.ch.textContent = 'CH 14';
     const me = shipGeo(); const nm = gDist(me, GEO.corbiere.at).toFixed(1); const brg = Math.round(gBearing(GEO.corbiere.at, me));
     comms('You', `St Helier VTS, ${YACHT.call}. Approaching the pilot station.`, 'me', 14);
@@ -640,8 +642,8 @@ function reset(options={}) {
   parts.length = 0; rings.length = 0; plotView.follow = true; setView(CFG.open.visH); LH.sector = ''; LH.abeam = false; LH.said = false; LH.vhf = false;
   Object.assign(S, { playing: true, phase: 'sea', t: 0, travelled: 0, path: 0, pos: GEO.route[0].slice(), hdg: LEGS[0].brg, rot: 0, rudder: 0, lat: 0, latV: 0, input: 0, speed: CFG.speedDefault, slowK: 1, slowT: 0, hits: 0, penalty: 0, nextSpawn: 20, pilotDone: false, nextFlight: CFG.overflight.first, done: false, dragX: null, graceT: 0, graceKind: '', drift: (S.drift || 0) + S.path, legIdx: 0, xte: 0, sched: 0 }); stickSet(0, CFG.throttle0);   // the sea keeps its place across a Go again: what was run becomes drift
   LATER.length = 0; game.classList.remove('done'); S.flightSaid = false; S.landedSaid = false; S.noticeChased = false; S.noticeAuto = false; S.reportChased = false; S.pilotAdvised = false; ENG.linked = true; ENG.thP = ENG.thS = ENG.nP = ENG.nS = S.throttle;
-  LIVE.said = false; S.starred = {}; S.flightN = 0; S.lightRead = false; S.lightWatch = 0; S.wakeDolphins = false; S.podCame = false; S.steadyT = 0; S.rideT = 0; Object.assign(CALLS, { coastguard: false, vts: false, pilot: false, taxi: false, crew: false, fuel: false, stores: null, hamper: null }); S.commsLog = []; CM.log.innerHTML = ''; CM.menu.hidden = true; CM.stores.hidden = true; CM.storesHead.hidden = true; CM.storesHead.classList.remove('open'); CM.storesHead.querySelector('span').textContent = 'Provisions'; CM.vtsBtn.disabled = false; CM.vtsLabel.textContent = "1 hour's notice · Ch 82"; CM.ch.textContent = 'CH 16';
-  comms('Bridge', `Under way from ${YACHT.from}. Listening watch on 16 and 14. Jersey Coastguard wants an hour's notice on 82 — the handset is yours.`);
+  LIVE.said = false; S.starred = {}; S.flightN = 0; S.lightRead = false; S.lightWatch = 0; S.wakeDolphins = false; S.podCame = false; S.steadyT = 0; S.rideT = 0; S.wakeRideT = 0; S.assists = []; Object.assign(CALLS, { coastguard: false, vts: false, pilot: false, taxi: false, crew: false, fuel: false, stores: null, hamper: null }); S.commsLog = []; CM.log.innerHTML = ''; CM.menu.hidden = true; CM.stores.hidden = true; CM.storesHead.hidden = true; CM.storesHead.classList.remove('open'); CM.storesHead.querySelector('span').textContent = 'Provisions'; CM.vtsBtn.disabled = false; CM.vtsLabel.textContent = "1 hour's notice · Ch 82"; CM.ch.textContent = 'CH 16';
+  comms('Bridge', `Under way from ${YACHT.from}. Listening watch on 16 and 14. St Helier VTS wants an hour's notice on 14, for the pilots and line handlers — the handset is yours.`);
   hud.hits.textContent = '0'; game.classList.add('playing');
   $('[data-card="intro"]').hidden = true; $('[data-card="done"]').hidden = true;
   arrivalUi?.reset();arrivalUi?.refresh(true);return true;   // 26 Sep 2026, Simon: the 1 hr notice is the player's to give again — was auto-sent here, free
@@ -673,7 +675,7 @@ function finish() {
   // out of" — each row now carries its own "/ 1000" alongside the label, and scoring.js's own `criteria` string
   // (already written when each task's scoring was worked out) underneath, instead of a bare number.
   { const {tasks,total:scoreTotal,max}=sceneScore(S,CALLS,CFG); const box=$('[data-hud="scene-score"]');
-    box.innerHTML=`<p class="score-total">${scoreTotal} <small>of ${max} pts</small></p>`+tasks.map(t=>`<div class="score-row"><div class="score-row-head"><span>${t.label}</span><b>${t.score} <small>/ ${MAX_TASK_SCORE}</small></b></div><p class="score-criteria">${t.criteria}</p></div>`).join(''); }
+    box.innerHTML=`<p class="score-total">${scoreTotal} <small>of ${max} pts</small></p>`+tasks.map(t=>`<div class="score-row"><div class="score-row-head"><span>${t.label}</span><b>${t.score} <small>/ ${t.max}</small></b></div><p class="score-criteria">${t.criteria}</p></div>`).join(''); mountLeaderboard(box, { game: 'approaches', score: scoreTotal, secs: S.t }); }
   const hamper=$('[data-hud="hamper"]');hamper.textContent=starCount()===5?"All five approach notes completed. Captain's Hamper achievement earned in the game. Contact Simon separately about a real visit.":'Your approach notes show what to try on the next passage.';hamper.hidden=false;
   // the finale (Howard, 20 Sep): a British Airways jet crosses the screen before the end card; the result is already settled
   const showDone=()=>{if(showDone.shown)return;showDone.shown=true;game.classList.add('done');$('[data-card="done"]').hidden=false;arrivalUi?.refresh(true);};
@@ -692,7 +694,7 @@ function avoided(o) {
     if(o.kind==='dolphin'){o.safeSubmerged=true;o.air=0;o.el.classList.add('under');}
     return; // one consequence for the same encounter, no false 'extra penalty' message
   }
-  S.graceT = A.grace; S.graceKind = o.kind; S.hits++; S.penalty += CFG.penalties[o.live ? 'live' : o.kind] ?? 6; hud.hits.textContent = String(S.hits);
+  S.graceT = A.grace; S.graceKind = o.kind; (S.assists ||= []).push(o.live ? 'live' : o.kind); S.hits++; S.penalty += CFG.penalties[o.live ? 'live' : o.kind] ?? 6; hud.hits.textContent = String(S.hits);
   S.slowK = 0.6; S.slowT = 1.4; S.latV = clamp(S.latV - dir * A.nudge, -CFG.steer.max, CFG.steer.max);   // the pilot takes the wheel: helm away, engine eased
   const aboard = S.pilotBoarded; const who = aboard ? 'The pilot took the wheel' : 'The pilot called her off on VHF';
   if (o.kind === 'pots') { ring(sx,sy,4,28,.9);toast(`Pilot assistance: pots cleared safely. +${CFG.penalties.pots} s`,'');comms('Pilot','Captain, I have the helm. Keeping the pots clear.','',14,{essential:true,priority:4,key:'safety-pots',repeat:true}); }
@@ -1178,7 +1180,7 @@ const safetyGuard=createSafetyGuard({
  toGeo:(x,y)=>[GEO.route[0][0]+y*NM_PER_UNIT/60,GEO.route[0][1]+x*NM_PER_UNIT/60/COSL],
  landAt,getTargets:()=>obs,
  onAdvice:message=>comms('Pilot',message,'',14,{essential:true,priority:3,repeat:true,group:'safety',key:'pilot-safe-advice'}),
- onIntervention:o=>{if(o){avoided(o);}else{S.hits++;S.penalty+=6;hud.hits.textContent=String(S.hits);S.pilotHelm={dir:1,t:3};comms('Pilot','Captain, I have the helm. Keeping clear of the shore.','',14,{essential:true,priority:4,key:'safety-shore',repeat:true});}}
+ onIntervention:o=>{if(o){avoided(o);}else{(S.assists ||= []).push('shore');S.hits++;S.penalty+=6;hud.hits.textContent=String(S.hits);S.pilotHelm={dir:1,t:3};comms('Pilot','Captain, I have the helm. Keeping clear of the shore.','',14,{essential:true,priority:4,key:'safety-shore',repeat:true});}}
 });
 const STEP = 1 / 60; let acc = 0, simT = 0, last = performance.now(); const t0 = last;
 for (let i = 0; i < 120; i++) { simT += STEP; wake.update(new THREE.Vector3(0, 0, 0), STEP, simT); } uni.uHeightmap.value = wake.texture();
@@ -1268,7 +1270,7 @@ function tick(dtForce,renderFrame=true) {   // dtForce: only the debug hook pass
   if (S.playing && !S.done && !S.wakeDolphins && CFG.dolphins.enabled) {   // ★ dolphins in the wake
     const steady = S.speed > 4.5 && S.speed < 9.6 && Math.abs(S.rot) < 1.5 && !S.pilotHelm; S.steadyT = steady ? (S.steadyT || 0) + dt : 0;
     if (!S.podCame && S.steadyT > CFG.dolphins.triggerSeconds) spawnRidePod();
-    else if (S.podCame) { S.rideT += dt; const pod = obs.filter(o => o.ride);
+    else if (S.podCame) { S.rideT += dt; const pod = obs.filter(o => o.ride); if (pod.length && S.rideT > CFG.dolphins.bowSeconds) S.wakeRideT = (S.wakeRideT || 0) + dt;   // 24 Nov 2026: seconds in the wake, for the dolphins' points (scoring.js)
       if (!steady && S.steadyT === 0 && pod.length) { for (const o of pod) removeObstacle(o); S.podCame = false; toast('The dolphins are gone — that was a hard helm', 'bad'); }
       else if (S.rideT > CFG.dolphins.bowSeconds && pod.some(o => o.ride.z > 0)) { for (const o of pod) { o.ride.z = -7 - rnd(0, 2); o.ride.x *= 1.3; } toast('They are in the wake — riding the stern wave', 'good'); }
       else if (S.rideT > CFG.dolphins.bowSeconds+CFG.dolphins.wakeSeconds && pod.length) { S.wakeDolphins = true; star('dolphins'); } } }
@@ -1331,7 +1333,7 @@ function tick(dtForce,renderFrame=true) {   // dtForce: only the debug hook pass
     ferryDirector.dispatch({time:S.t,targets:obs,gap:trafficRun.ferryGap,liveNearby:liveFerryNearby,
       boardingBusy:!S.pilotBoarded&&(!!pilot||(toPilot>=-BOARDING_ZONE_UNITS&&toPilot<220))},spawnOnRoute);   // the traffic, on its routes, to its timetable
     if (!S.pilotDone && !pilot && S.travelled >= LEGS[LEGS.length - 1].start - CFG.pilot.before) { S.pilotDone = true; spawnPilot();   // the pilot boards at the boarding place (the start of the last leg)
-      if (Math.abs(S.xte) > 25) { S.penalty += CFG.penalties.pilotOff; S.hits++; hud.hits.textContent = String(S.hits); later(2.2, () => toast(`The launch had to come and find you — ${Math.round(Math.abs(S.xte) * M_PER_UNIT / CFG.exaggerate)} m ${S.xte > 0 ? 'south' : 'north'} of the boarding place · +${CFG.penalties.pilotOff} s`, 'bad')); } }
+      if (Math.abs(S.xte) > 25) { S.penalty += CFG.penalties.pilotOff; (S.assists ||= []).push('pilotOff'); S.hits++; hud.hits.textContent = String(S.hits); later(2.2, () => toast(`The launch had to come and find you — ${Math.round(Math.abs(S.xte) * M_PER_UNIT / CFG.exaggerate)} m ${S.xte > 0 ? 'south' : 'north'} of the boarding place · +${CFG.penalties.pilotOff} s`, 'bad')); } }
     if (S.t >= S.nextFlight) { S.nextFlight = S.t + CFG.overflight.every + rnd(-4, 6); spawnOverflight(); if (!S.flightSaid) { S.flightSaid = true; comms('Jersey Airport','Your crew flight is inbound. CIPS has the transfer arranged.','',null,{essential:false,group:'ambience',priority:0}); } }
     // best practice on the radio, timed: the hour's notice, the pilot's advice, the report inside the line
     const toBoard = LEGS[LEGS.length - 1].start - S.travelled;
@@ -1339,11 +1341,10 @@ function tick(dtForce,renderFrame=true) {   // dtForce: only the debug hook pass
     // was a penalty-only nudge that left CALLS.coastguard false forever if the player never noticed; now it
     // genuinely completes the call for them (so the VTS report later still triggers normally) but S.noticeAuto
     // marks it as not theirs, so arrivalChecklist's 'notice' criterion (below) withholds the tick/star for it.
-    if (!CALLS.coastguard && !S.noticeChased && S.t > 16) { S.noticeChased = true; S.noticeAuto = true; S.penalty += CFG.penalties.noNotice; CALLS.coastguard = true; S.noticeAt = S.t; CM.ch.textContent = 'CH 82'; CM.vtsLabel.textContent = 'Report inside the line · Ch 14';
-      comms('Jersey Coastguard', `${YACHT.name}, Coastguard. No notice received — logging you in ourselves. Report to VTS on channel one four.`, '',82,{essential:true,priority:2}); }
-    if (CALLS.coastguard&&!CALLS.vts&&toBoard<95)callVts(); // Authored approach report, not a timed radio exercise.
+    // 24 Nov 2026: VTS logs the notice for you at 20 s (the notice's points have run out by then); one call only, so no report later
+    if (!CALLS.coastguard && !S.noticeChased && S.t > 20) { S.noticeChased = true; S.noticeAuto = true; S.penalty += CFG.penalties.noNotice; CALLS.coastguard = true; CALLS.vts = true; S.noticeAt = S.t; CM.ch.textContent = 'CH 14'; CM.vtsBtn.disabled = true; CM.vtsLabel.textContent = 'Logged by VTS · Ch 14';
+      comms('St Helier VTS', `${YACHT.name}, VTS. No notice received — logging you in ourselves. Pilots and line handlers standing by.`, '',14,{essential:true,priority:2}); }
     if (!S.pilotAdvised && toBoard < 180) { S.pilotAdvised=true;S.pilotReminderAt=S.t;if(boardingOk())transmit('pilot.ready',{}, {valid:()=>!S.pilotBoarded&&boardingOk()});else transmit('pilot.hold',{}, {key:'pilot-speed',valid:()=>!S.pilotBoarded&&!boardingOk()}); }   // 24 Oct 2026, Simon: the target heading and speed appear sooner, outside the zone (was 95 units, 0.85 nm; now ~1.6 nm out)
-    if (!CALLS.vts && toBoard < 45)callVts();
     if (S.phase === 'sea' && toBoard <= 45) S.phase = 'pilotzone';   // the camera zooms in on the station mark a little ahead of the launch itself; the mark itself exists from the start now (reset())
     // 28 Sep 2026, Simon: "pilot aboard scoring... should be how many s after entering the pilot boarding area" —
     // a fixed mark the moment she first crosses into the zone, for scoring.js's task 5. Deliberately NOT inside

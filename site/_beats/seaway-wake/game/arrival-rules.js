@@ -31,12 +31,12 @@ export function arrivalChecklist(S,calls,cfg) {
   const dolphinTime = cfg.dolphins.triggerSeconds + cfg.dolphins.bowSeconds + cfg.dolphins.wakeSeconds;
   return [
     // 26 Sep 2026, Simon: reintroduced as something the player actually does (was automatic on start) — the
-    // VHF 82 button on the VTS/Pilots card. If the port ends up logging it for you (S.noticeAuto, too slow off
+    // VHF 14 button on the VTS/Pilots card. If the port ends up logging it for you (S.noticeAuto, too slow off
     // the mark), it still ticks — Simon: "should still show a tick... autocompleted greyed out" — the `auto`
     // flag is what arrival-ui.js reads to grey it rather than the usual green/gold; the celebratory star toast
     // (game.js's star()) is never called on that path regardless, so no fanfare either way.
-    {id:'notice',label:"1 hr's notice sent",criterion:'Call VHF 82 early in the passage',done:callMade(calls.coastguard),auto:!!S.noticeAuto},
-    {id:'stores',label:'Provisions and bunkers',criterion:'Arrange both with Simon',done:suppliesComplete(calls),auto:false},
+    {id:'notice',label:"1 hr's notice sent",criterion:'Call St Helier VTS on VHF 14 early in the passage',done:callMade(calls.coastguard),auto:!!S.noticeAuto},
+    {id:'stores',label:'Provisions and bunkers',criterion:'Order fuel, stores and two other things from Simon',done:suppliesComplete(calls),auto:false},
     // 28 Sep 2026, Simon: "include those requirements on the arrival notes" \u2014 spells out all three the launch
     // actually gates on (game/pilot-boarding.js's `safe`), not just speed and a vague "course held".
     {id:'onStation',label:'On station for the pilot',criterion:`In the pilot boarding area, heading ${String(BOARDING_HEADING_MIN_DEG).padStart(3,'0')}\u2013${String(BOARDING_HEADING_MAX_DEG).padStart(3,'0')}\u00b0, ${BOARDING_SPEED_MIN_KNOTS}\u2013${BOARDING_SPEED_MAX_KNOTS} kts`,done:!!S.onStation,auto:false},
@@ -52,14 +52,14 @@ export function currentVtsMessage({S,calls,cfg,pilot,lastMessage},format) {
   // narrow enough that "1 hr's" was breaking between the two, leaving a lone "1" dangling at the line's end. A
   // non-breaking space between them (here and everywhere else "1 hr's" appears below) keeps the two together,
   // wrapping onto the next line as a pair instead of splitting.
-  if (!S.playing && !S.done) return {text:"Give 1 hr's notice on VHF 82 once under way."};
+  if (!S.playing && !S.done) return {text:"Give 1 hr's notice on VHF 14 once under way."};
   if (S.done) return {text:'Welcome to Jersey, Captain.'};
   // 26 Sep 2026, Simon: "soon after the start the pilot dialogue box can say don't forget... and flash" — urgent
   // here also flashes the card (arrival-ui.js toggles .urgent from it, arrival.css does the actual flashing).
   // Clears itself the moment the notice goes out, by whichever path (the button, or the t>16 auto-chase).
-  if (!callMade(calls.coastguard) && S.t >= 6) return {text:"Don't forget — give 1 hr's notice on VHF 82.",urgent:true};
-  if (!callMade(calls.coastguard)) return {text:"Ready when you are — 1 hr's notice on VHF 82."};
-  if (S.t - (S.noticeAt ?? -Infinity) < 4 && !S.noticeAuto) return {text: S.noticeAuto ? "Coastguard logged your notice for you — a little slow off the mark, Captain." : "1 hr's notice sent."};
+  if (!callMade(calls.coastguard) && S.t >= 6) return {text:"Don't forget — give 1 hr's notice on VHF 14.",urgent:true};
+  if (!callMade(calls.coastguard)) return {text:"Ready when you are — 1 hr's notice on VHF 14."};
+  if (S.t - (S.noticeAt ?? -Infinity) < 4 && !S.noticeAuto) return {text: S.noticeAuto ? "VTS logged your notice for you — a little slow off the mark, Captain." : "1 hr's notice sent."};
   if (pilot?.phase === 'boarding') return {text:format('pilot.boarding'),active:true};
   if (!S.pilotBoarded && S.pilotAdvised) {
     if (lastMessage?.id === 'pilot.station' && S.t < lastMessage.until && (!lastMessage.valid || lastMessage.valid())) return {text:lastMessage.text};

@@ -1,53 +1,40 @@
-// 26 Sep 2026, Simon: "stars plus scores... separately" — the star stays "did you do it" (arrival-rules.js);
-// this is "how well", a skill score behind each of the same five tasks, added up on the finishing card and as a
-// running total in the arrival notes. First pass: each benchmark is dead reckoned from the game's own already-
-// tuned numbers where a genuine best-possible time exists (pilot-boarding.js's constants, mostly), not measured
-// from real play yet — worth Simon's own feel for whether they're too harsh or too soft.
-// Deliberately NOT here yet (agreed, hold for later): a leaderboard, and the multi-scene scorecard this scene's
-// score would eventually feed into — both need a scene that doesn't exist yet to make sense of.
-export const MAX_TASK_SCORE = 1000;
-const clampScore = n => Math.max(0, Math.min(MAX_TASK_SCORE, Math.round(n)));
-// full marks at `best` (the real fastest a task can be done), 0 by `zeroAt`, straight-line between
-const decay = (t, best, zeroAt) => (t == null ? 0 : clampScore((MAX_TASK_SCORE * (zeroAt - t)) / (zeroAt - best)));
+// The Approaches' points (24 Nov 2026, Simon). Stars stay the main measure and are easy to earn (arrival-rules.js); the points
+// are hard to max out and feed the leaderboard. Out of 1,000, like the other two games:
+//   Clean passage 250 · Radio 200 · Orders with Simon 150 · Getting the pilot launch 250 · Dolphins 150
+// (Simon set the other four; the 50 left over went to the clean passage, 24 Nov 2026: one number to change if he wants it elsewhere.)
+export const SCENE_MAX = 1000;
+const clampTo = (n, max) => Math.max(0, Math.min(max, Math.round(n)));
+// full marks up to `full` seconds, then a straight line down to 0 at `zero` seconds
+const taper = (t, max, full, zero) => (t == null ? 0 : t <= full ? max : clampTo((max * (zero - t)) / (zero - full), max));
 function firstTime(log, event) { const m = log.find(e => e.event === event); return m ? m.time : null; }
+
+// what each time the pilot had to step in costs off the clean passage
+export const ASSIST_COST = { dfds: 80, ropax: 80, cruise: 80, iu: 80, dolphin: 60, live: 60, tuna: 40, potter: 40, superyacht: 40, trawler: 40, openboat: 40, racer: 40, tender: 40, lifeboat: 40, cgrib: 40, shore: 40, pilotOff: 40, taxi: 30, pots: 20 };
+const OTHER_ORDERS = ['taxi', 'crew', 'pilot', 'hamper'];   // the "two other things" ordered from Simon, besides fuel and stores
 
 export function sceneScore(S, calls, cfg) {
   const log = S.pilotBoardingLog || [];
   const tasks = [
-    // 1. 1 hr's notice — VHF 82, as early as possible; the port logging it for you (S.noticeAuto) scores nothing,
-    // same as it earns no star.
-    { id: 'notice', label: "1 hr's notice sent",
-      criteria: 'Full marks for calling it within 2s of getting under way; nothing left by 14s, and nothing at all if the port logged it for you.',
-      score: S.noticeAuto || S.noticeAt == null ? 0 : decay(S.noticeAt, 2, 14) },
-    // 2. Provisions and bunkers — completeness, not speed: nothing in the game times this one, so the "how well"
-    // here is a generous order (both arranged, several items, a hamper too) rather than a race.
-    { id: 'stores', label: 'Provisions and bunkers',
-      criteria: 'Order both fuel and stores for full marks; a hamper and 3+ store items on top of that.',
+    { id: 'clean', label: 'Clean passage', max: 250,
+      criteria: 'Starts at 250. Each time the pilot has to step in costs points: a ferry 80, a dolphin 60, a tuna boat 40, the water taxi 30, the pots 20.',
+      score: clampTo(250 - (S.assists || []).reduce((sum, k) => sum + (ASSIST_COST[k] ?? 40), 0), 250) },
+    { id: 'notice', label: "1 hr's notice to VTS", max: 200,
+      criteria: 'Full 200 if given within 5 s of getting under way, then 13 points less each second, nothing by 20 s. Nothing if VTS had to log it for you.',
+      score: S.noticeAuto || S.noticeAt == null ? 0 : taper(S.noticeAt, 200, 5, 20) },
+    { id: 'stores', label: 'Orders with Simon', max: 150,
+      criteria: 'Fuel 50, stores 50, then 25 for each other thing (water taxi, crew, pilot, hamper), up to two.',
       score: (() => { const stores = Array.isArray(calls.stores) ? calls.stores.length : 0;
-        if (!stores || !calls.fuel) return 0;
-        return clampScore(700 + (calls.hamper ? 200 : 0) + (stores >= 3 ? 100 : 0)); })() },
-    // 3. On station for the pilot — from the moment she's actually waiting on you (not the fixed ~3.2s she takes
-    // to come up from astern first) to holding speed/heading long enough. 1.25s is advanceBoarding's own real
-    // stability requirement — she can't call it any sooner, however ready you already are.
-    { id: 'onStation', label: 'On station for the pilot',
-      criteria: "Full marks for holding speed and course within 1.25s of the launch coming up astern — the pilot's own fastest read of it.",
-      score: (() => { const w = firstTime(log, 'waiting'), o = firstTime(log, 'onStation');
-        return decay(w != null && o != null ? o - w : null, 1.25, 8); })() },
-    // 4. Dolphins — ambient, not a race: nothing here to time or grade finer than the criterion itself.
-    { id: 'dolphins', label: 'Dolphins joined us', criteria: 'All or nothing — full marks if they ride the wake at any point, nothing if they never turn up.', score: S.wakeDolphins ? MAX_TASK_SCORE : 0 },
-    // 5. Pilot aboard — Simon's own example. 28 Sep 2026: "speed of the tap should not be the only variable, it
-    // should be how many s after entering the pilot boarding area... whatever the theoretical quickest is should
-    // be 1000pts, decaying thereafter" — was timed from the tap-timing actually starting (BOARDING_TRANSFER_S,
-    // 2.2s, the fastest a *landed* tap can transfer), ignoring everything before that. Now timed from
-    // S.enteredStationAt (game.js: the first tick she's within BOARDING_ZONE_UNITS of the pilot boarding place)
-    // to boarded — the whole job, not just the last 2.2s of it. 11.35s is not a hand guess: scripted the ideal
-    // run through the debug hook (full ahead to close the distance, settle to 7kt/100° the instant she's in the
-    // zone, tap the first safe moment) three times, identical each time — the pilot's own sequencing (the launch's
-    // fixed 'out' hold, the 1.25s stability check, BOARDING_CLOSE_S, BOARDING_TRANSFER_S) leaves no faster path.
-    { id: 'pilot', label: 'Pilot aboard',
-      criteria: 'Full marks for boarding within 11.35s of entering the pilot boarding area — the theoretical fastest the sequence allows — decaying thereafter.',
-      score: (() => { const e = S.enteredStationAt, a = firstTime(log, 'aboard');
-        return decay(e != null && a != null ? a - e : null, 11.35, 21.35); })() },
+        const others = OTHER_ORDERS.filter(k => k === 'hamper' ? !!calls.hamper : calls[k] === true).length;
+        return clampTo((calls.fuel ? 50 : 0) + (stores ? 50 : 0) + 25 * Math.min(2, others), 150); })() },
+    { id: 'onStation', label: 'Getting the pilot launch', max: 250,
+      criteria: 'Timed from entering the pilot zone to the launch\'s call (speed and heading right): full 250 within 8 s, then down to nothing at 53 s.',
+      score: (() => { const e = S.enteredStationAt, o = firstTime(log, 'onStation');
+        return taper(e != null && o != null ? Math.max(0, o - e) : null, 250, 8, 53); })() },
+    { id: 'dolphins', label: 'Dolphins', max: 150,
+      criteria: '5 points for every second the dolphins ride the wake, up to 150 (30 seconds). A hard helm or the wrong speed sends them off.',
+      score: clampTo(5 * (S.wakeRideT || 0), 150) },
   ];
-  return { tasks, total: tasks.reduce((sum, x) => sum + x.score, 0), max: tasks.length * MAX_TASK_SCORE };
+  return { tasks, total: tasks.reduce((sum, x) => sum + x.score, 0), max: SCENE_MAX };
 }
+// kept for code that still reads it (the finishing card's "/ 1000" per row now uses each task's own max)
+export const MAX_TASK_SCORE = 1000;

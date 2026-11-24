@@ -90,9 +90,11 @@ try {
   // the doors that open on a click: the seaway game (its modules, pictures and sounds load in an overlay)
   if (want('--doors')) await run('door: Play the arrival', 'index.html?goto=seaway-wake:0.04', false, false, async (send) => {
     await sleep(12000);
-    await send('Runtime.evaluate', { expression: "(()=>{const b=document.querySelector('[data-play]'); if(b){ b.hidden=false; b.click(); return 'clicked'; } return 'no button'; })()" });
+    for (let i = 0; i < 48; i++) { const b = await send('Runtime.evaluate', { expression: "!!document.querySelector('[data-play]') && !!window.__cipsSeekBeat && document.querySelectorAll('.beat').length >= 5", returnByValue: true }); if (b.result.result && b.result.result.value) break; await sleep(1000); }   // 24 Nov 2026: wait (up to a minute more) until the scenes are built; on a busy PC 12 s was not always enough
+    const clk = await send('Runtime.evaluate', { expression: "(()=>{const b=document.querySelector('[data-play]'); if(b){ b.hidden=false; b.click(); return 'clicked'; } return 'no button'; })()", returnByValue: true });
+    console.log('  door click: ' + (clk.result.result && clk.result.result.value));
     await sleep(18000);
-    const r = await send('Runtime.evaluate', { expression: "(()=>{const f=document.querySelector('.splay-overlay iframe'); return f ? 'overlay open, game frame ' + (f.contentDocument ? f.contentDocument.title : '?') : 'no overlay'; })()", returnByValue: true });
+    const r = await send('Runtime.evaluate', { expression: "(()=>{const f=document.querySelector('.splay-overlay iframe'); return f ? 'overlay open, game frame ' + (f.contentDocument ? f.contentDocument.title : '?') : 'no overlay (page: ' + document.documentElement.className + (document.getElementById('noGlobe') ? ', globe fallback shown' : '') + ', play button ' + (document.querySelector('[data-play]') ? 'present' : 'missing') + ')'; })()", returnByValue: true });
     console.log('  game: ' + r.result.result.value);
   });
 } finally { chrome.kill(); server.close(); }

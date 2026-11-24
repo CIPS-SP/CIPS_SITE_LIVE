@@ -22,6 +22,7 @@ export const EVENTS = {
   enquiry: 'Sent an enquiry',
 };
 const ORDER = Object.keys(EVENTS);
+import { GAMES, VTYPES, PER_HOUR, parseScore } from './board.js';
 
 // Problem reports (21 Nov 2026, Simon: a friend's Chrome sat on "Loading the globe" for ever; Edge worked). When the globe cannot start, the home page
 // sends what went wrong, the browser's name and version and the system (e.g. "Chrome 131 · Windows"), and the first line of the error. Nothing about
@@ -50,6 +51,9 @@ export class Counter {
     this.sql = state.storage.sql;
     this.sql.exec('CREATE TABLE IF NOT EXISTS c (day TEXT NOT NULL, ev TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, ev))');
     this.sql.exec('CREATE TABLE IF NOT EXISTS p (day TEXT NOT NULL, kind TEXT NOT NULL, browser TEXT NOT NULL, err TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, kind, browser, err))');
+    // the leaderboard (24 Nov 2026, src/board.js): one row per score sent in; r: how many each connection (a hash, never the address) sent this hour
+    this.sql.exec('CREATE TABLE IF NOT EXISTS s (id INTEGER PRIMARY KEY AUTOINCREMENT, game TEXT NOT NULL, score INTEGER NOT NULL, initials TEXT NOT NULL, vtype TEXT NOT NULL, day TEXT NOT NULL, at INTEGER NOT NULL, hidden INTEGER NOT NULL DEFAULT 0)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS r (k TEXT NOT NULL, hour INTEGER NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (k, hour))');
   }
   async fetch(request) {
     const u = new URL(request.url);
@@ -59,6 +63,28 @@ export class Counter {
       for (const ev of parseEvents(u.searchParams.get('evs'))) this.sql.exec('INSERT INTO c (day, ev, n) VALUES (?, ?, 1) ON CONFLICT (day, ev) DO UPDATE SET n = n + 1', day, ev);
       return new Response('ok');
     }
+    if (u.pathname === '/score/add') {
+      const sc = parseScore(u.searchParams.get('s')), k = u.searchParams.get('k') || '', at = Number(u.searchParams.get('at')) || Date.now(), hour = Math.floor(at / 3600000);
+      if (sc.error) return Response.json({ error: sc.error }, { status: 400 });
+      const used = this.sql.exec('SELECT n FROM r WHERE k = ? AND hour = ?', k, hour).toArray()[0];
+      if (used && used.n >= PER_HOUR) return Response.json({ error: 'busy' }, { status: 429 });
+      this.sql.exec('INSERT INTO r (k, hour, n) VALUES (?, ?, 1) ON CONFLICT (k, hour) DO UPDATE SET n = n + 1', k, hour);
+      this.sql.exec('DELETE FROM r WHERE hour < ?', hour - 2);
+      this.sql.exec('INSERT INTO s (game, score, initials, vtype, day, at) VALUES (?, ?, ?, ?, ?, ?)', sc.game, sc.score, sc.initials, sc.vtype, dayOf(at), at);
+      const id = this.sql.exec('SELECT last_insert_rowid() AS id').toArray()[0].id;
+      return Response.json({ ok: true, id });
+    }
+    if (u.pathname === '/score/top') {
+      const game = u.searchParams.get('game'); if (!GAMES[game]) return Response.json({ error: 'game' }, { status: 400 });
+      const since = u.searchParams.get('since') || '0000-00-00';
+      const q = (from) => this.sql.exec('SELECT id, score, initials, vtype, day FROM s WHERE game = ? AND hidden = 0 AND day >= ? ORDER BY score DESC, at ASC LIMIT 10', game, from).toArray();
+      return Response.json({ week: q(since), all: q('0000-00-00') });
+    }
+    if (u.pathname === '/score/hide') {
+      this.sql.exec('UPDATE s SET hidden = ? WHERE id = ?', u.searchParams.get('undo') ? 0 : 1, Number(u.searchParams.get('id')) || 0);
+      return Response.json({ ok: true });
+    }
+    if (u.pathname === '/score/recent') return Response.json(this.sql.exec('SELECT id, game, score, initials, vtype, day, hidden FROM s ORDER BY id DESC LIMIT 60').toArray());
     if (u.pathname === '/problem') {
       const day = u.searchParams.get('day') || '', pr = parseProblem(u.searchParams.get('p'));
       if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !pr) return new Response('bad', { status: 400 });
@@ -81,7 +107,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 // the totals page: today, the last 7, 30, 90 and 365 days and all time per milestone (with the share of everyone who saw the globe), then day by day.
 // Nothing is ever deleted: every day's totals are kept (a row per milestone per day, a few kilobytes a year).
-export function statsPage(rows, now, problems = []) {
+export function statsPage(rows, now, problems = [], scores = []) {
   const days = [...new Set(rows.map((r) => r.day))].sort().reverse();
   const get = {}; for (const r of rows) (get[r.day] || (get[r.day] = {}))[r.ev] = r.n;
   const sum = (n, ev) => { const from = n ? dayOf(now - (n - 1) * 86400000) : ''; return rows.filter((r) => r.ev === ev && r.day >= from).reduce((a, r) => a + r.n, 0); };
@@ -101,5 +127,9 @@ export function statsPage(rows, now, problems = []) {
     '<h1 style="font-size:18px">Problems (last 90 days)</h1><p>Visits where the globe could not start. The site then took the visitor straight to the main site. Browser and system as the browser reports them; no visitor details.</p>' +
     '<div class="wrap"><table><tr><th>Day</th><th>What happened</th><th>Browser</th><th>Error</th><th>Times</th></tr>' +
     (problems.length ? problems.map((r) => '<tr><td>' + esc(r.day) + '</td><td>' + esc(PROBLEMS[r.kind] || r.kind) + '</td><td>' + esc(r.browser) + '</td><td style="text-align:left">' + esc(r.err) + '</td><td>' + r.n + '</td></tr>').join('') : '<tr><td colspan="5">None.</td></tr>') +
+    '</table></div>' +
+    '<h1 style="font-size:18px">Leaderboard entries (latest 60)</h1><p>Scores the mini-games\' players chose to put on the leaderboard: three initials and a kind of vessel, nothing else. Hide any you do not want shown (it can be put back).</p>' +
+    '<div class="wrap"><table><tr><th>Day</th><th>Game</th><th>Initials</th><th>Vessel</th><th>Score</th><th></th></tr>' +
+    (scores.length ? scores.map((r) => '<tr' + (r.hidden ? ' style="color:#aab"' : '') + '><td>' + esc(r.day) + '</td><td style="text-align:left">' + esc((GAMES[r.game] || {}).name || r.game) + '</td><td>' + esc(r.initials) + '</td><td>' + esc(VTYPES[r.vtype] || r.vtype) + '</td><td>' + r.score + '</td><td><a href="/stats/hide?id=' + r.id + (r.hidden ? '&undo=1">Show again' : '">Hide') + '</a></td></tr>').join('') : '<tr><td colspan="6">None yet.</td></tr>') +
     '</table></div></html>';
 }

@@ -135,6 +135,7 @@ Do this once a month. To have it read through, export or screenshot what you see
 - How far they got: sea, coast, harbour, quay, film.
 - How many skipped to CIPS, and where: at the globe, or during the journey.
 - How many sent an enquiry.
+- **Leaderboard entries** (since 24 Nov 2026): the latest 60 scores players put on the mini-games' leaderboard (three initials, a vessel type, the score). **Hide** takes one off the public board (Show again puts it back). Look for rude initials or impossible-looking scores.
 - **Problems** (at the foot of the page, since 23 Nov 2026): visits where the 3D globe could not start, with the browser and system and the error. The site then took those visitors straight to the main site with a note to switch on graphics acceleration. A few are normal (old computers, work laptops). Many from one browser, or a new error after a release, need looking at: share a screenshot in a session.
 
 A sharp drop between two milestones shows where people lose interest.

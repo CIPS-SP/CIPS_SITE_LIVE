@@ -8,7 +8,24 @@
    the lane (wide at the start, narrowing to the pier heads, a little wider again in the channel) and the longer run.
    The model is pure (createModel), so it can be driven from node (tools/site-directions/test-hold-the-line.mjs) as well as from the page. */
 
+import { mountLeaderboard } from '../_shared/leaderboard.js';   // 24 Nov 2026: the leaderboard on the end card
 import { createBridgeConsole } from '../_shared/bridge-console.js';
+
+/* Points (24 Nov 2026, Simon): stars stay the main measure; the points (out of 1,000) are hard to max out and feed the leaderboard.
+   On the line 600: full for 80 to 100% of the time inside the lane, down to 0 at 50% (0 below). Harbour speed 250: five knots or under past the tanker berth,
+   50 less for every half knot over (the fastest she went from there on). Unassisted 150: 50 less for each rescue. If the pilot took the con, at most 200. */
+function linePoints(r, zoneMaxKn, c) {
+  const line = Math.round(600 * Math.max(0, Math.min(1, (r.pct - 0.5) / 0.3)));
+  const over = (zoneMaxKn || 0) - (c.limitKn + c.limitTol), speed = !r.crossed ? 0 : over <= 0 ? 250 : Math.max(0, 250 - 50 * Math.ceil(over / 0.5));
+  const help = Math.max(0, 150 - 50 * (r.rescues || 0));
+  const rows = [['On the line', line, 600], ['Harbour speed', speed, 250], ['Unassisted', help, 150]];
+  let total = line + speed + help; if (r.pilot) total = Math.min(total, 200);
+  return { total, max: 1000, rows, capped: !!r.pilot };
+}
+function pointsRows(P) {
+  if (!P) return '';
+  return '<dt>Points</dt><dd><b>' + P.total + '</b> of ' + P.max + (P.capped ? ' (at most 200 when the pilot takes the con)' : '') + '</dd>' + P.rows.map(([k, v, m]) => '<dt>' + k + '</dt><dd>' + v + ' / ' + m + '</dd>').join('');
+}
 
 export const CFG = {
   shipLen: 24, shipBeam: 5,
@@ -97,6 +114,7 @@ export function createModel(path, opt = {}) {
     const toZone = path.zoneS - st.s, secs = toZone / Math.max(0.5, st.u);
     if (!st.prompted && toZone > 0 && secs <= c.promptSecs && st.u > c.limitKn + c.limitTol && !st.pilotCon) { st.prompted = true; say('Pilot', 'Five knots by the tanker berth, Captain.'); }
     if (!st.crossed && st.s + c.bowGm >= path.zoneS) { st.crossed = true; st.zoneT = st.t; }
+    if (st.crossed && !st.done) st.zoneMaxKn = Math.max(st.zoneMaxKn || 0, st.u);   // 24 Nov 2026: the fastest past the tanker berth, for the speed points
     if (st.crossed && st.speedOK === null && st.t - st.zoneT >= c.zoneGraceSecs) {
       if (st.u <= c.limitKn + c.limitTol) st.speedOK = true;
       else if (!st.pilotCon) { st.speedOK = false; st.eased = true; say('Pilot', 'Five knots, Captain. I will bring us down.'); }
@@ -108,6 +126,8 @@ export function createModel(path, opt = {}) {
     if (st.s >= path.length) {
       st.done = true; st.settling = true; const pct = st.inTime / Math.max(0.1, st.t);
       st.result = { pct, lineStar: pct >= c.starOnLine, speedStar: st.speedOK === true && !st.eased && !st.pilotCon, maxLat: st.maxLat, rescues: st.rescues, pilot: st.pilotCon, speedOK: st.speedOK, crossed: st.crossed };
+      st.result.helpStar = !st.result.rescues && !st.pilotCon;   // 24 Nov 2026, Simon: a third star, No help (no rescues)
+      st.result.points = linePoints(st.result, st.zoneMaxKn, c);
       say('Pilot', 'Well steered. I have the con for the channel.', 'end');
     }
   }
@@ -208,10 +228,11 @@ export function createHoldTheLine(o) {
   }
   function finishCard() {
     const m = G.model, st = m.st, r = st.result; G.phase = 'end';
-    V.stars.innerHTML = r.pilot ? 'The pilot took us down the roads.' : (r.speedStar ? '★ Harbour speed<br>' : '') + (r.lineStar ? '★ On the line' : '');
+    V.stars.innerHTML = r.pilot ? 'The pilot took us down the roads.' : [r.speedStar && '★ Harbour speed', r.lineStar && '★ On the line', r.helpStar && '★ No help'].filter(Boolean).join('<br>');
     V.endH.textContent = 'Into the channel';
-    V.endSub.textContent = r.pilot ? 'A calm ride, and no stars for the roads this time.' : (r.lineStar && r.speedStar ? 'Two stars, and holding five knots.' : 'The stars need five knots or under past the tanker berth, and ' + Math.round(m.cfg.starOnLine * 100) + '% of the time inside the lane.');
-    V.endDl.innerHTML = '<dt>On the line</dt><dd>' + Math.round(r.pct * 100) + '% of the time</dd><dt>Speed past the tanker berth</dt><dd>' + (r.crossed ? (r.speedOK ? 'five knots or under' : 'too fast; the pilot eased us') : '—') + '</dd><dt>Furthest off the line</dt><dd>' + (r.maxLat * 2.08).toFixed(0) + ' m</dd>';
+    V.endSub.textContent = r.pilot ? 'A calm ride, and no stars for the roads this time.' : (r.lineStar && r.speedStar && r.helpStar ? 'All three stars, and holding five knots.' : 'The stars: five knots or under past the tanker berth, ' + Math.round(m.cfg.starOnLine * 100) + '% of the time inside the lane, and no help from the pilot.');
+    V.endDl.innerHTML = '<dt>On the line</dt><dd>' + Math.round(r.pct * 100) + '% of the time</dd><dt>Speed past the tanker berth</dt><dd>' + (r.crossed ? (r.speedOK ? 'five knots or under' : 'too fast; the pilot eased us') : '—') + '</dd><dt>Furthest off the line</dt><dd>' + (r.maxLat * 2.08).toFixed(0) + ' m</dd>' + pointsRows(r.points);
+    if (r.points) mountLeaderboard((() => { let h = V.endDl.parentElement.querySelector(':scope > .lb-host'); if (!h) { h = document.createElement('div'); h.className = 'lb-host'; V.endDl.after(h); } return h; })(), { game: 'line', score: r.points.total, secs: st.t });
     root.classList.remove('playing'); root.classList.add('ended'); layoutRight(false); show(V.end, true); o.onEnd(r);
   }
 

@@ -2,6 +2,7 @@
    reset, the results card and the keyboard. The model (berth-game.js) is pure; beat.js reads the ship's pose from `model.st.h` each frame in place of the scroll position and draws the ghost berth and the tide.
    The look, and nearly all the markup classes, are Hold the Line's (hold-the-line.js, the `sg-` classes in beat.css) so the two games read as one. Brief: DOCS/BRIEF-berthing-game.md. */
 
+import { mountLeaderboard } from '../_shared/leaderboard.js';   // 24 Nov 2026: the leaderboard on the end card
 import { createBridgeConsole } from '../_shared/bridge-console.js';
 import { createBerthModel } from './berth-game.js';
 
@@ -73,7 +74,7 @@ export function createBerthGame(o) {
   }
   function close(carryOn) { if (!G.active) return; setPause(false); show(V.crash, false); root.classList.remove('warning'); const fin = !!(G.model && G.model.st.phase === 'done'); layoutRight(false); G.active = false; G.phase = 'off'; root.hidden = true; root.classList.remove('on', 'playing', 'ended', 'hit'); show(V.choice, false); show(V.end, false); o.unlockScroll(); o.onExit(carryOn === true, fin); }
   function begin() {
-    G.phase = 'play'; show(V.choice, false); show(V.end, false); V.vhf.innerHTML = ''; root.classList.add('playing'); root.classList.remove('ended', 'hit'); keys.l = keys.r = false; G.rud = 0;
+    G.phase = 'play'; G.startedAt = performance.now(); show(V.choice, false); show(V.end, false); V.vhf.innerHTML = ''; root.classList.add('playing'); root.classList.remove('ended', 'hit'); keys.l = keys.r = false; G.rud = 0;
     const cfg = G.model.cfg; V.wdir.textContent = compass(cfg.windFromDeg); V.warrow.setAttribute('transform', 'rotate(' + ((cfg.windFromDeg + 180) % 360) + ' 24 24)'); sync(); hud();
   }
   btn('keep').onclick = begin; btn('story').onclick = () => close(false);
@@ -103,7 +104,8 @@ export function createBerthGame(o) {
     const m = G.model, st = m.st, r = st.result; G.phase = 'end';
     V.stars.innerHTML = '★ Alongside' + (r.soft ? '<br>★ Soft landing' : '') + (r.lines ? '<br>★ Lines' : '');
     V.endH.textContent = 'All fast'; V.endSub.textContent = r.attempts > 1 ? 'Alongside on attempt ' + r.attempts + '.' : 'Alongside, first time.';
-    V.endDl.innerHTML = '<dt>First touch</dt><dd>' + (r.firstTouchKn == null ? 'none: she was never on the fenders' : r.firstTouchKn.toFixed(1) + ' knots') + '</dd><dt>Lines</dt><dd>' + (r.lines ? 'both thrown by you' : r.crew === 2 ? 'both thrown by the crew' : 'one thrown by the crew') + (r.misses ? ' (' + r.misses + (r.misses > 1 ? ' misses' : ' miss') + ')' : '') + '</dd><dt>Attempts</dt><dd>' + r.attempts + '</dd>';
+    V.endDl.innerHTML = '<dt>First touch</dt><dd>' + (r.firstTouchKn == null ? 'none: she was never on the fenders' : r.firstTouchKn.toFixed(1) + ' knots') + '</dd><dt>Lines</dt><dd>' + (r.lines ? 'both thrown by you' : r.crew === 2 ? 'both thrown by the crew' : 'one thrown by the crew') + (r.misses ? ' (' + r.misses + (r.misses > 1 ? ' misses' : ' miss') + ')' : '') + '</dd><dt>Attempts</dt><dd>' + r.attempts + '</dd>' + (r.points ? '<dt>Points</dt><dd><b>' + r.points.total + '</b> of ' + r.points.max + '</dd>' + r.points.rows.map(([k, v, mx]) => '<dt>' + k + '</dt><dd>' + v + ' / ' + mx + '</dd>').join('') : '');
+    if (r.points) mountLeaderboard((() => { let h = V.endDl.parentElement.querySelector(':scope > .lb-host'); if (!h) { h = document.createElement('div'); h.className = 'lb-host'; V.endDl.after(h); } return h; })(), { game: 'berth', score: r.points.total, secs: (performance.now() - (G.startedAt || performance.now())) / 1000 });
     root.classList.remove('playing'); root.classList.add('ended'); layoutRight(false); show(V.end, true);
   }
 
