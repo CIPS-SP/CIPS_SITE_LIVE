@@ -112,15 +112,17 @@
 .arrival-pause{position:absolute;left:68px;right:auto;top:max(54px,calc(env(safe-area-inset-top) + 54px));bottom:auto;z-index:25;min-width:46px;height:38px;border:1px solid #bad3de48;border-radius:8px;background:#133748e6;color:#eef8fc;font:600 11px system-ui;cursor:pointer}
 /* 27 Nov 2026, Simon: the intro card carries the five tasks, so the notes card waits until the passage starts; on a computer the notes card sits below the page's Skip to CIPS pill
    (top right, 14 px down, about 40 px high) and mute and pause sit in a row to the pill's left; the full screen chart takes the whole width with the notes card put away (its close button was under the card) */
-.arrival-interface .card.intro .lead{margin-bottom:10px}
+.arrival-interface .card.intro .lead{margin-bottom:12px}.arrival-interface .card.intro h1{margin-bottom:14px}.arrival-interface .card.intro .keys.small{margin-top:16px}
 .arrival-interface .card.intro{width:min(92vw,600px)}
-.intro-tasks{list-style:none;counter-reset:t;margin:0 auto 12px;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:18px;text-align:left}
-.intro-tasks li{counter-increment:t;position:relative;padding:6px 0 6px 32px;border-top:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.35}
-.intro-tasks li:nth-last-child(-n+2){border-bottom:1px solid rgba(255,255,255,.1)}
-@media(max-width:560px){.intro-tasks{grid-template-columns:1fr}.intro-tasks li:nth-last-child(2){border-bottom:0}}
+.intro-tasks{list-style:none;counter-reset:t;margin:0 auto 18px;padding:0;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:1fr 1fr;column-gap:18px;text-align:left}
+.intro-tasks li{counter-increment:t;position:relative;padding:7px 0 7px 32px;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.35}
+.intro-tasks li:last-child{border-bottom:0}
+@media(max-width:560px){.intro-tasks{grid-template-columns:1fr}}
 .intro-tasks li::before{content:counter(t);position:absolute;left:4px;top:7px;width:19px;height:19px;border-radius:50%;border:1px solid #f2b64a;color:#f2b64a;font:600 11px/19px system-ui;text-align:center}
 .intro-tasks b{display:block;font-weight:600;color:#fff}.intro-tasks span{display:block;opacity:.72;font-size:12px}
-.intro-pts{margin:0 auto 16px;max-width:520px;font-size:12px;opacity:.7}
+.card .keys.ctl{display:flex;flex-direction:column;align-items:flex-start;gap:9px;width:fit-content;max-width:100%;margin:0 auto 30px;text-align:left}
+.card.intro button.exitlink{font-size:10.5px;letter-spacing:.12em}   /* the two control lines left-aligned one under the other, a gap between */
+.intro-pts{margin:0 auto 16px;max-width:520px;font-size:12.5px;font-weight:500;color:#f2b64a}   /* in the gold of the task numbers it scores */
 .arrival-interface:has(.card.intro:not([hidden])) .arrival-notepad{display:none}
 .arrival-interface.plotfull .arrival-notepad{display:none}
 @media(min-width:761px){

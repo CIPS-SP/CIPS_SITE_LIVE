@@ -652,8 +652,8 @@ function reset(options={}) {
 function arrivalNotes(){return arrivalChecklist(S,CALLS,CFG);}
 // 27 Nov 2026, Simon: the intro card lists the five tasks, from the same list as the approach notes (the dolphins' line reworded as something to do)
 function fillIntroTasks(){ const ol=$('[data-intro-tasks]'); if(!ol) return; const esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-  const say={notice:"Your hour's notice",dolphins:'Dolphins in the wake'};
-  ol.innerHTML=arrivalNotes().map(n=>{ let c=n.criterion; const d=/^speed (.+); steady for (\d+) s$/.exec(c); if(d) c=`Hold ${d[1]} and a steady course for ${d[2]} s`; return `<li><b>${esc(say[n.id]||n.label)}</b><span>${esc(c)}</span></li>`; }).join(''); }
+  const say={notice:"Your hour's notice",dolphins:'Dolphins in the wake'}, short={notice:'Call St Helier VTS on VHF 14 early',stores:'Fuel, stores and two more from Simon'};
+  ol.innerHTML=arrivalNotes().map(n=>{ let c=short[n.id]||n.criterion; const d=/^speed (.+); steady for (\d+) s$/.exec(c); if(d) c=`${d[1]} on a steady course for ${d[2]} s`; c=c.replace(/^In the pilot boarding area, heading /,'In the boarding area, '); return `<li><b>${esc(say[n.id]||n.label)}</b><span>${esc(c)}</span></li>`; }).join(''); }
 fillIntroTasks();
 const STARS=arrivalNotes().map(note=>[note.id,note.label,()=>arrivalNotes().find(n=>n.id===note.id).done,note.criterion]);
 function starCount() { return STARS.filter(x => x[2]()).length; }
