@@ -110,6 +110,25 @@
    untouched. */
 .arrival-interface .sndbtn{position:fixed;left:18px;right:auto;top:max(54px,calc(env(safe-area-inset-top) + 54px));bottom:auto;width:42px;height:38px;font-size:15px}   /* 23 Oct 2026, Simon: mute and pause up in the top left, under Back to the journey */
 .arrival-pause{position:absolute;left:68px;right:auto;top:max(54px,calc(env(safe-area-inset-top) + 54px));bottom:auto;z-index:25;min-width:46px;height:38px;border:1px solid #bad3de48;border-radius:8px;background:#133748e6;color:#eef8fc;font:600 11px system-ui;cursor:pointer}
+/* 27 Nov 2026, Simon: the intro card carries the five tasks, so the notes card waits until the passage starts; on a computer the notes card sits below the page's Skip to CIPS pill
+   (top right, 14 px down, about 40 px high) and mute and pause sit in a row to the pill's left; the full screen chart takes the whole width with the notes card put away (its close button was under the card) */
+.arrival-interface .card.intro .lead{margin-bottom:10px}
+.arrival-interface .card.intro{width:min(92vw,600px)}
+.intro-tasks{list-style:none;counter-reset:t;margin:0 auto 12px;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:18px;text-align:left}
+.intro-tasks li{counter-increment:t;position:relative;padding:6px 0 6px 32px;border-top:1px solid rgba(255,255,255,.1);font-size:13px;line-height:1.35}
+.intro-tasks li:nth-last-child(-n+2){border-bottom:1px solid rgba(255,255,255,.1)}
+@media(max-width:560px){.intro-tasks{grid-template-columns:1fr}.intro-tasks li:nth-last-child(2){border-bottom:0}}
+.intro-tasks li::before{content:counter(t);position:absolute;left:4px;top:7px;width:19px;height:19px;border-radius:50%;border:1px solid #f2b64a;color:#f2b64a;font:600 11px/19px system-ui;text-align:center}
+.intro-tasks b{display:block;font-weight:600;color:#fff}.intro-tasks span{display:block;opacity:.72;font-size:12px}
+.intro-pts{margin:0 auto 16px;max-width:520px;font-size:12px;opacity:.7}
+.arrival-interface:has(.card.intro:not([hidden])) .arrival-notepad{display:none}
+.arrival-interface.plotfull .arrival-notepad{display:none}
+@media(min-width:761px){
+ .arrival-notepad{top:max(64px,calc(env(safe-area-inset-top) + 64px))}
+ .arrival-interface .sndbtn{left:auto;right:224px;top:max(14px,env(safe-area-inset-top))}
+ .arrival-interface .arrival-pause{left:auto;right:170px;top:max(14px,env(safe-area-inset-top))}
+ .game.plotfull .plotter-box{right:18px}
+}
 .arrival-interface .toast{display:none!important} /* essential cues live in VTS; progress lives in the notes */
 .arrival-interface .card{z-index:60;max-height:calc(100dvh - 155px);overflow:auto;box-sizing:border-box;touch-action:pan-y}.arrival-interface .card .lead{font-size:16px}
 .arrival-dialog{color:#18314a;background:#f7f5ef;border:1px solid #b8c2c9;border-radius:16px;padding:22px;width:min(480px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;box-shadow:0 18px 65px #00182565;font:15px/1.5 system-ui,sans-serif;touch-action:pan-y;overscroll-behavior:contain}

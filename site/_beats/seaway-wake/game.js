@@ -650,6 +650,11 @@ function reset(options={}) {
 }
 /* Interface 03: checklist, stars and the result share the same event predicates. */
 function arrivalNotes(){return arrivalChecklist(S,CALLS,CFG);}
+// 27 Nov 2026, Simon: the intro card lists the five tasks, from the same list as the approach notes (the dolphins' line reworded as something to do)
+function fillIntroTasks(){ const ol=$('[data-intro-tasks]'); if(!ol) return; const esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const say={notice:"Your hour's notice",dolphins:'Dolphins in the wake'};
+  ol.innerHTML=arrivalNotes().map(n=>{ let c=n.criterion; const d=/^speed (.+); steady for (\d+) s$/.exec(c); if(d) c=`Hold ${d[1]} and a steady course for ${d[2]} s`; return `<li><b>${esc(say[n.id]||n.label)}</b><span>${esc(c)}</span></li>`; }).join(''); }
+fillIntroTasks();
 const STARS=arrivalNotes().map(note=>[note.id,note.label,()=>arrivalNotes().find(n=>n.id===note.id).done,note.criterion]);
 function starCount() { return STARS.filter(x => x[2]()).length; }
 function star(k) { const x = STARS.find(x => x[0] === k); if (!x || !x[2]() || S.starred?.[k]) return; (S.starred ||= {})[k] = true; later(0.6, () => { toast(`★ ${x[1]} — ${starCount()} of 5`, 'good'); sndBlip('star'); }); }
